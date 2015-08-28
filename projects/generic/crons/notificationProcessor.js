@@ -1,0 +1,378 @@
+/**
+ * Process notifications from notification collection
+ * */
+
+
+// Cron pattern:
+//    minute         0-59
+//    hour           0-23
+//    day of month   0-31
+//    month          0-12 (or names, see below)
+//    day of week    0-7 (0 or 7 is Sun, or use names)
+//
+// A field  may  be an asterisk (*), which always stands for
+// ``first-last''.
+//
+// Ranges of numbers are allowed.   Ranges  are  two  numbers
+// separated  with  a  hyphen.  The specified range is inclu-
+// sive.  For example, 8-11 for an ``hours'' entry  specifies
+// execution at hours 8, 9, 10 and 11.
+//
+// Lists are allowed.  A list is a set of numbers (or ranges)
+// separated by commas.  Examples: ``1,2,5,9'', ``0-4,8-12''.
+//
+// Step  values can be used in conjunction with ranges.  Fol-
+// lowing a range with ``/<number>'' specifies skips  of  the
+// number's value through the range.  For example, ``0-23/2''
+// can be used in the hours field to specify  command  execu-
+// tion  every other hour (the alternative in the V7 standard
+// is ``0,2,4,6,8,10,12,14,16,18,20,22'').   Steps  are  also
+// permitted after an asterisk, so if you want to say ``every
+// two hours'', just use ``*/2''.
+//
+// Names can also be used for  the  ``month''  and  ``day  of
+// week'' fields.  Use the first three letters of the partic-
+// ular day or month (case doesn't matter).  Ranges or  lists
+// of names are not allowed.
+//
+// Note: The day of a command's execution can be specified by
+// two  fields  --  day  of  month, and day of week.  If both
+// fields are restricted (ie, aren't *), the command will  be
+// run when either field matches the current time.  For exam-
+// ple,
+// ``30 4 1,15 * 5'' would cause a command to be run at  4:30
+// am on the 1st and 15th of each month, plus every Friday.
+
+var _ = require('lodash')
+    , MiaJs = require('mia-js-core')
+    , Utils = MiaJs.Utils
+    , CronJobs = MiaJs.CronJobs
+    , BaseCronJob = CronJobs.BaseCronJob
+    , Shared = MiaJs.Shared
+    , Q = require('q')
+    , Emailjs = require("emailjs")
+    , Encryption = require("mia-js-core/node_modules/utils").Encryption
+    , Apn = require('apn')
+    , NotificationModel = Shared.models('generic-notifications-model')
+    , AuthService = Shared.libs("generic-deviceAndSessionAuth");
+
+//Send email
+var _sendMail = function (smtpServer, sender, to, subject, text, html) {
+    var deferred = Q.defer();
+    smtpServer.send({
+        text: text,
+        from: sender,
+        to: to,
+        subject: subject,
+        attachment: [
+            {data: html, alternative: true}
+        ]
+    }, function (err, message) {
+        if (err) {
+            deferred.reject(err);
+        }
+        else {
+            deferred.resolve();
+        }
+    });
+    return deferred.promise;
+};
+
+
+// Set notification to fulfilled
+var _notificationStatusFulfilled = function (id) {
+    return NotificationModel.findAndModify({_id: id}, {}, {
+        $set: {
+            status: "fulfilled",
+            processed: new Date(Date.now())
+        }
+    }, {
+        partial: true, upsert: false, new: true
+    });
+};
+
+//Set notification to rejected
+var _notificationStatusReject = function (id, err) {
+    return NotificationModel.findAndModify({_id: id}, {}, {
+        $set: {
+            status: "rejected",
+            log: err || "Unknown error"
+        }
+    }, {
+        partial: true, upsert: false, new: true
+    });
+};
+
+//Set notification to retry
+var _notificationStatusRetry = function (id, log, schedule) {
+    return NotificationModel.findAndModify({_id: id}, {}, {
+        $set: {
+            status: "retry",
+            schedule: schedule || new Date(Date.now() + 1000 * 60 * 6), // Retry in 5*retry minute
+            workerId: null,
+            log: log || "Unknown error"
+        },
+        '$inc': {
+            'retry': 1
+        }
+    }, {
+        partial: true, upsert: false, new: true
+    });
+};
+
+// Get template data
+var _getTemplateData = function (id, connector, type, name) {
+    var model = Shared.config(id) || {};
+    if (_.isEmpty(model) || !model.templates || !model.templates[name] || _.isEmpty(model.templates[name]) || !model.templates[name][type] || _.isEmpty(model.templates[name][type]) || !model.templates[name][type][connector] || _.isEmpty(model.templates[name][type][connector])) {
+        return Q.reject("No template found");
+    }
+    return Q.resolve(_.cloneDeep(model.templates[name][type][connector]));
+};
+
+//Get connector data
+var _getConnector = function (id, type) {
+    var model = Shared.config(id) || {};
+    if (_.isEmpty(model) || !model.connectors || !model.connectors[type] || _.isEmpty(model.connectors[type])) {
+        return Q.reject("No connector found");
+    }
+    return Q.resolve(model.connectors[type]);
+};
+
+//Do text replacements i.e. [name] -> Josh Miller
+var _doReplacements = function (text, replacements) {
+    for (var index in replacements) {
+        var regEx = new RegExp("\\[" + index + "\\]", "ig");
+        text = text.replace(regEx, replacements[index]);
+    }
+    return text;
+};
+
+function _doReplacementsDeep(objSource, replacements) {
+    if (typeof objSource === "object") {
+        if (objSource === null) return null;
+
+        if (objSource instanceof Array) {
+            for (var i = 0; i < objSource.length; i++) {
+                objSource[i] = _doReplacementsDeep(objSource[i], replacements);
+            }
+        } else {
+            for (var property in objSource) {
+                objSource[property] = _doReplacementsDeep(objSource[property], replacements);
+            }
+        }
+        return objSource;
+    }
+
+    if (typeof objSource === "string") {
+        return _doReplacements(objSource, replacements);
+    }
+    return objSource;
+}
+
+// Process email.
+var _processEmail = function (data) {
+    return _getConnector(data.configId, "smtp").then(function (connector) {
+        var smtpServer = Emailjs.server.connect(connector);
+        var notification = data.notification;
+
+        return Q().then(function () {
+            return _getTemplateData(data.configId, "smtp", "mail", notification.template).fail(function () {
+                return Q.reject("Invalid template for email");
+            });
+        }).then(function (template) {
+            // Do replacements
+            if (notification.replacements && !_.isEmpty(notification.replacements)) {
+                template.html = _doReplacements(template.html, notification.replacements);
+                template.subject = _doReplacements(template.subject, notification.replacements);
+                template.text = _doReplacements(template.text, notification.replacements);
+            }
+
+            return _sendMail(smtpServer, template.sender, notification.to, template.subject, template.text, template.html)
+                .then(function () {
+                    console.log("Email " + data._id + " send to " + notification.to);
+                    _notificationStatusFulfilled(data._id).done();
+                    return Q.resolve();
+                }).fail(function (err) {
+                    //TODO: Write retry functionality if mail fails due to server connection reasons. Use collection field retry and schedule to define next retry
+                    console.log("Email " + data._id + " NOT send to " + notification.to);
+                    return Q.reject(err);
+                });
+        });
+    }).fail(function (err) {
+        _notificationStatusReject(data._id, err).done();
+        return Q.reject();
+    });
+};
+
+// Send push notification to Apple Push Notification Services (APNS)
+var _sendApn = function (data, deviceData) {
+
+    if (!Utils.MemberHelpers.hasPathPropertyValue(deviceData, "device.notification.token")) {
+        _notificationStatusReject(data._id, "Device is not registered for push. Missing push token");
+        return Q.reject("Device is not registered for push. Missing push token");
+    }
+
+    return _getConnector(data.configId, "apns").then(function (connector) {
+        var service = new Apn.Connection(connector);
+        service.on("connected", function () {
+            console.log("Connected to APNS");
+        });
+        service.on("transmitted", function (notification, device) {
+            console.log("Notification transmitted to: " + device.token.toString("hex"));
+            _notificationStatusFulfilled(data._id).done();
+        });
+        service.on("transmissionError", function (errCode, notification, device) {
+            console.error("Notification caused error: " + errCode + " for device ", device, notification);
+            if (errCode === 8) {
+                console.log("A error code of 8 indicates that the device token is invalid. This could be for a number of reasons - are you using the correct environment? i.e. Production vs. Sandbox");
+                _notificationStatusReject(data._id, "Device token is invalid").done();
+            } else {
+                _notificationStatusReject(data._id, "APN Transmission error occured").done();
+            }
+        });
+        service.on("timeout", function () {
+            console.log("Connection Timeout");
+        });
+        service.on("disconnected", function () {
+            console.log("Disconnected from APNS");
+        });
+        service.on("socketError", function (err) {
+            console.log("Socket connection error. Check config settings");
+            console.log(err);
+        });
+
+        var notification = data.notification;
+        return _getTemplateData(data.configId, "apns", "push", notification.template).then(function (template) {
+            //Do replacements
+            template.alert.title = _doReplacements(template.alert.title, notification.replacements);
+            template.alert.body = _doReplacements(template.alert.body, notification.replacements);
+
+            //Handle payload
+            var payload = template.payload ? _.merge(template.payload, data.notification.payload) : data.notification.payload;
+            payload = _doReplacementsDeep(payload, notification.replacements);
+            var pushData = new Apn.Notification();
+            pushData.alert = template.alert;
+            pushData.badge = data.notification.badge || template.badge;
+            pushData.sound = template.sound;
+            pushData.contentAvailable = template["content-available"];
+
+            if (!_.isEmpty(payload)) {
+                pushData.payload = payload;
+            }
+            service.pushNotification(pushData, [deviceData.device.notification.token]);
+        }).then(function () {
+            return Q.resolve();
+        });
+    }).fail(function (err) {
+        _notificationStatusReject(data._id, err).done();
+        return Q.reject();
+    });
+
+
+};
+
+// Process push. Lookup deviceId and push token and call push handler of device os type
+var _processPush = function (data, workerId) {
+    return AuthService.getDeviceDataById(data.notification.to).then(function (deviceData) {
+        if (deviceData.device && deviceData.device.os && deviceData.device.os.type) {
+            var deviceType = deviceData.device.os.type;
+            if (deviceType == "ios") {
+                return _sendApn(data, deviceData, workerId);
+            }
+            else if (deviceType == "android") {
+                _notificationStatusReject(data._id, "Unknown device type");
+                return Q.reject();
+            }
+            else {
+                _notificationStatusReject(data._id, "Unknown device type");
+                return Q.reject();
+            }
+        }
+        else {
+            _notificationStatusReject(data._id, "Unknown device type");
+            return Q.reject();
+        }
+    }).fail(function (err) {
+        var error = err || "Device failure";
+        _notificationStatusReject(data._id, error);
+        return Q.reject();
+    });
+};
+
+/**
+ * Custom cron job
+ */
+module.exports = BaseCronJob.extend({},
+    {
+        disabled: false, // Enable /disable job definition
+        time: {
+            hour: '0-23',
+            minute: '0-59',
+            second: '0-59/5',
+            dayOfMonth: '0-31',
+            dayOfWeek: '0-7', // (0 or 7 is Sun, or use names)
+            month: '0-12',   // names are also allowed
+            timezone: 'CET'
+        },
+
+        isSuspended: false,
+        debugOutput: false,
+        allowedHosts: [],
+
+        maxInstanceNumberTotal: 0,
+        maxInstanceNumberPerServer: 10,
+
+        identity: 'generic-notificationProcessor', // Job name
+
+        worker: function () {
+            var workerId = Encryption.randHash();
+            // Assign all notifications to this worker where schedule is due and status is pending or retry and no other worker is already processing
+            return NotificationModel.update({
+                    $or: [
+                        {status: "pending"},
+                        {status: "retry"}
+                    ],
+                    schedule: {$lte: new Date(Date.now())},
+                    workerId: null
+                },
+                {
+                    '$set': {
+                        workerId: workerId,
+                        status: "processing"
+                    }
+                },
+                {
+                    partial: true,
+                    multi: true,
+                    validate: false
+                }).then(function (affectedItems) {
+                    if (affectedItems > 0) {
+                        return NotificationModel.find({workerId: workerId}).then(function (notifications) {
+                            return Q.ninvoke(notifications, 'toArray').then(function (results) {
+                                var funcArray = [];
+                                for (var index in results) {
+                                    var data = results[index];
+                                    // Check notification types
+                                    if (data.type == "mail") {
+                                        funcArray.push(_processEmail(data));
+                                    }
+                                    else if (data.type == "push") {
+                                        funcArray.push(_processPush(data));
+                                    }
+                                    else {
+                                        _notificationStatusReject(data, "Notification type not supported");
+                                    }
+                                }
+                                return Q.allSettled(funcArray);
+                            });
+
+                        });
+                    }
+                }).fail(function (err) {
+                    console.log(err)
+                });
+        },
+        created: '2015-04-05T22:00:00', // Creation date
+        modified: '2015-04-05T22:00:00' // Last modified date
+    }
+);
