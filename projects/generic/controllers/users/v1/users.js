@@ -306,7 +306,7 @@ function thisModule() {
             }
         }).fail(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     /**
@@ -349,7 +349,7 @@ function thisModule() {
             }
         }).fail(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     self.setParametersForFbLogin = function (req, res, next) {
@@ -441,7 +441,7 @@ function thisModule() {
             });
         }).fail(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     /**
@@ -468,7 +468,7 @@ function thisModule() {
             next();
         }).fail(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     /**
@@ -521,7 +521,7 @@ function thisModule() {
             }
         }).fail(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     /**
@@ -576,7 +576,7 @@ function thisModule() {
             next();
         }).fail(function (err) {
             next(err);
-        }).done();
+        });
     };
 
 
@@ -606,7 +606,7 @@ function thisModule() {
             next();
         }).fail(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     /**
@@ -644,7 +644,7 @@ function thisModule() {
                 _setAuthentificateHeader(req, res);
             }
             next(err);
-        }).done();
+        });
     };
 
     var _setAuthentificateHeader = function (req, res) {
@@ -687,7 +687,7 @@ function thisModule() {
                 _setAuthentificateHeader(req, res);
             }
             next(err);
-        }).done();
+        });
     };
 
     /**
@@ -722,7 +722,7 @@ function thisModule() {
                 _setAuthentificateHeader(req, res);
             }
             next(err);
-        }).done();
+        });
     };
 
     /**
@@ -757,7 +757,7 @@ function thisModule() {
                 _setAuthentificateHeader(req, res);
             }
             next(err);
-        }).done();
+        });
     };
 
     return self;

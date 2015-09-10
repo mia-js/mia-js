@@ -6,7 +6,8 @@
 var MiaJs = require('mia-js-core')
     , Shared = MiaJs.Shared
     , Logger = MiaJs.Logger
-    , DemoLib = Shared.libs('demo-lib');
+    , DemoLib = Shared.libs('demo-lib')
+    , Q = require('q');
 
 function thisModule() {
     var self = this;
@@ -137,24 +138,22 @@ function thisModule() {
         DemoLib.getAllTodos(sort, ascending, limit, skip).then(function (result) {
             // Set a header
             res.header("About", Shared.config('demo-config.title'));
-            res.response = result;
 
-        }).then(function () {
-            if (res.response.length > 0) {
-                next();
+            if (result.length == 0) {
+                //Create some initial data on the fly
+                return _createInitialToDoData().then(function () {
+                    return DemoLib.getAllTodos(sort, ascending, limit, skip);
+                });
             }
             else {
-                //Create some initial data on the fly
-                _createInitialToDoData().then(function () {
-                    DemoLib.getAllTodos(sort, ascending, limit, skip).then(function (result) {
-                        res.response = result;
-                        next();
-                    });
-                }).done();
+                return Q(result);
             }
+        }).then(function (result) {
+            res.response = result;
+            next();
         }).fail(function (err) {
             next({status: 500});
-        }).done();
+        });
     };
 
     // Create a todo item
@@ -176,7 +175,7 @@ function thisModule() {
             else {
                 next({status: 500});
             }
-        }).done();
+        });
     };
 
     // Update a todo item
@@ -195,7 +194,7 @@ function thisModule() {
                 next({status: 500});
             }
 
-        }).done();
+        });
 
     };
 

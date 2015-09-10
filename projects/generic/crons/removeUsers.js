@@ -39,15 +39,16 @@ module.exports = BaseCronJob.extend({},
             var userModel = Shared.models('generic-user-model');
 
             //Delete user accounts marked as deleted
-            return userModel.remove(
+            return userModel.removeMany(
                 {
                     'status': 'deleted'
                 },
                 {
-                    multi: true, validate: false
+                    validate: false
                 }).then(function (data) {
-                    if (data > 0) {
-                        MiaJs.Logger('info', data + ' deleted user accounts removed from user collections');
+                    var deletedCount = data.deletedCount || 0;
+                    if (deletedCount > 0) {
+                        MiaJs.Logger('info', deletedCount + ' deleted user accounts removed from user collections');
                     }
                 }).fail(function (err) {
                     MiaJs.Logger('err', err);

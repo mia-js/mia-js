@@ -11,7 +11,7 @@
  * secretId = Identifier of used secret, to allow different secrets with different projects/releases
  * timestamp = UTC time stamp of current time in seconds since 1.1.1970, 10 digits
  * requestMethod = Used request method defined by HTTP i.e. post, get, put, delete
- * baseUrl = Protocol and domain of request i.e. https://mydomain.com
+ * baseUrl = Protocol and domain of request i.e. https://mia-js-core.sevenventures.com
  * urlPath = Path and Query Parameters of request UTF-8 encoded i.e. /api/v1/service?my=first&parameter=settings
  * bodyHash = Hash of plain JSON document of request. Default in SHA256
  *
@@ -137,30 +137,25 @@ function thisModule() {
      * @private
      */
     var _getSecretBySecretId = function (options, secretId) {
-        var deferred = Q.defer();
         var options = {};
         var translator = options.translator || Translator.default;
 
         if (_.isEmpty(secretId)) {
-            deferred.reject();
+            return Q.reject();
         }
-        SecretModel.findOne({
-                id: secretId
-            },
-            function (err, data) {
-                if (err) {
-                    deferred.reject({
-                        status: 500
-                    });
-                } else if (data) {
-                    deferred.resolve(data);
-                }
-                else {
-                    deferred.reject();
-                }
+
+        return SecretModel.findOne({id: secretId}).then(function (data) {
+            if (data) {
+                return Q(data);
             }
-        );
-        return deferred.promise;
+            else {
+                return Q.reject();
+            }
+        }).fail(function (err) {
+            return Q.reject({
+                status: 500
+            });
+        });
     };
 
     /**
@@ -171,42 +166,37 @@ function thisModule() {
      * @private
      */
     var _checkAccessKey = function (options, accessKey) {
-        var deferred = Q.defer();
         options = options || {};
         var translator = options.translator || Translator.default;
         // Check if session token is valid
-        DeviceModel.findOne({
-                'access.key': accessKey
-            },
-            function (err, deviceData) {
-                if (err) {
-                    //Error while requesting db
-                    deferred.reject({
-                        status: 500
-                    });
-                } else {
-                    // Access key not found
-                    if (deviceData === null) {
-                        deferred.reject({
-                            status: 401,
-                            err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
-                        });
-                    }
-                    //Access key is valid
-                    else {
-                        if (deviceData) {
-                            deferred.resolve(deviceData);
-                        }
-                        else {
-                            deferred.reject({
-                                status: 401,
-                                err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
-                            });
-                        }
-                    }
+
+        return DeviceModel.findOne({'access.key': accessKey}).then(function (deviceData) {
+            // Access key not found
+            if (deviceData === null) {
+                return Q.reject({
+                    status: 401,
+                    err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
+                });
+            }
+            //Access key is valid
+            else {
+                if (deviceData) {
+                    return Q(deviceData);
                 }
+                else {
+                    return Q.reject({
+                        status: 401,
+                        err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
+                    });
+                }
+            }
+        }).fail(function (err) {
+            //Error while requesting db
+            return Q.reject({
+                status: 500
             });
-        return deferred.promise;
+        });
+
     };
 
     /**
@@ -221,7 +211,6 @@ function thisModule() {
     var _checkAccessKeyAuthConstrains = function (options, deviceData, ip, group) {
         options = options || {};
         var translator = options.translator || Translator.default;
-
         if (_.isEmpty(deviceData)) {
             return Q.reject({
                 status: 500
@@ -459,16 +448,16 @@ function thisModule() {
                     //Add timeoffset of client to deviceData to give next controller the possibility of time correction if needed
                     deviceData.timeOffset = _clientTimeOffset(req);
                     req.miajs.device = deviceData;
-                    res.header("timestamp",Date.now());
+                    res.header("timestamp", Date.now());
                     next();
                 });
             }).fail(function (err) {
                 if (err.status == 401) {
                     res.setHeader('WWW-Authenticate', 'Token realm="' + protocol.toLowerCase() + "://" + req.headers.host.toLowerCase() + req.miajs.route.prefix + '"');
                 }
-                res.header("timestamp",Date.now());
+                res.header("timestamp", Date.now());
                 next(err);
-            }).done();
+            });
         }
         else {
             // Validate dynamic signature hash token
@@ -477,16 +466,16 @@ function thisModule() {
                     //Add timeoffset of client to deviceData to give next controller the possibility of time correction if needed
                     deviceData.timeOffset = _clientTimeOffset(req);
                     req.miajs.device = deviceData;
-                    res.header("timestamp",Date.now());
+                    res.header("timestamp", Date.now());
                     next();
                 });
             }).fail(function (err) {
                 if (err.status == 401) {
                     res.setHeader('WWW-Authenticate', 'Token realm="' + protocol.toLowerCase() + "://" + req.headers.host.toLowerCase() + req.miajs.route.prefix + '"');
                 }
-                res.header("timestamp",Date.now());
+                res.header("timestamp", Date.now());
                 next(err);
-            }).done();
+            });
         }
     };
 

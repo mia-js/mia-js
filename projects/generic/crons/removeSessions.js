@@ -82,7 +82,7 @@ module.exports = BaseCronJob.extend({},
             var expireDate = new Date(Date.now() - (expireTime * 60 * 1000));
 
             //Delete session node if session is expired
-            return deviceModel.update(
+            return deviceModel.updateMany(
                 {
                     'session.expireable': true,
                     'session.created': {$lte: expireDate}
@@ -94,9 +94,13 @@ module.exports = BaseCronJob.extend({},
                         'session.id': ''
                     }
                 },
-                {multi: true, validate: false}).then(function (data) {
-                    if (data > 0) {
-                        MiaJs.Logger('info', data + ' sessions removed from devices collections');
+                {
+                    validate: false
+                }
+            ).then(function (data) {
+                    var nModified = data.result && data.result.nModified ? data.result.nModified : 0;
+                    if (nModified > 0) {
+                        MiaJs.Logger('info', nModified + ' sessions removed from devices collections');
                     }
                 }).fail(function (err) {
                     MiaJs.Logger('err', err);

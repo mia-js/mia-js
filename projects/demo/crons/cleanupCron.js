@@ -81,22 +81,18 @@ module.exports = BaseCronJob.extend({},
 
             var maxAge = new Date(Date.now() - (5 * 60 * 1000)); // older than 5 minutes
 
-            ToDoModel.remove(
+            return ToDoModel.removeMany(
                 {
                     'lastModified': {$lte: maxAge}
                 },
-                {multi: true, validate: false},
-                function (err, data) {
-                    if (err) {
-                        MiaJs.Logger('err', err);
+                {validate: false}).then(function (data) {
+                    var deletedCount = data.deletedCount || 0;
+                    if (deletedCount > 0) {
+                        MiaJs.Logger('info', data + ' todos auto removed');
                     }
-                    else {
-                        if (data > 0) {
-                            MiaJs.Logger('info', data + ' todos auto removed');
-                        }
-                    }
+                }).fail(function (err) {
+                    MiaJs.Logger('err', err);
                 });
-
         },
 
         created: '2015-07-14T12:00:00', // Creation date

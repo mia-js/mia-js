@@ -29,20 +29,15 @@ function thisModule() {
         var secretToken = Shared.models('generic-secret-model');
         _.forEach(secretTokenList, function (token) {
                 //Save or update secrets in db
-                secretToken.insert(
-                    token,
-                    function (err, data) {
-                        if (err) {
-                            if (err.code != 11000) {
-                                Logger('err', 'Error while writing initial data secrets to db');
-                            }
-                        }
-                        else {
-                            // New session token saved to db
-                            Logger('info', 'Written secretId ' + token.id + ' to db.');
-                        }
+
+                secretToken.insertOne(token).then(function (result) {
+                    // New session token saved to db
+                    Logger('info', 'Written secretId ' + token.id + ' to db.');
+                }).fail(function (err) {
+                    if (err.code != 11000) {
+                        Logger('err', 'Error while writing initial data secrets to db');
                     }
-                );
+                });
             }
         );
     };

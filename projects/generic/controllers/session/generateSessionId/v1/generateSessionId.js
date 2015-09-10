@@ -59,7 +59,7 @@ function thisModule() {
             .fail(function (err) {
                 next(err);
             })
-            .done();
+            ;
     };
 
     return self;

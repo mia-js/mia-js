@@ -36,20 +36,14 @@ function thisModule() {
 
         _.forEach(secretTokenList, function (token) {
                 //Save or update secrets in db
-                secretToken.insert(
-                    token,
-                    function (err, data) {
-                        if (err) {
-                            if (err.code != 11000) {
-                                Logger('err', 'Error while writing initial data secrets to db');
-                            }
-                        }
-                        else {
-                            // New session token saved to db
-                            Logger('info', 'Written secretId ' + token.id + ' to db.');
-                        }
+                secretToken.insertOne(token).then(function (result) {
+                    // New session token saved to db
+                    Logger('info', 'Written secretId ' + token.id + ' to db.');
+                }).fail(function (err) {
+                    if (err.code != 11000) {
+                        Logger('err', 'Error while writing initial data secrets to db');
                     }
-                );
+                });
             }
         );
     };
@@ -71,40 +65,22 @@ function thisModule() {
             }
         };
 
-        DeviceModel.findOne(
-            {
-                'access.key': staticAccessKey
-            },
-            function (err, deviceData) {
-                if (err) {
-                    console.log(err);
-                }
-                else if (deviceData != null) {
-                    //admin session exists
-                    console.log("User with static key" + staticAccessKey + " already exists!");
-                }
-                else {
-                    var device = new DeviceModel();
-                    device.setValues(addDevice, function (err, data) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        else {
-                            device.insert(addDevice, {validate: false},
-                                function (err, data) {
-                                    if (err) {
-                                        console.log(err);
-                                    }
-                                    else {
-                                        console.log(sessionId + " added!");
-                                    }
-                                });
-                        }
-                    });
-
-                }
+        return DeviceModel.findOne({'access.key': staticAccessKey}).then(function (deviceData) {
+            if (deviceData != null) {
+                //admin session exists
+                console.log("User with static key " + staticAccessKey + " already exists!");
             }
-        );
+            else {
+                var device = new DeviceModel();
+                return device.setValues(addDevice).then(function (data) {
+                    return device.insertOne(addDevice).then(function (data) {
+                        console.log("A user with session id" + addDevice.session.id + " added!");
+                    })
+                });
+            }
+        }).fail(function (err) {
+            console.log(err);
+        });
     };
 
     return self;

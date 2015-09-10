@@ -61,7 +61,7 @@ var _ = require('lodash')
 var _recycleNotifications = function () {
     var removeAfter = 60; //in minutes
     var removeTimeLimit = new Date(Date.now() - (removeAfter * 60 * 1000));  // Removes notification after 1h
-    return NotificationModel.remove({
+    return NotificationModel.removeMany({
         $or: [
             {
                 'status': 'rejected',
@@ -73,10 +73,10 @@ var _recycleNotifications = function () {
             }
         ]
     }, {
-        multi: true,
         validate: false
-    }).then(function (affectedItems) {
-        if (affectedItems > 0) {
+    }).then(function (data) {
+        var deletedCount = data.deletedCount || 0;
+        if (deletedCount > 0) {
             console.log("Removed " + affectedItems + " notifications.");
         }
     });
@@ -90,7 +90,7 @@ var _recycleNotifications = function () {
 var _resetNotifications = function () {
     var resetAfter = 10; // in minutes
     var messageAge = new Date(Date.now() - (resetAfter * 60 * 1000)); // Retry message send after 10min maked as processed but not send
-    return NotificationModel.update({
+    return NotificationModel.updateMany({
         'status': 'processing',
         'processed': null,
         'schedule': {'$lte': messageAge}
@@ -102,9 +102,9 @@ var _resetNotifications = function () {
         }
     }, {
         partial: true,
-        multi: true,
         validate: false
-    }).then(function (affectedItems) {
+    }).then(function (data) {
+        var affectedItems = data.result && data.result.nModified ? data.result.nModified : 0;
         if (affectedItems > 0) {
             console.log("Reset " + affectedItems + " notifications to pending. Seems theses messages got stuck in process before.");
         }
@@ -119,7 +119,7 @@ var _resetNotifications = function () {
  * @private
  */
 var _retryNotificationsTerminate = function () {
-    return NotificationModel.update({
+    return NotificationModel.updateMany({
         'status': 'retry',
         'retry': {'$gt': 10}
     }, {
@@ -130,9 +130,9 @@ var _retryNotificationsTerminate = function () {
         }
     }, {
         partial: true,
-        multi: true,
         validate: false
-    }).then(function (affectedItems) {
+    }).then(function (data) {
+        var affectedItems = data.result && data.result.nModified ? data.result.nModified : 0;
         if (affectedItems > 0) {
             console.log("Giving up " + affectedItems + " notifications due to max reties reached.");
         }

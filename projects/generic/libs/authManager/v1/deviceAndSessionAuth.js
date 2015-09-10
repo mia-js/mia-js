@@ -34,36 +34,32 @@ function thisModule() {
      * @returns { promise containing new device id or error }
      */
     self.createDevice = function (options, deviceData, retryCount) {
-        var deferred = Q.defer();
-
         options = options || {};
         var translator = options.translator || Translator.default;
-
         var device = new DeviceModel();
-        device.setValuesAndInsert(deviceData, function (err, deviceDataCreated) {
-            if (err) {
-                if (err.code && err.code == '11000' && retryCount > 1) {
-                    Logger('info', 'DeviceId already exists, retrying to generate one');
-                    deferred.resolve(self.createDevice(options, deviceData, retryCount - 1));
-                }
-                else {
-                    deferred.reject({
-                        status: 400,
-                        err: err
-                    });
-                }
+        return device.setValuesAndInsert(deviceData).then(function (data) {
+            var deviceDataCreated = data.ops;
+            if (deviceDataCreated[0] && deviceDataCreated[0].id) {
+                return Q(deviceDataCreated[0].id);
             }
             else {
-                if (deviceDataCreated[0] && deviceDataCreated[0].id) {
-                    deferred.resolve(deviceDataCreated[0].id);
-                }
-                else {
-                    deferred.reject({status: 500});
-                }
+                return Q.reject({status: 500});
+            }
+        }).fail(function (err) {
+            if (err.status == 500){
+                return Q.reject(err);
+            }
+            else if (err.code && err.code == '11000' && retryCount > 1) {
+                Logger('info', 'DeviceId already exists, retrying to generate one');
+                return Q(self.createDevice(options, deviceData, retryCount - 1));
+            }
+            else {
+                return Q.reject({
+                    status: 400,
+                    err: err
+                });
             }
         });
-
-        return deferred.promise;
     };
 
     /**
@@ -74,8 +70,6 @@ function thisModule() {
      * @returns {promise.promise|jQuery.promise|promise|Q.promise|jQuery.ready.promise}
      */
     self.updateDevice = function (options, id, deviceData) {
-        var deferred = Q.defer();
-
         options = options || {};
         var translator = options.translator || Translator.default;
 
@@ -83,27 +77,25 @@ function thisModule() {
         deviceData.lastModified = new Date(Date.now());
 
         var device = new DeviceModel();
-        device.setValuesAndUpdate({id: id}, {$set: deviceData}, {partial: true}, function (err, data) {
-            if (err) {
-                deferred.reject(err);
+        return device.setValuesAndUpdate({id: id}, {$set: deviceData}, {partial: true}).then(function (data) {
+            var nModified = data.result && data.result.nModified ? data.result.nModified : 0;
+            if (nModified == 0) {
+                return Q.reject({
+                    status: 400,
+                    err: {
+                        'code': 'DeviceIdDoesNotExist',
+                        'msg': translator('generic-translations', 'DeviceIdDoesNotExist')
+                    }
+                });
             }
             else {
-                if (data == 0) {
-                    deferred.reject({
-                        status: 400,
-                        err: {
-                            'code': 'DeviceIdDoesNotExist',
-                            'msg': translator('generic-translations', 'DeviceIdDoesNotExist')
-                        }
-                    });
-                }
-                else {
-                    deferred.resolve(id);
-                }
+                return Q(id);
             }
+
+        }).fail(function (err) {
+            return Q.reject(err);
         });
 
-        return deferred.promise;
     };
 
     //========================================
@@ -223,8 +215,6 @@ function thisModule() {
      * @returns { promise containing new session id or error }
      */
     self.generateSessionId = function (options, deviceId, ip, groups, retryCount) {
-        var deferred = Q.defer();
-
         options = options || {};
         var translator = options.translator || Translator.default;
 
@@ -237,37 +227,35 @@ function thisModule() {
             status: 'active'
         };
 
-        device.setValuesAndUpdate({id: deviceId}, {$set: params}, {partial: true}, function (err, data) {
-            if (err) {
-                if (err.code && err.code == '11001' && retryCount > 1) {
-                    Logger('info', 'SessionId already exists retrying to generate one');
-                    deferred.resolve(self.generateSessionId(options, deviceId, ip, allowedAccessGroups, retryCount - 1));
-                }
-                else {
-                    deferred.reject({
-                        status: 400,
-                        //TODO: ersetzen durch 503
-                        err: err
-                    });
-                }
+        return device.setValuesAndUpdate({id: deviceId}, {$set: params}, {partial: true}).then(function(data){
+            var nModified = data.result && data.result.nModified ? data.result.nModified : 0;
+            if (nModified == 1 && device.data && device.data['$set']['session.id']) {
+                return Q(device.data['$set']['session.id']);
             }
             else {
-                if (data == 1 && device.data && device.data['$set']['session.id']) {
-                    deferred.resolve(device.data['$set']['session.id']);
-                }
-                else {
-                    deferred.reject({
-                        status: 403,
-                        err: {
-                            'code': 'DeviceIdInvalid',
-                            'msg': translator('generic-translations', 'DeviceIdInvalidOrDoesNotExists')
-                        }
-                    });
-                }
+                return Q.reject({
+                    status: 403,
+                    err: {
+                        'code': 'DeviceIdInvalid',
+                        'msg': translator('generic-translations', 'DeviceIdInvalidOrDoesNotExists')
+                    }
+                });
+            }
+        }).fail(function(err){
+            if (err.status == 500){
+                return Q.reject(err);
+            }
+            else if (err.code && err.code == '11001' && retryCount > 1) {
+                Logger('info', 'SessionId already exists retrying to generate one');
+                return Q.resolve(self.generateSessionId(options, deviceId, ip, allowedAccessGroups, retryCount - 1));
+            }
+            else {
+                return Q.reject({
+                    status: 400,
+                    err: err
+                });
             }
         });
-
-        return deferred.promise;
     };
 
     /**

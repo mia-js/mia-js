@@ -218,7 +218,7 @@ function thisModule() {
                 res.header("timestamp", Date.now());
                 next(err);
             })
-            .done();
+            ;
     };
 
     self.update = function (req, res, next) {
@@ -251,7 +251,7 @@ function thisModule() {
                 res.header("timestamp", Date.now());
                 next(err);
             })
-            .done();
+            ;
     };
 
     return self;

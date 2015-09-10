@@ -45,7 +45,7 @@ describe("AuthManager", function () {
                         console.log(err);
                         expect(false).toBeTruthy();
                         next();
-                    }).done();
+                    });
                 });
 
                 it("updateDevice", function (next) {
@@ -58,7 +58,7 @@ describe("AuthManager", function () {
                         console.log(err);
                         expect(false).toBeTruthy();
                         next();
-                    }).done();
+                    });
                 });
 
                 it("generateSessionId", function (next) {
@@ -71,7 +71,7 @@ describe("AuthManager", function () {
                         console.log(err);
                         expect(false).toBeTruthy();
                         next();
-                    }).done();
+                    });
                 });
 
                 it("validateSessionToken", function (next) {
@@ -84,7 +84,7 @@ describe("AuthManager", function () {
                         console.log(err);
                         expect(false).toBeTruthy();
                         next();
-                    }).done();
+                    });
                 });
             }
 
@@ -113,7 +113,7 @@ describe("AuthManager", function () {
                 }).fail(function (err) {
                     console.log(err);
                     next();
-                }).done();
+                });
             });
 
             it("signUpUser", function (next) {
@@ -131,7 +131,7 @@ describe("AuthManager", function () {
                     console.log(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("_registerAccessTokenCheckingMaxDevices", function (next) {
@@ -151,7 +151,7 @@ describe("AuthManager", function () {
                         console.log(err);
                         expect(false).toBeTruthy();
                         next();
-                    }).done();
+                    });
             });
 
             it("_registerAccessTokenCheckingMaxDevices", function (next) {
@@ -171,7 +171,7 @@ describe("AuthManager", function () {
                         console.log(err);
                         expect(false).toBeTruthy();
                         next();
-                    }).done();
+                    });
             });
 
             it("_registerAccessTokenCheckingMaxDevices", function (next) {
@@ -191,7 +191,7 @@ describe("AuthManager", function () {
                         console.log(err);
                         expect(false).toBeTruthy();
                         next();
-                    }).done();
+                    });
             });
 
             it("_isUserLoggedInOnDeviceByLoginAndGroup", function (next) {
@@ -202,7 +202,7 @@ describe("AuthManager", function () {
                     console.log(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("logoutAnyUserFromDevice", function (next) {
@@ -213,7 +213,7 @@ describe("AuthManager", function () {
                     console.log(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("_isUserLoggedInOnDeviceByLoginAndGroup", function (next) {
@@ -224,7 +224,7 @@ describe("AuthManager", function () {
                     console.log(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
         });
 
@@ -239,7 +239,7 @@ describe("AuthManager", function () {
                 }).fail(function (err) {
                     console.log(err);
                     next();
-                }).done();
+                });
             });
 
             it("signUpUser", function (next) {
@@ -257,7 +257,7 @@ describe("AuthManager", function () {
                     console.log(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("deleteUser", function (next) {
@@ -266,7 +266,7 @@ describe("AuthManager", function () {
                 }).fail(function (err) {
                     console.log(err);
                     next();
-                }).done();
+                });
             });
 
             it("signUpUser", function (next) {
@@ -284,7 +284,7 @@ describe("AuthManager", function () {
                     console.log(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("login user 1 on device 1", function (next) {
@@ -295,7 +295,7 @@ describe("AuthManager", function () {
                     console.log(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("login user 1 on device 2", function (next) {
@@ -306,7 +306,7 @@ describe("AuthManager", function () {
                     console.log(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("login user 2 on device 2", function (next) {
@@ -323,7 +323,7 @@ describe("AuthManager", function () {
                     console.log(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("login user 1 on device 2", function (next) {
@@ -340,7 +340,7 @@ describe("AuthManager", function () {
                     console.log(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
         });
     });
@@ -355,21 +355,21 @@ describe("AuthManager", function () {
 //                expect(hash).toBeDefined();
 //                console.log('User credentials hash: ' + hash);
 //                next();
-//            }).done();
+//            });
 //        });
 //
 //        it("_getUserDataByLoginAndGroup", function (next) {
 //            UserAuth.getUserData('login1').then(function (userData) {
 //                expect(userData).toBeDefined();
 //                next();
-//            }).done();
+//            });
 //        });
 //
 //        it("_checkUsersCredentials", function (next) {
 //            UserAuth.checkUsersCredentials('login1', 'password1', options).then(function (userData) {
 //                expect(userData).toBeDefined();
 //                next();
-//            }).done();
+//            });
 //        });
 //
 //        it("deleteUser", function (next) {
@@ -378,7 +378,7 @@ describe("AuthManager", function () {
 //            }).fail(function (err) {
 //                console.log(err);
 //                next();
-//            }).done();
+//            });
 //        });
 //
 //        it("signUpUser", function (next) {
@@ -389,7 +389,7 @@ describe("AuthManager", function () {
 //            }).fail(function (err) {
 //                console.log(err);
 //                next();
-//            }).done();
+//            });
 //        });
 //
 //        it("_getUserDataByLoginAndGroup", function (next) {
@@ -402,7 +402,7 @@ describe("AuthManager", function () {
 //                console.log(err);
 //                expect(false).toBeTruthy();
 //                next();
-//            }).done();
+//            });
 //        });
 //    });
 //
@@ -419,7 +419,7 @@ describe("AuthManager", function () {
 //                console.log(err);
 //                expect(false).toBeTruthy();
 //                next();
-//            }).done();
+//            });
 //        });
 //
 //        it("Login user on device 1", function (next) {
@@ -433,7 +433,7 @@ describe("AuthManager", function () {
 //                console.log(err);
 //                expect(false).toBeTruthy();
 //                next();
-//            }).done();
+//            });
 //        });
 //
 //        it("User now is logged in on device 1", function (next) {
@@ -448,7 +448,7 @@ describe("AuthManager", function () {
 //                console.log(err);
 //                expect(false).toBeTruthy();
 //                next();
-//            }).done();
+//            });
 //        });
 //
 //        it("Login same user on another device 2", function (next) {
@@ -462,7 +462,7 @@ describe("AuthManager", function () {
 //                console.log(err);
 //                expect(false).toBeTruthy();
 //                next();
-//            }).done();
+//            });
 //        });
 //
 //        it("Login same user with wrong password on device 2", function (next) {
@@ -474,7 +474,7 @@ describe("AuthManager", function () {
 //                console.log(err);
 //                expect(true).toBeTruthy();
 //                next();
-//            }).done();
+//            });
 //        });
 //
 //        it("Login same user on another device 3 - should exceed max device number", function (next) {
@@ -486,7 +486,7 @@ describe("AuthManager", function () {
 //                console.log(err);
 //                expect(true).toBeTruthy();
 //                next();
-//            }).done();
+//            });
 //        });
 //    });
 //});

@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var BaseModel = require("mia-js-core/node_modules/baseModel").V2;
+var BaseModel = require("mia-js-core/node_modules/baseModel");
 
 module.exports = BaseModel.extend({
         data: {
@@ -47,7 +47,7 @@ module.exports = BaseModel.extend({
         version: '1.0', // Version number
         created: '2015-07-14T12:00:00', // Creation date
         modified: '2015-07-14T12:00:00', // Last modified date
-        collectionName: 'demo.todos'
+        collectionName: 'demo-todos'
     });
 
 

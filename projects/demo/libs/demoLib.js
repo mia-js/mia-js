@@ -36,7 +36,7 @@ function thisModule() {
             docs.sort(sort).skip(skip).limit(limit).toArray(function (err, result) {
                 return err ? deferred.reject(err) : deferred.resolve(result);
             })
-        }).done();
+        });
 
         return deferred.promise;
     };
@@ -52,9 +52,10 @@ function thisModule() {
         };
 
         var toDoModel = new ToDoModel();
-        return toDoModel.setValuesAndInsert(data).then(function (result) {
-            if (result && result[0] && result[0]._id) {
-                return Q.resolve({id: result[0]._id});
+        return toDoModel.setValuesAndInsert(data).then(function (data) {
+            var deviceDataCreated = data.ops;
+            if (deviceDataCreated && deviceDataCreated[0] && deviceDataCreated[0]._id) {
+                return Q.resolve({id: deviceDataCreated[0]._id});
             }
             else {
                 return Q.reject();
@@ -85,7 +86,7 @@ function thisModule() {
         }
 
         var toDoModel = new ToDoModel();
-        return toDoModel.setValuesAndUpdate(query, {$set: data}, {partial: true, upsert: true}).then(function (result) {
+        return toDoModel.setValuesAndUpdate(query, {$set: data}, {partial: true, upsert: true}).then(function () {
             return Q.resolve();
         }).fail(function (err) {
             return err && err.code == "11000" ? Q.reject(err) : Q.reject();
@@ -96,8 +97,9 @@ function thisModule() {
         var query = {
             _id: ObjectID(id)
         };
-        return ToDoModel.remove(query).then(function (result) {
-            return result == 1 ? Q.resolve() : Q.reject();
+        return ToDoModel.removeOne(query).then(function (data) {
+            var deletedCount = data.deletedCount || 0;
+            return deletedCount == 1 ? Q.resolve() : Q.reject();
         }).fail(function (err) {
             return Q.reject(err);
         })

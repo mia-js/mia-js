@@ -83,8 +83,7 @@ module.exports = BaseCronJob.extend({},
             var absentDeviceTimeLimit = new Date(Date.now() - (maxAbsent * 60 * 60 * 24 * 1000));
 
             //Delete session node if session is expired
-            return deviceModel.remove(
-                {
+            return deviceModel.removeMany({
                     $or: [
                         {
                             'status': 'inactive',
@@ -95,9 +94,12 @@ module.exports = BaseCronJob.extend({},
                         }
                     ]
                 },
-                {multi: true, validate: false}).then(function (data) {
-                    if (data > 0) {
-                        MiaJs.Logger('info', data + ' inactive devices removed from devices collections');
+                {
+                    validate: false
+                }).then(function (data) {
+                    var deletedCount = data.deletedCount || 0;
+                    if (deletedCount > 0) {
+                        MiaJs.Logger('info', deletedCount + ' inactive devices removed from devices collections');
                     }
                 }).fail(function (err) {
                     MiaJs.Logger('err', err);

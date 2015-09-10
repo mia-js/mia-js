@@ -112,7 +112,7 @@ function thisModule() {
         }, {
             partial: true,
             upsert: false,
-            new: true
+            returnOriginal: false
         }, {
             '$set': {
                 accessTokens: [],
@@ -145,7 +145,7 @@ function thisModule() {
         return _updateUserData(query, {
             partial: true,
             upsert: false,
-            new: true
+            returnOriginal: false
         }, {
             '$pull': {
                 accessTokens: {
@@ -173,7 +173,7 @@ function thisModule() {
         }, {
             partial: true,
             upsert: false,
-            new: true
+            returnOriginal: false
         }, {
             '$set': {
                 etag: _incETag()
@@ -483,14 +483,14 @@ function thisModule() {
             return _updateUserData(queryObject, {
                 partial: true,
                 upsert: false,
-                new: true
+                returnOriginal: false
             }, updateDoc).then(function (result) {
                 //Remove old entry from messaging as this can not be done in one query
                 if (!_.isEmpty(updateDocRemoveEntry) && result != null) {
                     return _updateUserData(queryObjectRemoveEntry, {
                         partial: true,
                         upsert: false,
-                        new: true
+                        returnOriginal: false
                     }, updateDocRemoveEntry);
                 }
                 else {
@@ -534,7 +534,9 @@ function thisModule() {
      * @private
      */
     var _updateUserData = function (query, options, updateDoc) {
-        return UserModel.findAndModify(query, {}, updateDoc, options);
+        return UserModel.findOneAndUpdate(query, updateDoc, options).then(function (data) {
+            return data.value;
+        });
     };
     //</editor-fold>
 
@@ -647,7 +649,7 @@ function thisModule() {
         }, {
             partial: true,
             upsert: false,
-            new: true
+            returnOriginal: false
         }, {
             '$push': {
                 deviceCounts: {
@@ -676,7 +678,7 @@ function thisModule() {
             }, {
                 partial: true,
                 upsert: false,
-                new: true
+                returnOriginal: false
             }, {
                 '$push': {
                     accessTokens: accessToken
@@ -843,8 +845,9 @@ function thisModule() {
             validated: false
         }).then(function () {
             userData.data.profile = params.userProfileData || {};
-            return userData.insert();
-        }).then(function (userData) {
+            return userData.insertOne();
+        }).then(function (data) {
+            var userData = data.ops;
             if (_.isArray(userData)) {
                 return userData[0];
             }
@@ -879,7 +882,7 @@ function thisModule() {
         }, {
             partial: true,
             upsert: false,
-            new: true
+            returnOriginal: false
         }, {
             '$set': {
                 status: 'active',
@@ -910,7 +913,7 @@ function thisModule() {
         }, {
             partial: true,
             upsert: false,
-            new: true
+            returnOriginal: false
         }, {
             '$set': {
                 status: 'deleted',
@@ -1199,7 +1202,7 @@ function thisModule() {
             }, {
                 partial: true,
                 upsert: false,
-                new: true
+                returnOriginal: false
             }, {
                 $set: {
                     'messaging.$.validated': true,
@@ -1222,7 +1225,7 @@ function thisModule() {
             }, {
                 partial: true,
                 upsert: false,
-                new: true
+                returnOriginal: false
             }, {
                 $set: {
                     status: 'deleted',
@@ -1248,7 +1251,7 @@ function thisModule() {
         }, {
             partial: true,
             upsert: false,
-            new: true
+            returnOriginal: false
         }, {
             '$set': {
                 "inspectTokens.passwordResetToken.token": _generatePasswordResetToken(),

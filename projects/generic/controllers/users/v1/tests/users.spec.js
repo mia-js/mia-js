@@ -58,7 +58,7 @@ describe("Testing user service", function () {
         }).fail(function (err) {
             expect(false).toBe(expectResult);
             next();
-        }).done();
+        });
     });
 
     var _signUp = function (expectResult) {
@@ -91,7 +91,7 @@ describe("Testing user service", function () {
             }).fail(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            }).done();
+            });
         });
     };
 
@@ -125,7 +125,7 @@ describe("Testing user service", function () {
             }).fail(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            }).done();
+            });
         });
     };
 
@@ -150,7 +150,7 @@ describe("Testing user service", function () {
             }).fail(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            }).done();
+            });
         });
     };
 
@@ -175,7 +175,7 @@ describe("Testing user service", function () {
             }).fail(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            }).done();
+            });
         });
     };
 
@@ -203,7 +203,7 @@ describe("Testing user service", function () {
             }).fail(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            }).done();
+            });
         });
     };
 

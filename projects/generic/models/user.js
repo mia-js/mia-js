@@ -1,5 +1,5 @@
 var _ = require('lodash')
-    , BaseModel = require("mia-js-core/node_modules/baseModel").V2;
+    , BaseModel = require("mia-js-core/node_modules/baseModel");
 
 function thisModule() {
 

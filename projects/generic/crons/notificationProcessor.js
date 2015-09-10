@@ -81,31 +81,31 @@ var _sendMail = function (smtpServer, sender, to, subject, text, html) {
 
 // Set notification to fulfilled
 var _notificationStatusFulfilled = function (id) {
-    return NotificationModel.findAndModify({_id: id}, {}, {
+    return NotificationModel.findOneAndUpdate({_id: id}, {
         $set: {
             status: "fulfilled",
             processed: new Date(Date.now())
         }
     }, {
-        partial: true, upsert: false, new: true
+        partial: true, upsert: false, returnOriginal: false
     });
 };
 
 //Set notification to rejected
 var _notificationStatusReject = function (id, err) {
-    return NotificationModel.findAndModify({_id: id}, {}, {
+    return NotificationModel.findOneAndUpdate({_id: id}, {
         $set: {
             status: "rejected",
             log: err || "Unknown error"
         }
     }, {
-        partial: true, upsert: false, new: true
+        partial: true, upsert: false, returnOriginal: false
     });
 };
 
 //Set notification to retry
 var _notificationStatusRetry = function (id, log, schedule) {
-    return NotificationModel.findAndModify({_id: id}, {}, {
+    return NotificationModel.findOneAndUpdate({_id: id}, {
         $set: {
             status: "retry",
             schedule: schedule || new Date(Date.now() + 1000 * 60 * 6), // Retry in 5*retry minute
@@ -116,7 +116,7 @@ var _notificationStatusRetry = function (id, log, schedule) {
             'retry': 1
         }
     }, {
-        partial: true, upsert: false, new: true
+        partial: true, upsert: false, returnOriginal: false
     });
 };
 
@@ -190,7 +190,7 @@ var _processEmail = function (data) {
             return _sendMail(smtpServer, template.sender, notification.to, template.subject, template.text, template.html)
                 .then(function () {
                     console.log("Email " + data._id + " send to " + notification.to);
-                    _notificationStatusFulfilled(data._id).done();
+                    _notificationStatusFulfilled(data._id);
                     return Q.resolve();
                 }).fail(function (err) {
                     //TODO: Write retry functionality if mail fails due to server connection reasons. Use collection field retry and schedule to define next retry
@@ -199,7 +199,7 @@ var _processEmail = function (data) {
                 });
         });
     }).fail(function (err) {
-        _notificationStatusReject(data._id, err).done();
+        _notificationStatusReject(data._id, err);
         return Q.reject();
     });
 };
@@ -219,15 +219,15 @@ var _sendApn = function (data, deviceData) {
         });
         service.on("transmitted", function (notification, device) {
             console.log("Notification transmitted to: " + device.token.toString("hex"));
-            _notificationStatusFulfilled(data._id).done();
+            _notificationStatusFulfilled(data._id);
         });
         service.on("transmissionError", function (errCode, notification, device) {
             console.error("Notification caused error: " + errCode + " for device ", device, notification);
             if (errCode === 8) {
                 console.log("A error code of 8 indicates that the device token is invalid. This could be for a number of reasons - are you using the correct environment? i.e. Production vs. Sandbox");
-                _notificationStatusReject(data._id, "Device token is invalid").done();
+                _notificationStatusReject(data._id, "Device token is invalid");
             } else {
-                _notificationStatusReject(data._id, "APN Transmission error occured").done();
+                _notificationStatusReject(data._id, "APN Transmission error occured");
             }
         });
         service.on("timeout", function () {
@@ -264,7 +264,7 @@ var _sendApn = function (data, deviceData) {
             return Q.resolve();
         });
     }).fail(function (err) {
-        _notificationStatusReject(data._id, err).done();
+        _notificationStatusReject(data._id, err);
         return Q.reject();
     });
 
@@ -327,7 +327,7 @@ module.exports = BaseCronJob.extend({},
         worker: function () {
             var workerId = Encryption.randHash();
             // Assign all notifications to this worker where schedule is due and status is pending or retry and no other worker is already processing
-            return NotificationModel.update({
+            return NotificationModel.updateMany({
                     $or: [
                         {status: "pending"},
                         {status: "retry"}
@@ -343,9 +343,9 @@ module.exports = BaseCronJob.extend({},
                 },
                 {
                     partial: true,
-                    multi: true,
                     validate: false
-                }).then(function (affectedItems) {
+                }).then(function (data) {
+                    var affectedItems = data.result && data.result.nModified ? data.result.nModified : 0;
                     if (affectedItems > 0) {
                         return NotificationModel.find({workerId: workerId}).then(function (notifications) {
                             return Q.ninvoke(notifications, 'toArray').then(function (results) {
@@ -368,8 +368,12 @@ module.exports = BaseCronJob.extend({},
 
                         });
                     }
+                    else {
+                        return Q();
+                    }
                 }).fail(function (err) {
-                    console.log(err)
+                    console.log(err);
+                    return Q().reject();
                 });
         },
         created: '2015-04-05T22:00:00', // Creation date

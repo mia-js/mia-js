@@ -32,18 +32,18 @@ module.exports = {
     local: {
 
         /* Define virtual hosts (vhosts) this application should listen to. Use id in routes file definition to apply a route to a host.
-           hosts are optional. If a routes file does not have a hostId setting the file is listening to every host pointing to this server
-          */
+         hosts are optional. If a routes file does not have a hostId setting the file is listening to every host pointing to this server
+         */
         /*hosts: [
-            {
-                id: "myApplication1",
-                host: "example.com"
-            },
-            {
-                id: "myApplication2",
-                host: ["api.example.com", "example-domain.com"]
-            }
-        ],*/
+         {
+         id: "myApplication1",
+         host: "example.com"
+         },
+         {
+         id: "myApplication2",
+         host: ["api.example.com", "example-domain.com"]
+         }
+         ],*/
         server: {
             http: {
                 port: 3000
@@ -51,16 +51,16 @@ module.exports = {
             }
             // To use SSL encryption uncomment the following parameters and provide a valid certificate
             /*,https: {
-                port: 4000,
-                options: {
-                    key: fs.readFileSync('cert/ssl.key'),
-                    cert: fs.readFileSync('cert/ssl.crt'),
-                    ca: fs.readFileSync('cert/ca.pem'),
-                    passphrase: 'xxxxxx',
-                    requestCert: true,
-                    rejectUnauthorized: false
-                }
-            }*/
+             port: 4000,
+             options: {
+             key: fs.readFileSync('cert/ssl.key'),
+             cert: fs.readFileSync('cert/ssl.crt'),
+             ca: fs.readFileSync('cert/ca.pem'),
+             passphrase: 'xxxxxx',
+             requestCert: true,
+             rejectUnauthorized: false
+             }
+             }*/
         },
         debug: true, // Show more details in error case
         cronJobs: {
@@ -91,37 +91,28 @@ module.exports = {
         mongoDatabases: {
             // Application db
             mia: {
-                // Use Array to define server cluster instead of object
-                servers: {
-                    host: 'localhost', // Host
-                    options: { //server options, see docs of Mongo.Server
-                        auto_reconnect: true,
-                        poolSize: 10
-                    }
-                },
-                dbName: 'mia', // DB name
-                user: "api", // Username
-                password: "api", // Password
+                url: 'mongodb://api:api@localhost:27017/mia',
                 options: {
-                    w: 1 //write acknowledgement
-                }
-            },
-            // Tests db
-            tests: {
-                servers: {
-                    host: 'localhost',
-                    options: { //server options, see docs of Mongo.Server
-                        auto_reconnect: true,
-                        poolSize: 10
+                    db: {
+                        w: 1 //write acknowledgement
+                    },
+                    server: {
+                        poolSize: 15
                     }
-                },
-                dbName: 'tests',
-                user: "api",
-                password: "api",
-                options: {
-                    w: 1 //write acknowledgement
                 }
             }
+            // Tests db
+            /*,tests: {
+             url: 'mongodb://api:api@localhost:27017/tests',
+             options: {
+             db: {
+             w: 1 //write acknowledgement
+             },
+             server: {
+             poolSize: 15
+             }
+             }
+             }*/
         }
     },
 
@@ -185,37 +176,28 @@ module.exports = {
         mongoDatabases: {
             // Application db
             mia: {
-                // Use Array to define server cluster instead of object
-                servers: {
-                    host: 'localhost', // Host
-                    options: { //server options, see docs of Mongo.Server
-                        auto_reconnect: true,
-                        poolSize: 10
-                    }
-                },
-                dbName: 'mia', // DB name
-                user: "api", // Username
-                password: "api", // Password
+                url: 'mongodb://api:api@localhost:27017/mia',
                 options: {
-                    w: 1 //write acknowledgement
-                }
-            },
-            // Tests db
-            tests: {
-                servers: {
-                    host: 'localhost',
-                    options: { //server options, see docs of Mongo.Server
-                        auto_reconnect: true,
-                        poolSize: 10
+                    db: {
+                        w: 1 //write acknowledgement
+                    },
+                    server: {
+                        poolSize: 15
                     }
-                },
-                dbName: 'tests',
-                user: "api",
-                password: "api",
-                options: {
-                    w: 1 //write acknowledgement
                 }
             }
+            // Tests db
+            /*,tests: {
+             url: 'mongodb://api:api@localhost:27017/tests',
+             options: {
+             db: {
+             w: 1 //write acknowledgement
+             },
+             server: {
+             poolSize: 15
+             }
+             }
+             }*/
         }
     }
 };
