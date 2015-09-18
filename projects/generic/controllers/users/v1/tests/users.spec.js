@@ -4,6 +4,8 @@ var MiaJs = require('mia-js-core')
     , Encryption = MiaJs.Utils.Encryption
     , Request = MiaJs.Request;
 
+Q.stopUnhandledRejectionTracking();
+
 describe("Testing user service", function () {
     var _protocol = "http";
     var _hostName = "localhost";
@@ -58,7 +60,7 @@ describe("Testing user service", function () {
         }).fail(function (err) {
             expect(false).toBe(expectResult);
             next();
-        });
+        }).done();
     });
 
     var _signUp = function (expectResult) {
@@ -91,7 +93,7 @@ describe("Testing user service", function () {
             }).fail(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            });
+            }).done();
         });
     };
 
@@ -125,7 +127,7 @@ describe("Testing user service", function () {
             }).fail(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            });
+            }).done();
         });
     };
 
@@ -150,7 +152,7 @@ describe("Testing user service", function () {
             }).fail(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            });
+            }).done();
         });
     };
 
@@ -175,7 +177,7 @@ describe("Testing user service", function () {
             }).fail(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            });
+            }).done();
         });
     };
 
@@ -203,7 +205,7 @@ describe("Testing user service", function () {
             }).fail(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            });
+            }).done();
         });
     };
 

@@ -5,6 +5,8 @@ var _ = require('lodash')
     , Utils = MiaJs.Utils
     , MemberHelpers = Utils.MemberHelpers;
 
+Q.stopUnhandledRejectionTracking();
+
 function thisModule() {
     var self = this;
 

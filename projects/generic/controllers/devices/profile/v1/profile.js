@@ -6,6 +6,7 @@
  */
 
 var MiaJs = require('mia-js-core');
+var Logger = MiaJs.Logger;
 var MemberHelpers = MiaJs.Utils.MemberHelpers;
 var Shared = MiaJs.Shared;
 var _ = require('lodash');
@@ -207,18 +208,15 @@ function thisModule() {
 
         MemberHelpers.setPathPropertyValue(data, 'device.userAgent', req.headers['user-agent']);
 
-        AuthService.createDevice({translator: translator}, data, 5)
-            .then(function (id) {
-                MiaJs.Logger('info', 'Device ' + id + ' created');
-                res.response = {id: id};
-                res.header("timestamp", Date.now());
-                next();
-            })
-            .fail(function (err) {
-                res.header("timestamp", Date.now());
-                next(err);
-            })
-            ;
+        AuthService.createDevice({translator: translator}, data, 5).then(function (id) {
+            Logger.info('Device ' + id + ' created');
+            res.response = {id: id};
+            res.header("timestamp", Date.now());
+            next();
+        }).fail(function (err) {
+            res.header("timestamp", Date.now());
+            next(err);
+        }).done();
     };
 
     self.update = function (req, res, next) {
@@ -242,7 +240,7 @@ function thisModule() {
 
         AuthService.updateDevice({translator: translator}, id, data)
             .then(function (id) {
-                MiaJs.Logger('info', 'Device ' + id + ' updated');
+                Logger.info('Device ' + id + ' updated');
                 res.response = {id: id};
                 res.header("timestamp", Date.now());
                 return next();
@@ -251,7 +249,7 @@ function thisModule() {
                 res.header("timestamp", Date.now());
                 next(err);
             })
-            ;
+        ;
     };
 
     return self;

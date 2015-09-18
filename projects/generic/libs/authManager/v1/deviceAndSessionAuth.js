@@ -16,6 +16,8 @@ var Q = require('q')
     , SecretModel = Shared.models('generic-secret-model')
     , DeviceModel = Shared.models('generic-device-model');
 
+Q.stopUnhandledRejectionTracking();
+
 function thisModule() {
     var self = this;
 
@@ -50,7 +52,7 @@ function thisModule() {
                 return Q.reject(err);
             }
             else if (err.code && err.code == '11000' && retryCount > 1) {
-                Logger('info', 'DeviceId already exists, retrying to generate one');
+                Logger.info('DeviceId already exists, retrying to generate one');
                 return Q(self.createDevice(options, deviceData, retryCount - 1));
             }
             else {
@@ -196,7 +198,7 @@ function thisModule() {
                 return Q.resolve(secretData);
             }
             else {
-                Logger('info', 'Expected key: ' + validHash + secretId);
+                Logger.info('Expected key: ' + validHash + secretId);
                 return Q.reject({
                     status: 403,
                     err: {'code': 'AccessKeyInvalid', 'msg': translator('generic-translations', 'AccessKeyInvalid')}
@@ -246,7 +248,7 @@ function thisModule() {
                 return Q.reject(err);
             }
             else if (err.code && err.code == '11001' && retryCount > 1) {
-                Logger('info', 'SessionId already exists retrying to generate one');
+                Logger.info('SessionId already exists retrying to generate one');
                 return Q.resolve(self.generateSessionId(options, deviceId, ip, allowedAccessGroups, retryCount - 1));
             }
             else {
@@ -296,7 +298,7 @@ function thisModule() {
                             deferred.resolve(deviceData);
                         }
                         else {
-                            Logger('info', 'Error no id');
+                            Logger.info('Error no id');
                             deferred.reject({
                                 status: 403,
                                 err: {
@@ -381,7 +383,7 @@ function thisModule() {
             //Check CIDRs
             for (var thisCIDR in deviceData.session.cidr) {
                 if (CIDRCheck(ip, deviceData.session.cidr[thisCIDR])) {
-                    Logger('info', 'Grant access for device ' + deviceData.id);
+                    Logger.info('Grant access for device ' + deviceData.id);
                     return Q(deviceData);
                 }
             }

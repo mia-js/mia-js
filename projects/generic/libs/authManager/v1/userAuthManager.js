@@ -19,6 +19,8 @@ var Q = require('q')
     , DeviceModel = Shared.models('generic-device-model');
 //</editor-fold>
 
+Q.stopUnhandledRejectionTracking();
+
 function thisModule() {
     var self = this;
 

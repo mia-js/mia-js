@@ -45,6 +45,7 @@
 
 var _ = require('lodash')
     , MiaJs = require('mia-js-core')
+    , Logger = MiaJs.Logger.tag('cron')
     , Utils = MiaJs.Utils
     , CronJobs = MiaJs.CronJobs
     , BaseCronJob = CronJobs.BaseCronJob
@@ -53,6 +54,7 @@ var _ = require('lodash')
     , Encryption = require("mia-js-core/node_modules/utils").Encryption
     , NotificationModel = Shared.models('generic-notifications-model');
 
+Q.stopUnhandledRejectionTracking();
 
 /**
  * Remove notifications from notifications queue.
@@ -77,7 +79,7 @@ var _recycleNotifications = function () {
     }).then(function (data) {
         var deletedCount = data.deletedCount || 0;
         if (deletedCount > 0) {
-            console.log("Removed " + affectedItems + " notifications.");
+            Logger.info("Removed " + affectedItems + " notifications.");
         }
     });
 };
@@ -106,10 +108,10 @@ var _resetNotifications = function () {
     }).then(function (data) {
         var affectedItems = data.result && data.result.nModified ? data.result.nModified : 0;
         if (affectedItems > 0) {
-            console.log("Reset " + affectedItems + " notifications to pending. Seems theses messages got stuck in process before.");
+            Logger.info("Reset " + affectedItems + " notifications to pending. Seems theses messages got stuck in process before.");
         }
     }).fail(function (err) {
-        console.log(err);
+        Logger.error(err);
     });
 };
 
@@ -134,10 +136,10 @@ var _retryNotificationsTerminate = function () {
     }).then(function (data) {
         var affectedItems = data.result && data.result.nModified ? data.result.nModified : 0;
         if (affectedItems > 0) {
-            console.log("Giving up " + affectedItems + " notifications due to max reties reached.");
+            Logger.warn("Giving up " + affectedItems + " notifications due to max reties reached.");
         }
     }).fail(function (err) {
-        console.log(err);
+        Logger.error(err);
     });
 };
 

@@ -45,6 +45,7 @@
 
 var _ = require('lodash');
 var MiaJs = require('mia-js-core');
+var Logger = MiaJs.Logger;
 var Utils = MiaJs.Utils;
 var CronJobs = MiaJs.CronJobs;
 var BaseCronJob = CronJobs.BaseCronJob;
@@ -99,10 +100,10 @@ module.exports = BaseCronJob.extend({},
                 }).then(function (data) {
                     var deletedCount = data.deletedCount || 0;
                     if (deletedCount > 0) {
-                        MiaJs.Logger('info', deletedCount + ' inactive devices removed from devices collections');
+                        Logger.info(deletedCount + ' inactive devices removed from devices collections');
                     }
                 }).fail(function (err) {
-                    MiaJs.Logger('err', err);
+                    Logger.error(null, err);
                 });
 
         },

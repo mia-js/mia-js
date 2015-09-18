@@ -49,17 +49,14 @@ function thisModule() {
             groups = req.allowedAccessGroups,
             translator = req.miajs.translator;
 
-        AuthService.generateSessionId({translator: translator}, id, ip, groups, 5)
-            .then(function (sessionId) {
-                res.response = {
-                    sessionId: sessionId
-                };
-                next();
-            })
-            .fail(function (err) {
-                next(err);
-            })
-            ;
+        AuthService.generateSessionId({translator: translator}, id, ip, groups, 5).then(function (sessionId) {
+            res.response = {
+                sessionId: sessionId
+            };
+            next();
+        }).fail(function (err) {
+            next(err);
+        }).done();
     };
 
     return self;

@@ -46,6 +46,7 @@
 var _ = require('lodash');
 //base class
 var MiaJs = require('mia-js-core');
+var Logger = MiaJs.Logger;
 var Utils = MiaJs.Utils;
 var CronJobs = MiaJs.CronJobs;
 var BaseCronJob = CronJobs.BaseCronJob;
@@ -100,10 +101,10 @@ module.exports = BaseCronJob.extend({},
             ).then(function (data) {
                     var nModified = data.result && data.result.nModified ? data.result.nModified : 0;
                     if (nModified > 0) {
-                        MiaJs.Logger('info', nModified + ' sessions removed from devices collections');
+                        Logger.info(nModified + ' sessions removed from devices collections');
                     }
                 }).fail(function (err) {
-                    MiaJs.Logger('err', err);
+                    Logger.info(null, err);
                 });
         },
 

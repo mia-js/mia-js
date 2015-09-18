@@ -1,7 +1,3 @@
-/**
- * Custom logging function like console.log
- */
-
 var _ = require('lodash');
 var Async = require('async');
 var Shared = require('mia-js-core/node_modules/shared');
@@ -13,7 +9,7 @@ function thisModule() {
     var self = this;
 
     self.init = function () {
-        console.log("Initializing generic data");
+        Logger.info("Initializing generic data");
         _generateSecretTokens();
     };
 
@@ -32,12 +28,12 @@ function thisModule() {
 
                 secretToken.insertOne(token).then(function (result) {
                     // New session token saved to db
-                    Logger('info', 'Written secretId ' + token.id + ' to db.');
+                    Logger.info('Written secretId ' + token.id + ' to db.');
                 }).fail(function (err) {
                     if (err.code != 11000) {
-                        Logger('err', 'Error while writing initial data secrets to db');
+                        Logger.error('Error while writing initial data secrets to db');
                     }
-                });
+                }).done();
             }
         );
     };

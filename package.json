@@ -1,9 +1,9 @@
 {
   "name": "mia.js",
   "description": "mia.js - Middleware API framework",
-  "version": "1.0.0",
+  "version": "0.8.1",
   "dependencies": {
-    "mia-js-core": "0.8.0",
+    "mia-js-core": "0.8.1",
     "apn": "1.7.3",
     "async": "0.2.9",
     "body-parser": "1.12.3",
@@ -17,7 +17,7 @@
     "ip": "0.3.0",
     "jasmine-node": "1.11.0",
     "lodash": "2.4.0",
-    "memcached":"0.2.8",
+    "memcached": "2.2.0",
     "mongodb": "2.0.42",
     "morgan": "1.1.1",
     "nodemon": "1.0.17",
@@ -38,7 +38,7 @@
     "underscore.string": "2.3.3",
     "vhost":"3.0.1",
     "util": "0.10.3",
-    "q": "1.1.2"
+    "q": "1.4.1"
   },
   "devDependencies": {
     "grunt": "0.4.5",

@@ -5,7 +5,7 @@
 
 var MiaJs = require('mia-js-core')
     , Shared = MiaJs.Shared
-    , Logger = MiaJs.Logger
+    , Logger = MiaJs.Logger.tag('demo')
     , DemoLib = Shared.libs('demo-lib')
     , Q = require('q');
 

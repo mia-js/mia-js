@@ -3,6 +3,7 @@
  */
 
 var MiaJs = require('mia-js-core')
+    , Logger = MiaJs.Logger.tag('demo')
     , Shared = MiaJs.Shared
     , q = require('q');
 var NotificationManager = Shared.libs("generic-notificationManager");
@@ -34,7 +35,7 @@ function thisModule() {
             next();
         }).fail(function (err) {
             //Error handling. Will only fail if not possible to add to queue
-            console.log(err);
+            Logger.error(err);
             next({status: 500});
         });
 

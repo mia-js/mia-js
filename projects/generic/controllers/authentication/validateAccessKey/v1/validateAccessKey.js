@@ -26,6 +26,7 @@
 
 var _ = require('lodash')
     , MiaJs = require('mia-js-core')
+    , Logger = MiaJs.Logger
     , Shared = require('mia-js-core').Shared
     , AuthService = Shared.libs("generic-deviceAndSessionAuth")
     , Crypto = require('crypto')
@@ -35,6 +36,8 @@ var _ = require('lodash')
     , SecretModel = Shared.models('generic-secret-model')
     , DeviceModel = Shared.models('generic-device-model')
     , Q = require('q');
+
+Q.stopUnhandledRejectionTracking();
 
 function thisModule() {
     var self = this;
@@ -92,7 +95,7 @@ function thisModule() {
         else {
             timeOffset = (tokenDate - dateNow) / 1000; //Timeoffset in seconds
             if (Math.abs(timeOffset) > maxTokenValidTime) {
-                console.log("Timestamp in signature has expired");
+                Logger.info("Timestamp in signature has expired");
                 return Q.reject({
                     status: 401,
                     err: {'code': 'KeyExpired', 'msg': translator('generic-translations', 'KeyExpired')}
@@ -315,7 +318,7 @@ function thisModule() {
             , maxTokenValidTime = 100000; // Max time token is valid in seconds
 
         if (signatureMethod != "sha256") {
-            console.log("Signature method not allowed");
+            Logger.info("Signature method not allowed");
             return Q.reject({
                 status: 403,
                 err: {
@@ -327,7 +330,7 @@ function thisModule() {
 
         // Check deviceId
         if (_.isEmpty(deviceId) || deviceId.length < 32) {
-            console.log("DeviceId is invalid length, given: " + deviceId);
+            Logger.info("DeviceId is invalid length, given: " + deviceId);
             return Q.reject({
                 status: 401,
                 err: {'code': 'DeviceIdInvalid', 'msg': translator('generic-translations', 'DeviceIdInvalid')}
@@ -336,7 +339,7 @@ function thisModule() {
 
         //Check secretId
         if (_.isEmpty(secretId) || secretId.length < 32) {
-            console.log("SecretId is invalid length, given: " + secret);
+            Logger.info("SecretId is invalid length, given: " + secret);
             return Q.reject({
                 status: 401,
                 err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
@@ -346,7 +349,7 @@ function thisModule() {
         //Check signatureTimeStamp is valid
         var signatureDate = new Date(signatureTimeStamp * 1000); // needs to be in milliseconds
         if (signatureDate == "Invalid Date") {
-            console.log("Timestamp is invalid date, given: " + signatureTimeStamp);
+            Logger.info("Timestamp is invalid date, given: " + signatureTimeStamp);
             return Q.reject({
                 status: 401,
                 err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
@@ -393,9 +396,9 @@ function thisModule() {
 
                 // Check validity of given signature
                 if (signature.toLowerCase() != authorizedSignature.toLowerCase()) {
-                    console.log("DENIED: Expected Hash: " + authorizedSignature + ", Given: " + signature);
-                    /*console.log("DENIED: Expected Signature: " + deviceId + secretId + signatureTimeStamp + authorizedSignature);
-                     console.log("DENIED: Given Signature: " + signatureToken);*/
+                    Logger.info("DENIED: Expected Hash: " + authorizedSignature + ", Given: " + signature);
+                    /*Logger.warn("DENIED: Expected Signature: " + deviceId + secretId + signatureTimeStamp + authorizedSignature);
+                     Logger.warn("DENIED: Given Signature: " + signatureToken);*/
                     return Q.reject({
                         status: 401,
                         err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
@@ -457,7 +460,7 @@ function thisModule() {
                 }
                 res.header("timestamp", Date.now());
                 next(err);
-            });
+            }).done();
         }
         else {
             // Validate dynamic signature hash token
@@ -475,7 +478,7 @@ function thisModule() {
                 }
                 res.header("timestamp", Date.now());
                 next(err);
-            });
+            }).done();
         }
     };
 

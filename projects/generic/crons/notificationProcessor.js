@@ -46,6 +46,7 @@
 var _ = require('lodash')
     , MiaJs = require('mia-js-core')
     , Utils = MiaJs.Utils
+    , Logger = MiaJs.Logger
     , CronJobs = MiaJs.CronJobs
     , BaseCronJob = CronJobs.BaseCronJob
     , Shared = MiaJs.Shared
@@ -55,6 +56,8 @@ var _ = require('lodash')
     , Apn = require('apn')
     , NotificationModel = Shared.models('generic-notifications-model')
     , AuthService = Shared.libs("generic-deviceAndSessionAuth");
+
+Q.stopUnhandledRejectionTracking();
 
 //Send email
 var _sendMail = function (smtpServer, sender, to, subject, text, html) {
@@ -189,12 +192,12 @@ var _processEmail = function (data) {
 
             return _sendMail(smtpServer, template.sender, notification.to, template.subject, template.text, template.html)
                 .then(function () {
-                    console.log("Email " + data._id + " send to " + notification.to);
+                    Logger.info("Email " + data._id + " send to " + notification.to);
                     _notificationStatusFulfilled(data._id);
                     return Q.resolve();
                 }).fail(function (err) {
                     //TODO: Write retry functionality if mail fails due to server connection reasons. Use collection field retry and schedule to define next retry
-                    console.log("Email " + data._id + " NOT send to " + notification.to);
+                    Logger.err("Email " + data._id + " NOT send to " + notification.to);
                     return Q.reject(err);
                 });
         });
@@ -215,30 +218,29 @@ var _sendApn = function (data, deviceData) {
     return _getConnector(data.configId, "apns").then(function (connector) {
         var service = new Apn.Connection(connector);
         service.on("connected", function () {
-            console.log("Connected to APNS");
+            Logger.info("Connected to APNS");
         });
         service.on("transmitted", function (notification, device) {
-            console.log("Notification transmitted to: " + device.token.toString("hex"));
+            Logger.info("Notification transmitted to: " + device.token.toString("hex"));
             _notificationStatusFulfilled(data._id);
         });
         service.on("transmissionError", function (errCode, notification, device) {
-            console.error("Notification caused error: " + errCode + " for device ", device, notification);
+            Logger.error("Notification caused error: " + errCode + " for device ", device, notification);
             if (errCode === 8) {
-                console.log("A error code of 8 indicates that the device token is invalid. This could be for a number of reasons - are you using the correct environment? i.e. Production vs. Sandbox");
+                Logger.warn("A error code of 8 indicates that the device token is invalid. This could be for a number of reasons - are you using the correct environment? i.e. Production vs. Sandbox");
                 _notificationStatusReject(data._id, "Device token is invalid");
             } else {
                 _notificationStatusReject(data._id, "APN Transmission error occured");
             }
         });
         service.on("timeout", function () {
-            console.log("Connection Timeout");
+            Logger.info("Connection Timeout");
         });
         service.on("disconnected", function () {
-            console.log("Disconnected from APNS");
+            Logger.info("Disconnected from APNS");
         });
         service.on("socketError", function (err) {
-            console.log("Socket connection error. Check config settings");
-            console.log(err);
+            Logger.error("Socket connection error. Check config settings", err);
         });
 
         var notification = data.notification;
@@ -372,7 +374,7 @@ module.exports = BaseCronJob.extend({},
                         return Q();
                     }
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.error(err);
                     return Q().reject();
                 });
         },

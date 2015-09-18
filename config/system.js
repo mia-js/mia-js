@@ -22,14 +22,11 @@ module.exports = {
         region: 'gb'
     },
 
-    // Log error codes to db
-    logging: {
-        logErrorStatus: [400, 403, 404, 500]
-    },
-
     /* ########## Environments #################
      * Define multiple stages with different configuration.*/
     local: {
+
+        logLevel: "info", // none, fatal, error, warn, info, debug, trace
 
         /* Define virtual hosts (vhosts) this application should listen to. Use id in routes file definition to apply a route to a host.
          hosts are optional. If a routes file does not have a hostId setting the file is listening to every host pointing to this server
@@ -76,10 +73,11 @@ module.exports = {
 
         // Init memcache. Available in controllers with Shared.memcached()
         memcached: {
+            flushOnStart: true, // Flush mem cache content on initial first usage of memcache after server start
             servers: 'localhost:11211',
             options: {
                 retries: 0,
-                retry: 0,
+                retry: 5000,
                 timeout: 500
             }
         },
@@ -117,6 +115,9 @@ module.exports = {
     },
 
     production: {
+
+        logLevel: "info", // none, fatal, error, warn, info, debug, trace
+
         /* Define virtual hosts (vhosts) this application should listen to. Use id in routes file definition to apply a route to a host.
          hosts are optional. If a routes file does not have a hostId setting the file is listening to every host pointing to this server
          */
@@ -161,10 +162,11 @@ module.exports = {
 
         // Init memcache. Available in controllers with Shared.memcached()
         memcached: {
+            flushOnStart: true, // Flush mem cache content on initial first usage of memcache after server start
             servers: 'localhost:11211',
             options: {
                 retries: 0,
-                retry: 0,
+                retry: 5000,
                 timeout: 500
             }
         },

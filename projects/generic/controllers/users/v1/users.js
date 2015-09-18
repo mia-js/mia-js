@@ -11,6 +11,8 @@ var Q = require('q')
     , _ = require('lodash')
     , UserProfileModel = Shared.models('generic-userProfile-model');
 
+Q.stopUnhandledRejectionTracking();
+
 function thisModule() {
     var self = this;
     self.disabled = false; // Enable /disable controller
@@ -246,7 +248,7 @@ function thisModule() {
         AuthManager.prepareDataForSignup(params).then(function (params) {
             req.miajs.userService.signupParams = params;
             next();
-        });
+        }).done();
     };
 
     var _getUserAccountResponse = function (req, res, userData, appId) {
@@ -276,7 +278,7 @@ function thisModule() {
 
         //checking preconditions for chaining this controller
         if (!req.miajs.device || !req.miajs.userService || !req.miajs.userService.signupParams) {
-            MiaJs.Logger('err', "Failure in chaining controllers.");
+            Logger.error("Failure in chaining controllers.");
             next({status: 500});
             return;
         }
@@ -306,7 +308,7 @@ function thisModule() {
             }
         }).fail(function (err) {
             next(err);
-        });
+        }).done();
     };
 
     /**
@@ -323,7 +325,7 @@ function thisModule() {
 
         //checking preconditions for chaining this controller
         if (!req.miajs.device) {
-            MiaJs.Logger('err', 'Missing req.miajs.device. Failure in chaining controllers.');
+            Logger.error('Missing req.miajs.device. Failure in chaining controllers.');
             next({status: 500});
             return;
         }
@@ -349,7 +351,7 @@ function thisModule() {
             }
         }).fail(function (err) {
             next(err);
-        });
+        }).done();
     };
 
     self.setParametersForFbLogin = function (req, res, next) {
@@ -393,7 +395,7 @@ function thisModule() {
             || !req.miajs.userService
             || !req.miajs.userService.fbLoginParams
             || !req.miajs.userService.fbLoginParams.thirdPartyLogin) {
-            MiaJs.Logger('err', "Failure in chaining controllers.");
+            Logger.error("Failure in chaining controllers.");
             next({status: 500});
             return;
         }
@@ -458,7 +460,7 @@ function thisModule() {
         var group = req.miajs.userService.group || req.miajs.route.group;
 
         if (!req.miajs.device) {
-            MiaJs.Logger('err', 'Missing req.miajs.device. Failure in chaining controllers.');
+            Logger.error('Missing req.miajs.device. Failure in chaining controllers.');
             next({status: 500});
             return;
         }
@@ -468,7 +470,7 @@ function thisModule() {
             next();
         }).fail(function (err) {
             next(err);
-        });
+        }).done();
     };
 
     /**
@@ -486,7 +488,7 @@ function thisModule() {
         var appId = req.miajs.userService.appId || req.miajs.route.group;
 
         if (!req.miajs.device) {
-            MiaJs.Logger('err', 'Missing req.miajs.device. Failure in chaining controllers.');
+            Logger.error('Missing req.miajs.device. Failure in chaining controllers.');
             next({status: 500});
             return;
         }
@@ -521,7 +523,7 @@ function thisModule() {
             }
         }).fail(function (err) {
             next(err);
-        });
+        }).done();
     };
 
     /**
@@ -539,7 +541,7 @@ function thisModule() {
 
         //checking preconditions for chaining this controller
         if (!req.miajs.validatedParameters || !req.miajs.device) {
-            MiaJs.Logger('err', "Missing session or validatedParameters in req.miajs. Failure in chaining controllers.");
+            Logger.error("Missing session or validatedParameters in req.miajs. Failure in chaining controllers.");
             next({status: 500});
             return;
         }
@@ -606,7 +608,7 @@ function thisModule() {
             next();
         }).fail(function (err) {
             next(err);
-        });
+        }).done();
     };
 
     /**
@@ -644,7 +646,7 @@ function thisModule() {
                 _setAuthentificateHeader(req, res);
             }
             next(err);
-        });
+        }).done();
     };
 
     var _setAuthentificateHeader = function (req, res) {
@@ -687,7 +689,7 @@ function thisModule() {
                 _setAuthentificateHeader(req, res);
             }
             next(err);
-        });
+        }).done();
     };
 
     /**
@@ -722,7 +724,7 @@ function thisModule() {
                 _setAuthentificateHeader(req, res);
             }
             next(err);
-        });
+        }).done();
     };
 
     /**
@@ -757,7 +759,7 @@ function thisModule() {
                 _setAuthentificateHeader(req, res);
             }
             next(err);
-        });
+        }).done();
     };
 
     return self;

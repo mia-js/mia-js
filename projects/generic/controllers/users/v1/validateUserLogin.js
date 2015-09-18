@@ -36,23 +36,20 @@ function thisModule() {
         req.miajs.userService = req.miajs.userService || {};
         var group = req.miajs.userService.group || req.miajs.route.group;
 
-        AuthService.getUserLoggedInOnDevice(req.miajs.device.id, group)
-            .then(function (userData) {
-                if (!userData) {
-                    next({
-                        status: 401,
-                        err: {'code': 'NoUserIsLoggedIn', 'msg': translator('generic-translations', 'NoUserIsLoggedIn')}
-                    });
-                }
-                else {
-                    req.miajs.userData = userData;
-                    next();
-                }
-            })
-            .fail(function (err) {
-                next(err);
-            })
-            ;
+        AuthService.getUserLoggedInOnDevice(req.miajs.device.id, group).then(function (userData) {
+            if (!userData) {
+                next({
+                    status: 401,
+                    err: {'code': 'NoUserIsLoggedIn', 'msg': translator('generic-translations', 'NoUserIsLoggedIn')}
+                });
+            }
+            else {
+                req.miajs.userData = userData;
+                next();
+            }
+        }).fail(function (err) {
+            next(err);
+        }).done();
     };
 
     return self;

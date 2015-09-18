@@ -46,6 +46,7 @@
 
 var _ = require('lodash')
     , MiaJs = require('mia-js-core')
+    , Logger = MiaJs.Logger.tag('cron', 'demo')
     , Utils = MiaJs.Utils
     , CronJobs = MiaJs.CronJobs
     , BaseCronJob = CronJobs.BaseCronJob
@@ -77,7 +78,7 @@ module.exports = BaseCronJob.extend({},
         identity: 'removeToDosMarkedAsDoneCron', // Job name
 
         worker: function () {
-            console.log("Start clean cronjob, see crons");
+            Logger.info("Start clean cronjob, see crons");
 
             var maxAge = new Date(Date.now() - (5 * 60 * 1000)); // older than 5 minutes
 
@@ -88,10 +89,10 @@ module.exports = BaseCronJob.extend({},
                 {validate: false}).then(function (data) {
                     var deletedCount = data.deletedCount || 0;
                     if (deletedCount > 0) {
-                        MiaJs.Logger('info', data + ' todos auto removed');
+                        Logger.info(deletedCount + ' todos auto removed');
                     }
                 }).fail(function (err) {
-                    MiaJs.Logger('err', err);
+                    Logger.error(err);
                 });
         },
 

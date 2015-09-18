@@ -5,7 +5,7 @@
  */
 
 var MiaJs = require('mia-js-core')
-    , Logger = MiaJs.Utils.Logger
+    , Logger = MiaJs.Logger
     , Shared = MiaJs.Shared
     , fs = require("fs")
     , _ = require('lodash');

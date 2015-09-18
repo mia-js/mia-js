@@ -5,7 +5,7 @@
 var _ = require('lodash');
 var Async = require('async');
 var Shared = require('mia-js-core/node_modules/shared');
-var Logger = require('mia-js-core/node_modules/logger');
+var Logger = require('mia-js-core/node_modules/logger').tag('demo');
 var DeviceModel = Shared.models('generic-device-model');
 
 function thisModule() {
@@ -38,10 +38,10 @@ function thisModule() {
                 //Save or update secrets in db
                 secretToken.insertOne(token).then(function (result) {
                     // New session token saved to db
-                    Logger('info', 'Written secretId ' + token.id + ' to db.');
+                    Logger.info('Written secretId ' + token.id + ' to db.');
                 }).fail(function (err) {
                     if (err.code != 11000) {
-                        Logger('err', 'Error while writing initial data secrets to db');
+                        Logger.error('Error while writing initial data secrets to db');
                     }
                 });
             }
@@ -68,18 +68,18 @@ function thisModule() {
         return DeviceModel.findOne({'access.key': staticAccessKey}).then(function (deviceData) {
             if (deviceData != null) {
                 //admin session exists
-                console.log("User with static key " + staticAccessKey + " already exists!");
+                Logger.info("User with static key " + staticAccessKey + " already exists!");
             }
             else {
                 var device = new DeviceModel();
                 return device.setValues(addDevice).then(function (data) {
                     return device.insertOne(addDevice).then(function (data) {
-                        console.log("A user with session id" + addDevice.session.id + " added!");
+                        Logger.info("A user with session id" + addDevice.session.id + " added!");
                     })
                 });
             }
         }).fail(function (err) {
-            console.log(err);
+            Logger.error(err);
         });
     };
 

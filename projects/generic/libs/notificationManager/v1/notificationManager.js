@@ -11,7 +11,7 @@
  },
  schedule: new Date(Date.now()+60*5*1000) // OPTIONAL: Set a schedule date for the notification
  }).address("adrian@kuehlewind.net").fail(function(err){
-            console.log(err);
+            Logger.error(err);
         });
 
 
@@ -24,7 +24,7 @@
             payload: {} // OPTIONAL: Put in any object you like to submit to the app as payload
             schedule: new Date(Date.now()+60*5*1000) // OPTIONAL: Set a schedule date for the notification
         }).user("5538b7b3f0007f6ce1000006").fail(function(err){
-            console.log(err);
+            Logger.error(err);
         });
 
  NotificationManager.push({
@@ -34,7 +34,7 @@
                 name: "Test"
             }
         }).device("3f90f57437acb4dfd7f0f9221763ae32").fail(function(err){
-            console.log(err);
+            Logger.error(err);
         });
 
  */
@@ -50,6 +50,8 @@ var Q = require('q')
     , Encryption = Utils.Encryption
     , AuthManager = Shared.libs("generic-userAuthManager")
     , NotificationModel = Shared.models('generic-notifications-model');
+
+Q.stopUnhandledRejectionTracking();
 
 function thisModule() {
     var self = this;

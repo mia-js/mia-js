@@ -3,7 +3,7 @@
  */
 
 var MiaJs = require('mia-js-core')
-    , Logger = MiaJs.Utils.Logger
+    , Logger = MiaJs.Logger.tag('demo')
     , Shared = MiaJs.Shared
     , _ = require('lodash');
 

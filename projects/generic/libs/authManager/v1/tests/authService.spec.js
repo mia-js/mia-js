@@ -1,5 +1,6 @@
 global.sharedInfo = null;
 var Shared = require('mia-js-core/node_modules/shared')
+    , Logger = require('mia-js-core/node_modules/logger').tag('test')
     , MongoAdapter = require('mia-js-core/node_modules/dbAdapters').MongoAdapter
     , DeviceAuth = require('../generic-deviceAndSessionAuth.js')
     , UserAuth = require('../generic-deviceAndSessionAuth.js');
@@ -38,53 +39,53 @@ describe("AuthManager", function () {
                 it("createDevice", function (next) {
                     DeviceAuth.createDevice({}, {}, 5).then(function (deviceId) {
                         expect(deviceId).not.toBeNull();
-                        console.log("Created device: " + deviceId);
+                        Logger.info("Created device: " + deviceId);
                         createdDeviceId = deviceId;
                         next();
                     }).fail(function (err) {
-                        console.log(err);
+                        Logger.error(err);
                         expect(false).toBeTruthy();
                         next();
-                    });
+                    }).done();
                 });
 
                 it("updateDevice", function (next) {
                     DeviceAuth.updateDevice({}, createdDeviceId, {device: {model: 'iPhone7'}}).then(function (deviceId) {
                         expect(deviceId).not.toBeNull();
-                        console.log("Updated device: " + deviceId);
+                        Logger.info("Updated device: " + deviceId);
                         createdDeviceId = deviceId;
                         next();
                     }).fail(function (err) {
-                        console.log(err);
+                        Logger.error(err);
                         expect(false).toBeTruthy();
                         next();
-                    });
+                    }).done();
                 });
 
                 it("generateSessionId", function (next) {
                     DeviceAuth.generateSessionId({}, createdDeviceId, '1.1.1.1', ['12gebrauchtwagen.de'], 5).then(function (sessionId) {
                         expect(sessionId).not.toBeNull();
-                        console.log("Created session: " + sessionId);
+                        Logger.info("Created session: " + sessionId);
                         createdSessionId = sessionId;
                         next();
                     }).fail(function (err) {
-                        console.log(err);
+                        Logger.error(err);
                         expect(false).toBeTruthy();
                         next();
-                    });
+                    }).done();
                 });
 
                 it("validateSessionToken", function (next) {
                     DeviceAuth.validateSessionToken({}, createdSessionId, '1.1.1.1', '12gebrauchtwagen.de').then(function (deviceData) {
                         expect(deviceData).not.toBeNull();
                         callback(deviceData);
-                        console.log("Device data: " + deviceData);
+                        Logger.info("Device data: " + deviceData);
                         next();
                     }).fail(function (err) {
-                        console.log(err);
+                        Logger.error(err);
                         expect(false).toBeTruthy();
                         next();
-                    });
+                    }).done();
                 });
             }
 
@@ -111,9 +112,9 @@ describe("AuthManager", function () {
                 UserAuth.deleteUser('login1', 'group1').then(function () {
                     next();
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.info(err);
                     next();
-                });
+                }).done();
             });
 
             it("signUpUser", function (next) {
@@ -125,13 +126,13 @@ describe("AuthManager", function () {
                 }, options).then(function (userData) {
                     expect(userData).not.toBeNull();
                     createdUserData = userData;
-                    console.log(userData);
+                    Logger.info(userData);
                     next();
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                });
+                }).done();
             });
 
             it("_registerAccessTokenCheckingMaxDevices", function (next) {
@@ -148,10 +149,10 @@ describe("AuthManager", function () {
                         expect(userData).not.toBeNull();
                         next();
                     }).fail(function (err) {
-                        console.log(err);
+                        Logger.error(err);
                         expect(false).toBeTruthy();
                         next();
-                    });
+                    }).done();
             });
 
             it("_registerAccessTokenCheckingMaxDevices", function (next) {
@@ -168,10 +169,10 @@ describe("AuthManager", function () {
                         expect(userData).toBeNull();
                         next();
                     }).fail(function (err) {
-                        console.log(err);
+                        Logger.error(err);
                         expect(false).toBeTruthy();
                         next();
-                    });
+                    }).done();
             });
 
             it("_registerAccessTokenCheckingMaxDevices", function (next) {
@@ -188,10 +189,10 @@ describe("AuthManager", function () {
                         expect(userData).not.toBeNull();
                         next();
                     }).fail(function (err) {
-                        console.log(err);
+                        Logger.error(err);
                         expect(false).toBeTruthy();
                         next();
-                    });
+                    }).done();
             });
 
             it("_isUserLoggedInOnDeviceByLoginAndGroup", function (next) {
@@ -199,10 +200,10 @@ describe("AuthManager", function () {
                     expect(isLoggedIn).toBeTruthy();
                     next();
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                });
+                }).done();
             });
 
             it("logoutAnyUserFromDevice", function (next) {
@@ -210,10 +211,10 @@ describe("AuthManager", function () {
                     expect(userData).not.toBeNull();
                     next();
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                });
+                }).done();
             });
 
             it("_isUserLoggedInOnDeviceByLoginAndGroup", function (next) {
@@ -221,10 +222,10 @@ describe("AuthManager", function () {
                     expect(isLoggedIn).toBeFalsy();
                     next();
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                });
+                }).done();
             });
         });
 
@@ -237,9 +238,9 @@ describe("AuthManager", function () {
                 UserAuth.deleteUser('login2', 'group2').then(function () {
                     next();
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.error(err);
                     next();
-                });
+                }).done();
             });
 
             it("signUpUser", function (next) {
@@ -251,22 +252,22 @@ describe("AuthManager", function () {
                 }, options).then(function (userData) {
                     expect(userData).not.toBeNull();
                     createdUserData1 = userData;
-                    console.log(userData);
+                    Logger.info(userData);
                     next();
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                });
+                }).done();
             });
 
             it("deleteUser", function (next) {
                 UserAuth.deleteUser('login3', 'group2').then(function () {
                     next();
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.error(err);
                     next();
-                });
+                }).done();
             });
 
             it("signUpUser", function (next) {
@@ -278,13 +279,13 @@ describe("AuthManager", function () {
                 }, options).then(function (userData) {
                     expect(userData).not.toBeNull();
                     createdUserData2 = userData;
-                    console.log(userData);
+                    Logger.info(userData);
                     next();
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                });
+                }).done();
             });
 
             it("login user 1 on device 1", function (next) {
@@ -292,10 +293,10 @@ describe("AuthManager", function () {
                     expect(loginResult).not.toBeNull();
                     next();
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                });
+                }).done();
             });
 
             it("login user 1 on device 2", function (next) {
@@ -303,10 +304,10 @@ describe("AuthManager", function () {
                     expect(loginResult).not.toBeNull();
                     next();
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                });
+                }).done();
             });
 
             it("login user 2 on device 2", function (next) {
@@ -317,13 +318,13 @@ describe("AuthManager", function () {
                         UserAuth.isUserLoggedInOnDeviceByLoginAndGroup('login2', 'group2', deviceId2, 'app3').then(function (userData) {
                             expect(userData).toBeNull();
                             next();
-                        });
-                    });
+                        }).done();
+                    }).done();
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                });
+                }).done();
             });
 
             it("login user 1 on device 2", function (next) {
@@ -334,13 +335,13 @@ describe("AuthManager", function () {
                         UserAuth.isUserLoggedInOnDeviceByLoginAndGroup('login3', 'group2', deviceId2, 'app3').then(function (userData) {
                             expect(userData).toBeNull();
                             next();
-                        });
-                    });
+                        }).done();
+                    }).done();
                 }).fail(function (err) {
-                    console.log(err);
+                    Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                });
+                }).done();
             });
         });
     });
@@ -353,7 +354,7 @@ describe("AuthManager", function () {
 //        it("_hashCredentials", function (next) {
 //            UserAuth.hashCredentials('login1', 'password1', options).then(function (hash) {
 //                expect(hash).toBeDefined();
-//                console.log('User credentials hash: ' + hash);
+//                Logger.info('User credentials hash: ' + hash);
 //                next();
 //            });
 //        });
@@ -376,7 +377,7 @@ describe("AuthManager", function () {
 //            UserAuth.deleteUser('login1').then(function () {
 //                next();
 //            }).fail(function (err) {
-//                console.log(err);
+//                Logger.error(err);
 //                next();
 //            });
 //        });
@@ -384,10 +385,10 @@ describe("AuthManager", function () {
 //        it("signUpUser", function (next) {
 //            UserAuth.signUpUser('login1', 'password1', options).then(function (userData) {
 //                expect(userData).toBeDefined();
-//                console.log(userData);
+//                Logger.info(userData);
 //                next();
 //            }).fail(function (err) {
-//                console.log(err);
+//                Logger.error(err);
 //                next();
 //            });
 //        });
@@ -396,10 +397,10 @@ describe("AuthManager", function () {
 //            UserAuth.getUserData('login1').then(function (userData) {
 //                expect(userData).toBeDefined();
 //                loadedUserData = userData;
-//                console.log(userData);
+//                Logger.info(userData);
 //                next();
 //            }).fail(function (err) {
-//                console.log(err);
+//                Logger.error(err);
 //                expect(false).toBeTruthy();
 //                next();
 //            });
@@ -413,10 +414,10 @@ describe("AuthManager", function () {
 //                var deviceData = loginCheckResult.deviceData;
 //                var isLoggedIn = loginCheckResult.isLoggedIn;
 //                expect(isLoggedIn).toBeFalsy();
-//                console.log(loginCheckResult);
+//                Logger.info(loginCheckResult);
 //                next();
 //            }).fail(function (err) {
-//                console.log(err);
+//                Logger.error(err);
 //                expect(false).toBeTruthy();
 //                next();
 //            });
@@ -427,10 +428,10 @@ describe("AuthManager", function () {
 //                expect(loginData).toBeDefined();
 //                expect(loginData.accessToken).toBeDefined();
 //                expect(loginData.userData).toBeDefined();
-//                console.log('Access token: ' + accessToken);
+//                Logger.info('Access token: ' + accessToken);
 //                next();
 //            }).fail(function (err) {
-//                console.log(err);
+//                Logger.error(err);
 //                expect(false).toBeTruthy();
 //                next();
 //            });
@@ -442,10 +443,10 @@ describe("AuthManager", function () {
 //                var deviceData = loginCheckResult.deviceData;
 //                var isLoggedIn = loginCheckResult.isLoggedIn;
 //                expect(isLoggedIn).toBeTruthy();
-//                console.log(loginCheckResult);
+//                Logger.info(loginCheckResult);
 //                next();
 //            }).fail(function (err) {
-//                console.log(err);
+//                Logger.error(err);
 //                expect(false).toBeTruthy();
 //                next();
 //            });
@@ -456,10 +457,10 @@ describe("AuthManager", function () {
 //                expect(loginData).toBeDefined();
 //                expect(loginData.accessToken).toBeDefined();
 //                expect(loginData.userData).toBeDefined();
-//                console.log('Access token: ' + accessToken);
+//                Logger.info('Access token: ' + accessToken);
 //                next();
 //            }).fail(function (err) {
-//                console.log(err);
+//                Logger.error(err);
 //                expect(false).toBeTruthy();
 //                next();
 //            });
@@ -468,10 +469,10 @@ describe("AuthManager", function () {
 //        it("Login same user with wrong password on device 2", function (next) {
 //            UserAuth.loginUser('login1', 'password2', loadedDeviceData2, 'Phone1', options).then(function (loginData) {
 //                expect(loginData).not.toBeDefined();
-//                console.log('Access token: ' + accessToken);
+//                Logger.info('Access token: ' + accessToken);
 //                next();
 //            }).fail(function (err) {
-//                console.log(err);
+//                Logger.error(err);
 //                expect(true).toBeTruthy();
 //                next();
 //            });
@@ -480,10 +481,10 @@ describe("AuthManager", function () {
 //        it("Login same user on another device 3 - should exceed max device number", function (next) {
 //            UserAuth.loginUser('login1', 'password1', loadedDeviceData3, 'Phone3', options).then(function (loginData) {
 //                expect(loginData).not.toBeDefined();
-//                console.log('Access token: ' + accessToken);
+//                Logger.info('Access token: ' + accessToken);
 //                next();
 //            }).fail(function (err) {
-//                console.log(err);
+//                Logger.error(err);
 //                expect(true).toBeTruthy();
 //                next();
 //            });

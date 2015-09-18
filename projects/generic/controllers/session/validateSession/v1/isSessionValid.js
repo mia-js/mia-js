@@ -55,7 +55,10 @@ function thisModule() {
         }
 
         if (_.isEmpty(ip)) {
-            next({'status': 403, err: {'code': 'NoIPDetermined', 'msg': Translator('generic-translations', 'NoIPDetermined')}});
+            next({
+                'status': 403,
+                err: {'code': 'NoIPDetermined', 'msg': Translator('generic-translations', 'NoIPDetermined')}
+            });
             return;
         }
 
@@ -67,26 +70,23 @@ function thisModule() {
             return;
         }
 
-        AuthService.validateSessionToken({translator: translator}, sessionId, ip, group)
-            .then(function (deviceData) {
+        AuthService.validateSessionToken({translator: translator}, sessionId, ip, group).then(function (deviceData) {
 
-                // Calculate datetime offset between server and client in milliseconds if header field requestdate is set and valid date
-                var deviceDate = new Date(req.headers.date);
-                var dateNow = new Date(Date.now());
-                if (deviceDate != "Invalid Date") {
-                    deviceData.timeOffset = deviceDate - dateNow;
-                }
-                else {
-                    deviceData.timeOffset = 0;
-                }
+            // Calculate datetime offset between server and client in milliseconds if header field requestdate is set and valid date
+            var deviceDate = new Date(req.headers.date);
+            var dateNow = new Date(Date.now());
+            if (deviceDate != "Invalid Date") {
+                deviceData.timeOffset = deviceDate - dateNow;
+            }
+            else {
+                deviceData.timeOffset = 0;
+            }
 
-                req.miajs.device = deviceData;
-                next();
-            })
-            .fail(function (err) {
-                next(err);
-            })
-            ;
+            req.miajs.device = deviceData;
+            next();
+        }).fail(function (err) {
+            next(err);
+        }).done();
     };
 
     return self;
