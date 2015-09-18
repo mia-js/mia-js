@@ -6,14 +6,14 @@ Passthrough, aggregate or modify other external apis or create your own ones in 
 Use multiple project folders to keep track of all your apis and connect them by loose coupling of ids. Mia.js provides predefined functionality like user management, device profile management, session handling, authorization layers or notification handlers (push, email). There is also an iOS and Android SDK available to work with mia.js.
 
 # Installation
-**With [node.js](http://nodejs.org) and [mongoDB](https://www.mongodb.org/) installed:**
+**With [node.js](http://nodejs.org) v.10.x and [mongoDB](https://www.mongodb.org/) >2.6x installed:**
 ```sh
 # Get the latest stable release of mia.ja
 $ npm install mia-js
 ```
 
 > ######New release available
-> The v0.80 release of mia.js is now available
+> The v0.8.1 release of mia.js is now available
 
 
 # Quick start
@@ -61,10 +61,112 @@ You can define multiple environments like local, stage, production or your own w
   * Paths of mia.js project working directories
   * HTTP/HTTPS server settings like port, ssl 
   * Virtual hosts to run multiple domains on same application server
+  * CronJob configuration
   * MongoDB settings like replica sets, ports, hostnames 
+  * Memcache settings
   * Default culture and language settings
   * Logging level
   * Debug mode
+
+##### Configuration example:
+```js
+module.exports = {
+    // Directory names for mia-js modules in projects directory
+    path: {
+        projects: 'projects',
+        modules: {
+            routes: 'routes',
+            models: 'models',
+            controllers: 'controllers',
+            crons: 'crons',
+            public: 'public',
+            libs: 'libs',
+            config: 'config',
+            init: 'init'
+        },
+        config: 'config'
+    },
+
+    // Default culture and language used for translations
+    defaultCulture: {
+        language: 'en',
+        region: 'gb'
+    },
+
+     // Define multiple stages with different configuration i.e. local, stage, production
+    local: {
+        logLevel: "info", // none, fatal, error, warn, info, debug, trace
+
+        /* Define virtual hosts (vhosts) this application should listen to. Use id in routes file definition to apply a route to a host. Hosts are optional. If a routes file does not have a hostId setting the file is listening to every host pointing to this server
+         */
+        hosts: [
+            {
+                id: "myApplication1",  // HostId
+                host: "example.com" // Host name of this hostId.
+            },
+            {
+                id: "myApplication2", // HostId
+                host: ["api.example.com", "example-domain.com"] // Host names of this hostId.
+            }
+        ],
+        server: { // Optional define http, https or both
+            http: { 
+                port: 3000, // Port for http
+                redir: true // Fforward all traffic to https
+            }
+            , https: { // Optional define http, https or both
+                port: 4000, // Port for https
+                options: { // SSL Options
+                    key: fs.readFileSync('cert/ssl.key'),
+                    cert: fs.readFileSync('cert/ssl.crt'),
+                    ca: fs.readFileSync('cert/ca.pem'),
+                    passphrase: 'xxxxxx',
+                    requestCert: true,
+                    rejectUnauthorized: false
+                }
+            }
+        },
+        debug: true, // Show more details in error case
+        cronJobs: {
+            enabled: true, // Enable/Disable cron jobs as a global setting
+            allowedHosts: [] // Define specific hosts (host names) to run cronjobs. Leave empty to start cron on any server running this application
+        },
+
+        //Wrap each request function in a try catch block to catch all application exceptions automatically
+        tryCatchForRouteFunctions: true,
+
+        // Memcache settings if you want to use memcache to cache data in your controllers
+        memcached: {
+            flushOnStart: true, // Flush mem cache content on initial first usage of memcache after server start
+            servers: 'localhost:11211',
+            options: {
+                retries: 0,
+                retry: 5000,
+                timeout: 500
+            }
+        },
+
+        //Default db name of mongoDb to use for application
+        defaultMongoDatabase: 'mia',
+
+        // Mongodb: Database configuration
+        mongoDatabases: {
+            // Application dbs. You can define multiple databases
+            mia: {
+                url: 'mongodb://api:api@localhost:27017/mia',
+                options: { // MongoDB options see MongoClient definition
+                    db: {
+                        w: 1 //write acknowledgement
+                    },
+                    server: {
+                        poolSize: 15
+                    }
+                }
+            }
+        }
+    }
+};
+```
 
 #### Translations configuration
 Mia.js is designed to support multiple languages for response and error handling messages. See `config/translations.js` to modify theses messages on a global level.
@@ -166,7 +268,8 @@ To define a cron job place a file in the folder `crons` and add the following co
 var _ = require('lodash')
     , MiaJs = require('mia-js-core') // include Mia.js core module 
     , CronJobs = MiaJs.CronJobs // use cron functionality of mia.js core module
-    , BaseCronJob = CronJobs.BaseCronJob; // extend the cron definition to your cron model
+    , BaseCronJob = CronJobs.BaseCronJob // extend the cron definition to your cron model
+    , Q = require('q'); // Promise lib
 
 module.exports = BaseCronJob.extend({},
     {
@@ -181,16 +284,18 @@ module.exports = BaseCronJob.extend({},
             timezone: 'CET'
         },
 
-        isPaused: false,
-        servers: ['server1'], // Not working currently - ignore
+        isSuspended: false, // set to true to suspend this job
+        debugOutput: false, // set to true to get detailed output of job startup and terminating
+        allowedHosts: [], // define hosts to run this job. Leave empty if every host is allowed to
 
-        maxInstanceNumberTotal: 1,// Not working currently - ignore
-        maxInstanceNumberPerServer: 1,// Not working currently - ignore
+        maxInstanceNumberTotal: 1, // max number of paralell running instances on all application host 
+        maxInstanceNumberPerServer: 1, // max number of paralell running instances on this host
 
         identity: 'randomlyGenerateNewIcecreamFlavours', // Job name
 
         worker: function () {
             // RUN A TASK HERE
+            return Q(); // Cronjob has to return a promise
         },
         created: '2015-07-14T12:00:00', // Creation date
         modified: '2015-07-14T12:00:00' // Last modified date
@@ -241,7 +346,7 @@ When handling with user generated data you always have to deal with validation t
 #### Defining a model
 
 ```js
-var BaseModel = require("mia-js-core/node_modules/baseModel").V2;
+var BaseModel = require("mia-js-core/node_modules/baseModel");
 module.exports = BaseModel.extend({
         data: {
             _id: {},
@@ -314,8 +419,14 @@ module.exports = {
     group: 'demo', // Group name
     name: 'My icecream API',  // if disabled path is used as name in api documentation
     version: '1.0', // Version
+    hostId: ['myDomain1','myDomain2'] // Optional if vhosts are defined in global mia.js config.
     environment: ['local','production'], // Define environments where this route file should be registered
     prefix: ['/icecream/v1','/icecream/latest'], // Route prefix. Multiple prefixes possible
+    corsHeaders: { // Optionally set CORS headers to routes definition or to a single route
+        "Access-Control-Allow-Origin": "*", // See CORS header definition 
+        "Access-Control-Allow-Headers": "Content-Type",  // See CORS header definition 
+        "Access-Control-Allow-Credentials": true  // See CORS header definition 
+    },
     routes: {
         // Route /unicorn
         './flavours': {
@@ -338,6 +449,12 @@ module.exports = {
                         name: 'generic-defaultResponse',
                         version: '1.0'
                     }
+                ],
+                errorController: [
+                    {
+                        name: 'myCustomErrorController',
+                        version: '1.0'
+                    }
                 ]
             }
         }
@@ -350,9 +467,11 @@ There are some global parameters of your routes file to adjust the routes behavi
 
 * `group` - Connect your project files by giving it a group name. When a request is processed this group name will be available to all controllers to identify what route is currently calling this controller. Due to your controllers can be nested in multiple routes this is kind of important to identify from which routes this request came from. You can use this variable to write a controller function with different return values depending on the route path.
 * `name` - *optional* All routes will be grouped by this optional name in auto generated documentation. Using this parameter gives your routes a more 	meaningfully name. If not set the path is taken as group name for all routes in this file the documentation.
+* `hostId` - When using vhosts in mia.js global configuration you can bind all routes of this route file to a specific vhost i.e. my.domain.tld. In consequence this route is only available for requests coming from this domain. You can assign multiple hostIds to a route. Notice: Use a host ID here not a domain name. Domains names for vhosts should be defined in mia.js global config matching to a hostId.
 * `version` - Mia.js is designed to work with versioning. Giving your routes file and also your controllers a version number makes it easy to use versioning for your route by simply duplicating the routes file and make your modifications.
 * `envrionment` - *optional* Define environments for a routes file. The routes file is only registered and available public if the environment name matches the current environment name on server startup. You can creates routes for testing purpose and i.e. just deploy them to your staging servers and disable and hide them on your production environment.
 * `prefix` - *optional* You can prefix a route or even use multiple prefixes to make sure not to have conflicts with other route files or other projects. When building api routes we recommend to use the version nummer as part of the prefix i.e. `/icecream/v1/flavours`. It's up to you!
+* `corsHeaders` - Apply CORS headers to a routes file i.e. for Cross Domain Policy. Defining the CORS header automatically enables all routes of this routes definiton file to response to a browsers CORS requests methods OPTIONS
 * `routes` - All of your application routes 
 
 ##### Routes
@@ -381,13 +500,18 @@ Define multiple routes for your application project. Mia.js has some build in me
 * `bodyparser {type:'json',limit:'512kb'` - *optional* Mia.js automatically parses a request body as json. To change this behaviour set the bodyparser type to `none` or change the limit of the body size.
 * `controllers` - Array of your project controllers to use for this route
 * `authorization` - Indicates if this route requries authorization. This flag is available in `generic-listServices` controller to indicate that this service is somehow protected and needs authorization.
-
+* `corsHeaders` - Apply CORS headers to single route i.e. for Cross Domain Policy. Defining the CORS header automatically enables this route to response to a browsers CORS requests methods OPTIONS
+* 
 ####### Define controllers of a route method
 Controllers are defined as array in the routes file definition of your route method. The order of elements followes the chaining of your controllers. You can chain as many controllers as you need to perform a request and return a response. Controllers are chained by calling `next()` in a controller file. The last controller should handle the response output i.e. `res.send()` see [Express](https://github.com/strongloop/express)
 
 * `name` - Identity of the controller alias the field `identity` in your controller file. We should rename this ;-)
 * `version` - Version of the controller
 * `function` - Name of the custom function to use with this route request. Skip this parameter if you provide a method with the same name as the request method in your controller i.e. `self.list`
+
+####### Define error controllers of a route
+In the same way `controllers` are nested and used you can define `errorController` to provide a custom error handler to your route. In every case an error occures in the controller chain and `next(err)` is called all controllers are skipped and the `errorController` chain is executed. You can use as many error handler controllers as you like to finsih your task i.e. write some logs, cleanup some data or output a custom response to the client.
+
  
 # Globals
 <a name="globals"></a>
@@ -799,7 +923,7 @@ If you want to add some custom fields to a user profile i.e. phone number, fist 
 Example of a custom user profile model
 <a name="ExampleOfACustomUserProfileModel"></a>
 ```js
-var BaseModel = require("mia-js-core/node_modules/baseModel").V2;
+var BaseModel = require("mia-js-core/node_modules/baseModel");
 function thisModule() {
     var model = BaseModel.extend({
             data: {
