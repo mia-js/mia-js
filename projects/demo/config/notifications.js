@@ -1,5 +1,5 @@
 /*
-Mia.js supports notifications like email and push. To use notifications manager you have to define notifications settings and templates for notifications
+ Mia.js supports notifications like email and push. To use notifications manager you have to define notifications settings and templates for notifications
  */
 
 function thisModule() {
@@ -14,15 +14,25 @@ function thisModule() {
     self.notifications = {
         connectors: {
             smtp: {
-                user: "my@domain.com",
-                password: "your password",
-                host: "mail.domain.com"
+                production: {
+                    user: "my@domain.com",
+                    password: "your password",
+                    host: "mail.domain.com"
+                }
             },
             apns: {
-                production: true,
-                cert: new Buffer("your cert string"),
-                key: new Buffer("your key string"),
-                passphrase: "your password"
+                production: {
+                    production: true,
+                    cert: new Buffer("your cert string"),
+                    key: new Buffer("your key string"),
+                    passphrase: "your password"
+                },
+                sandbox: {
+                    production: false,
+                    cert: new Buffer("your cert string"),
+                    key: new Buffer("your key string"),
+                    passphrase: "your password"
+                }
             }
         },
         templates: {

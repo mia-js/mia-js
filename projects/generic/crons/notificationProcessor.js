@@ -133,12 +133,13 @@ var _getTemplateData = function (id, connector, type, name) {
 };
 
 //Get connector data
-var _getConnector = function (id, type) {
+var _getConnector = function (id, type, environment) {
+    environment = environment || "production";
     var model = Shared.config(id) || {};
-    if (_.isEmpty(model) || !model.connectors || !model.connectors[type] || _.isEmpty(model.connectors[type])) {
+    if (_.isEmpty(model) || !model.connectors || !model.connectors[type] || !model.connectors[type][environment] || _.isEmpty(model.connectors[type][environment])) {
         return Q.reject("No connector found");
     }
-    return Q.resolve(model.connectors[type]);
+    return Q.resolve(model.connectors[type][environment]);
 };
 
 //Do text replacements i.e. [name] -> Josh Miller
@@ -210,15 +211,17 @@ var _processEmail = function (data) {
 // Send push notification to Apple Push Notification Services (APNS)
 var _sendApn = function (data, deviceData) {
 
-    if (!Utils.MemberHelpers.hasPathPropertyValue(deviceData, "device.notification.token")) {
+    if (!deviceData.device || !deviceData.device.notification || !deviceData.device.notification.token) {
         _notificationStatusReject(data._id, "Device is not registered for push. Missing push token");
         return Q.reject("Device is not registered for push. Missing push token");
     }
 
-    return _getConnector(data.configId, "apns").then(function (connector) {
+    var environment = deviceData.device && deviceData.device.notification && deviceData.device.notification.environment ? deviceData.device.notification.environment : "production";
+
+    return _getConnector(data.configId, "apns", environment).then(function (connector) {
         var service = new Apn.Connection(connector);
         service.on("connected", function () {
-            Logger.info("Connected to APNS");
+            Logger.info("Connected to APNS ("+environment+")");
         });
         service.on("transmitted", function (notification, device) {
             Logger.info("Notification transmitted to: " + device.token.toString("hex"));

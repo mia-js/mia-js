@@ -306,6 +306,11 @@ function thisModule() {
                     notification: {
                         token: {
                             type: String
+                        },
+                        environment: {
+                            type: String,
+                            allow: ["sandbox", "production"],
+                            default: "production"
                         }
                     }
                 },
