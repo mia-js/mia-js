@@ -265,7 +265,7 @@ function thisModule() {
                             type: String,
                             minLength: 2,
                             maxLength: 50,
-                            allow: ['ios', 'android', 'windows phone'],
+                            //allow: ['ios', 'android', 'windows phone'],
                             convert: 'lower'
                         },
                         version: {

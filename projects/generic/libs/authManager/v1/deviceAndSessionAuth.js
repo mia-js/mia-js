@@ -38,17 +38,18 @@ function thisModule() {
     self.createDevice = function (options, deviceData, retryCount) {
         options = options || {};
         var translator = options.translator || Translator.default;
-        var device = new DeviceModel();
-        return device.setValuesAndInsert(deviceData).then(function (data) {
-            var deviceDataCreated = data.ops;
-            if (deviceDataCreated[0] && deviceDataCreated[0].id) {
-                return Q(deviceDataCreated[0].id);
-            }
-            else {
-                return Q.reject({status: 500});
-            }
+        return DeviceModel.validate(deviceData).then(function (validatedData) {
+            return DeviceModel.insertOne(validatedData).then(function (data) {
+                var deviceDataCreated = data.ops;
+                if (deviceDataCreated[0] && deviceDataCreated[0].id) {
+                    return Q(deviceDataCreated[0].id);
+                }
+                else {
+                    return Q.reject({status: 500});
+                }
+            })
         }).fail(function (err) {
-            if (err.status == 500){
+            if (err.status == 500) {
                 return Q.reject(err);
             }
             else if (err.code && err.code == '11000' && retryCount > 1) {
@@ -79,21 +80,22 @@ function thisModule() {
         deviceData.lastModified = new Date(Date.now());
 
         var device = new DeviceModel();
-        return device.setValuesAndUpdate({id: id}, {$set: deviceData}, {partial: true}).then(function (data) {
-            var nModified = data.result && data.result.nModified ? data.result.nModified : 0;
-            if (nModified == 0) {
-                return Q.reject({
-                    status: 400,
-                    err: {
-                        'code': 'DeviceIdDoesNotExist',
-                        'msg': translator('generic-translations', 'DeviceIdDoesNotExist')
-                    }
-                });
-            }
-            else {
-                return Q(id);
-            }
-
+        return DeviceModel.validate(deviceData, {partial: true}).then(function (validatedData) {
+            return DeviceModel.updateOne({id: id}, {$set: validatedData}, {partial: true}).then(function (data) {
+                var nModified = data.result && data.result.nModified ? data.result.nModified : 0;
+                if (nModified == 0) {
+                    return Q.reject({
+                        status: 400,
+                        err: {
+                            'code': 'DeviceIdDoesNotExist',
+                            'msg': translator('generic-translations', 'DeviceIdDoesNotExist')
+                        }
+                    });
+                }
+                else {
+                    return Q(id);
+                }
+            })
         }).fail(function (err) {
             return Q.reject(err);
         });
@@ -229,22 +231,24 @@ function thisModule() {
             status: 'active'
         };
 
-        return device.setValuesAndUpdate({id: deviceId}, {$set: params}, {partial: true}).then(function(data){
-            var nModified = data.result && data.result.nModified ? data.result.nModified : 0;
-            if (nModified == 1 && device.data && device.data['$set']['session.id']) {
-                return Q(device.data['$set']['session.id']);
-            }
-            else {
-                return Q.reject({
-                    status: 403,
-                    err: {
-                        'code': 'DeviceIdInvalid',
-                        'msg': translator('generic-translations', 'DeviceIdInvalidOrDoesNotExists')
-                    }
-                });
-            }
-        }).fail(function(err){
-            if (err.status == 500){
+        return DeviceModel.validate(params, {partial: true}).then(function (validatedData) {
+            return DeviceModel.updateOne({id: deviceId}, {$set: validatedData}, {partial: true}).then(function (data) {
+                var nModified = data.result && data.result.nModified ? data.result.nModified : 0;
+                if (nModified == 1 && validatedData && validatedData.session && validatedData.session.id) {
+                    return Q(validatedData.session.id);
+                }
+                else {
+                    return Q.reject({
+                        status: 403,
+                        err: {
+                            'code': 'DeviceIdInvalid',
+                            'msg': translator('generic-translations', 'DeviceIdInvalidOrDoesNotExists')
+                        }
+                    });
+                }
+            })
+        }).fail(function (err) {
+            if (err.status == 500) {
                 return Q.reject(err);
             }
             else if (err.code && err.code == '11001' && retryCount > 1) {

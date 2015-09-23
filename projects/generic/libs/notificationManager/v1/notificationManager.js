@@ -66,8 +66,9 @@ function thisModule() {
      * @private
      */
     var _pushToQueue = function (data) {
-        var notificationModel = new NotificationModel();
-        return notificationModel.setValuesAndInsert(data);
+        return NotificationModel.validate(data).then(function (validatedData) {
+            return NotificationModel.insertOne(validatedData);
+        })
     };
 
     /**

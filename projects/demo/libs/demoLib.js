@@ -51,15 +51,16 @@ function thisModule() {
             created: new Date()
         };
 
-        var toDoModel = new ToDoModel();
-        return toDoModel.setValuesAndInsert(data).then(function (data) {
-            var deviceDataCreated = data.ops;
-            if (deviceDataCreated && deviceDataCreated[0] && deviceDataCreated[0]._id) {
-                return Q.resolve({id: deviceDataCreated[0]._id});
-            }
-            else {
-                return Q.reject();
-            }
+        return ToDoModel.validate(data).then(function (validatedData) {
+            return ToDoModel.insertOne(validatedData).then(function (data) {
+                var deviceDataCreated = data.ops;
+                if (deviceDataCreated && deviceDataCreated[0] && deviceDataCreated[0]._id) {
+                    return Q.resolve({id: deviceDataCreated[0]._id});
+                }
+                else {
+                    return Q.reject();
+                }
+            });
 
         }).fail(function (err) {
             return err && err.code == "11000" ? Q.reject(err) : Q.reject();
@@ -85,9 +86,12 @@ function thisModule() {
             data["status"] = status;
         }
 
-        var toDoModel = new ToDoModel();
-        return toDoModel.setValuesAndUpdate(query, {$set: data}, {partial: true, upsert: true}).then(function () {
-            return Q.resolve();
+        return ToDoModel.validate(data, {partial: true}).then(function (validatedData) {
+            return ToDoModel.updateOne(query, {$set: validatedData}, {
+                upsert: true
+            }).then(function () {
+                return Q.resolve();
+            });
         }).fail(function (err) {
             return err && err.code == "11000" ? Q.reject(err) : Q.reject();
         })

@@ -204,15 +204,13 @@ function thisModule() {
             var userProfile;
             if (_.isObject(params.userProfileModel) && params.userProfileModel != UserProfileModel) {
                 //Use custom model
-                userProfile = new params.userProfileModel();
                 params.userProfileData = params.userProfileData || {};
-                return userProfile.setValues(params.userProfileData).fail(function (err) {
+                return params.userProfileModel.validate(params.userProfileData).fail(function (err) {
                     return Q.reject({status: 400, err: err});
                 });
             }
             else if (!_.isObject(params.userProfileModel) && !_.isObject(params.userProfileData)) {
                 //use default model and ignore provided userProfileData if any, since it can't be validated with default model
-                userProfile = new UserProfileModel();
                 var now = new Date(Date.now());
                 params.userProfileModel = UserProfileModel;
                 params.userProfileData = {
@@ -221,7 +219,7 @@ function thisModule() {
                 if (params.options && params.options.setCreatedAt === true) {
                     params.userProfileData.createdAt = now;
                 }
-                return userProfile.setValues(params.userProfileData).fail(function (err) {
+                return UserProfileModel.validate(params.userProfileData).fail(function (err) {
                     return Q.reject({status: 400, err: err});
                 });
             }
@@ -824,9 +822,8 @@ function thisModule() {
      * @private
      */
     var _createNewUserAccount = function (params) {
-        var userData = new UserModel();
         var now = new Date(Date.now());
-        return userData.setValues({
+        return UserModel.validate({
             group: params.group,
             login: params.login,
             status: 'active',
@@ -845,9 +842,9 @@ function thisModule() {
             deviceCounts: [],
             thirdParty: params.thirdPartyTokens || [],
             validated: false
-        }).then(function () {
-            userData.data.profile = params.userProfileData || {};
-            return userData.insertOne();
+        }).then(function (validatedData) {
+            validatedData.profile = params.userProfileData || {};
+            return UserModel.insertOne(validatedData);
         }).then(function (data) {
             var userData = data.ops;
             if (_.isArray(userData)) {

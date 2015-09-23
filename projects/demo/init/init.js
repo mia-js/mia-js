@@ -71,10 +71,10 @@ function thisModule() {
                 Logger.info("User with static key " + staticAccessKey + " already exists!");
             }
             else {
-                var device = new DeviceModel();
-                return device.setValues(addDevice).then(function (data) {
-                    return device.insertOne(addDevice).then(function (data) {
-                        Logger.info("A user with session id" + addDevice.session.id + " added!");
+                return DeviceModel.validate(addDevice).then(function (validatedData) {
+                    validatedData.session.id = addDevice.session.id;
+                    return DeviceModel.insertOne(validatedData).then(function (data) {
+                        Logger.info("A user with session id " + addDevice.session.id + " added!");
                     })
                 });
             }
