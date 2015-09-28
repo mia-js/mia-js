@@ -84,7 +84,7 @@ function thisModule() {
             login: login,
             group: group,
             status: 'active',
-            nativeLoginEnabled: true,
+            nativeLoginIsSet: true,
             accessTokens: {
                 $elemMatch: {
                     appId: appId,
@@ -267,7 +267,7 @@ function thisModule() {
             });
         }
         else {
-            params.login = params.login || params.userData.login;
+            params.login = params.userData.login;
             return Q(params);
         }
 
@@ -294,7 +294,6 @@ function thisModule() {
      *      login: String,
      *      email: String,  //provided email overwrites old email if different
      *      appId: String
-     *      nativeLoginEnabled: Boolean,
      *      nativeLoginIsSet: Boolean,
      *      userProfileModel: {},  // if provided used for validation of userProfileData
      *      userProfileData: {},   // if provided will be set to corresponding profile section contained in appId
@@ -332,7 +331,6 @@ function thisModule() {
      *      group: String,
      *      login: String,
      *      email: String,  //provided email overwrites old email if different
-     *      nativeLoginEnabled: Boolean,
      *      nativeLoginIsSet: Boolean,
      *      userProfileData: {},
      *      thirdPartyTokensUpdate: {add: [{}], remove: {}}, //removing single token only, removing array is not yet supported due to mongo syntax
@@ -355,6 +353,7 @@ function thisModule() {
     var _updateUserProfileDataCore = function (params) {
         var userData = params.userData;
         var options = params.options || {};
+        var isEmailValidated = MemberHelpers.getPathPropertyValue(params.options, 'isEmailValidated');
 
         var queryObject;
         if (options.ignoreEtag === true) {
@@ -400,9 +399,6 @@ function thisModule() {
             if (params.nativeLoginIsSet != null) {
                 updateDoc['$set'].nativeLoginIsSet = params.nativeLoginIsSet;
             }
-            if (params.nativeLoginEnabled != null) {
-                updateDoc['$set'].nativeLoginEnabled = params.nativeLoginEnabled;
-            }
 
             //set login and password to be updated if provided
             if (!_.isEmpty(params.login) && params.login != userData.login) {
@@ -440,7 +436,7 @@ function thisModule() {
                 if (!_.isEmpty(usersEmailValue)) {
                     updateDocRemoveEntry['$pull'] = {messaging: {value: usersEmailValue}};
                 }
-                updateDoc['$push'] = {messaging: _generateEmailMessagingEntry(params.email)};
+                updateDoc['$push'] = {messaging: _generateEmailMessagingEntry(params.email, isEmailValidated)};
             }
 
             if (params.thirdPartyTokensUpdate) {
@@ -575,11 +571,23 @@ function thisModule() {
     var _checkUsersCredentials = function (login, group, password, options) {
         return self.hashCredentials(group, password, options).then(function (passHash) {
             return UserModel.findOne({
-                login: login,
+                $or: [
+                    {
+                        login: login
+                    },
+                    {
+                        messaging: {
+                            $elemMatch: {
+                                type: 'email',
+                                value: login
+                            }
+                        }
+                    }
+                ],
                 group: group,
                 passHash: passHash,
                 status: 'active',
-                nativeLoginEnabled: true
+                nativeLoginIsSet: true
             });
         });
     };
@@ -782,11 +790,11 @@ function thisModule() {
     //</editor-fold>
 
     //<editor-fold desc="=== Account creation/deletion : OK ===">
-    var _generateEmailMessagingEntry = function (email) {
+    var _generateEmailMessagingEntry = function (email, isValidated) {
         return {
             type: 'email',
             value: email,
-            validated: false,
+            validated: isValidated === true,
             inspectTokens: {
                 validateToken: {
                     token: _generateValidationToken(),
@@ -796,9 +804,9 @@ function thisModule() {
         };
     };
 
-    var _generateMessagingSection = function (email) {
+    var _generateMessagingSection = function (email, isValidated) {
         if (email) {
-            return [_generateEmailMessagingEntry(email)];
+            return [_generateEmailMessagingEntry(email, isValidated)];
         }
         else {
             return [];
@@ -812,7 +820,6 @@ function thisModule() {
      *      login: String,
      *      email: String,
      *      passHash: String,
-     *      nativeLoginEnabled: Boolean,
      *      nativeLoginIsSet: Boolean,
      *      userProfileData: {},
      *      thirdPartyTokens: Array
@@ -823,11 +830,11 @@ function thisModule() {
      */
     var _createNewUserAccount = function (params) {
         var now = new Date(Date.now());
+        var isEmailValidated = MemberHelpers.getPathPropertyValue(params.options, 'isEmailValidated') === true;
         return UserModel.validate({
             group: params.group,
             login: params.login,
             status: 'active',
-            nativeLoginEnabled: params.nativeLoginEnabled,
             nativeLoginIsSet: params.nativeLoginIsSet,
             passHash: params.passHash,
             etag: _incETag(),
@@ -837,11 +844,11 @@ function thisModule() {
                     tokenIssueDate: now
                 }
             },
-            messaging: _generateMessagingSection(params.email),
+            messaging: _generateMessagingSection(params.email, isEmailValidated),
             accessTokens: [],
             deviceCounts: [],
             thirdParty: params.thirdPartyTokens || [],
-            validated: false
+            validated: isEmailValidated || false
         }).then(function (validatedData) {
             validatedData.profile = params.userProfileData || {};
             return UserModel.insertOne(validatedData);
@@ -862,7 +869,6 @@ function thisModule() {
      *      userId: String,
      *      email: String,
      *      passHash: String,
-     *      nativeLoginEnabled: Boolean,
      *      nativeLoginIsSet: Boolean,
      *      userProfileData: {},
      *      thirdPartyTokens: Array
@@ -873,6 +879,7 @@ function thisModule() {
      */
     var _reinitializeUser = function (params) {
         var now = new Date(Date.now());
+        var isEmailValidated = MemberHelpers.getPathPropertyValue(params.options, 'isEmailValidated');
         return _updateUserData({
             _id: params.userId,
             status: {
@@ -885,7 +892,6 @@ function thisModule() {
         }, {
             '$set': {
                 status: 'active',
-                nativeLoginEnabled: params.nativeLoginEnabled,
                 nativeLoginIsSet: params.nativeLoginIsSet,
                 passHash: params.passHash,
                 etag: _incETag(),
@@ -896,7 +902,7 @@ function thisModule() {
                         tokenIssueDate: now
                     }
                 },
-                messaging: _generateMessagingSection(params.email),
+                messaging: _generateMessagingSection(params.email, isEmailValidated),
                 accessTokens: [],
                 deviceCounts: [],
                 thirdParty: params.thirdPartyTokens || [],
@@ -907,7 +913,19 @@ function thisModule() {
 
     self.deleteUser = function (login, group) {
         return _updateUserData({
-            login: login,
+            $or: [
+                {
+                    login: login
+                },
+                {
+                    messaging: {
+                        $elemMatch: {
+                            type: 'email',
+                            value: login
+                        }
+                    }
+                }
+            ],
             group: group
         }, {
             partial: true,
@@ -916,7 +934,7 @@ function thisModule() {
         }, {
             '$set': {
                 status: 'deleted',
-                nativeLoginEnabled: false,
+                nativeLoginIsSet: false,
                 accessTokens: [],
                 deviceCounts: [],
                 thirdParty: [],
@@ -955,7 +973,6 @@ function thisModule() {
             params.login = Encryption.randHash();
             params.password = Encryption.randHash();
             params.nativeLoginIsSet = false;
-            params.nativeLoginEnabled = false;
         }
         else {
             if (_.isEmpty(params.password)) {
@@ -982,7 +999,6 @@ function thisModule() {
      *      email: String,
      *      passHash: String,
      *      appId: String,
-     *      nativeLoginEnabled: Boolean,
      *      nativeLoginIsSet: Boolean,
      *      userProfileModel: {},  // if provided used for validation of userProfileData
      *      userProfileData: {},   // if provided will be set to corresponding profile section contained in appId
@@ -1008,7 +1024,6 @@ function thisModule() {
      *      login: String,
      *      email: String,
      *      passHash: String,
-     *      nativeLoginEnabled: Boolean,
      *      nativeLoginIsSet: Boolean,
      *      userProfileData: {},
      *      thirdPartyTokens: Array
@@ -1036,6 +1051,7 @@ function thisModule() {
 
         if (!params.email.match(/[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}/)) {
             return Q.reject({
+                status: 400,
                 err: {
                     code: "InvalidEmailAddress",
                     msg: translator('generic-translations', 'InvalidEmailAddress')
@@ -1044,7 +1060,19 @@ function thisModule() {
         }
 
         return UserModel.findOne({
-            login: params.login,
+            $or: [
+                {
+                    login: params.login
+                },
+                {
+                    messaging: {
+                        $elemMatch: {
+                            type: 'email',
+                            value: params.email
+                        }
+                    }
+                }
+            ],
             group: params.group
         }).then(function (userData) {
             if (!userData) {
@@ -1245,7 +1273,19 @@ function thisModule() {
     //<editor-fold desc="=== Password forgotten : OK ===">
     self.getPasswordResetToken = function (login, group) {
         return _updateUserData({
-            login: login,
+            $or: [
+                {
+                    login: login
+                },
+                {
+                    messaging: {
+                        $elemMatch: {
+                            type: 'email',
+                            value: login
+                        }
+                    }
+                }
+            ],
             group: group
         }, {
             partial: true,

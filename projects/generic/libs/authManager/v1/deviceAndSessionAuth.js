@@ -79,9 +79,8 @@ function thisModule() {
         deviceData.id = id;
         deviceData.lastModified = new Date(Date.now());
 
-        var device = new DeviceModel();
-        return DeviceModel.validate(deviceData, {partial: true}).then(function (validatedData) {
-            return DeviceModel.updateOne({id: id}, {$set: validatedData}, {partial: true}).then(function (data) {
+        return DeviceModel.validate(deviceData, {partial: true, flat: true}).then(function (validatedData) {
+            return DeviceModel.updateOne({id: id}, {$set: validatedData}).then(function (data) {
                 var nModified = data.result && data.result.nModified ? data.result.nModified : 0;
                 if (nModified == 0) {
                     return Q.reject({
@@ -222,7 +221,6 @@ function thisModule() {
         options = options || {};
         var translator = options.translator || Translator.default;
 
-        var device = new DeviceModel();
         var params = {
             'session.set': true,
             'session.cidr': [ip + '/32'],
@@ -231,11 +229,11 @@ function thisModule() {
             status: 'active'
         };
 
-        return DeviceModel.validate(params, {partial: true}).then(function (validatedData) {
-            return DeviceModel.updateOne({id: deviceId}, {$set: validatedData}, {partial: true}).then(function (data) {
+        return DeviceModel.validate(params, {partial: true, flat: true}).then(function (validatedData) {
+            return DeviceModel.updateOne({id: deviceId}, {$set: validatedData}).then(function (data) {
                 var nModified = data.result && data.result.nModified ? data.result.nModified : 0;
-                if (nModified == 1 && validatedData && validatedData.session && validatedData.session.id) {
-                    return Q(validatedData.session.id);
+                if (nModified == 1 && validatedData && validatedData["session.id"]) {
+                    return Q(validatedData["session.id"]);
                 }
                 else {
                     return Q.reject({

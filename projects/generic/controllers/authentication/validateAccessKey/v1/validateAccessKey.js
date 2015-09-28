@@ -194,10 +194,7 @@ function thisModule() {
                 }
             }
         }).fail(function (err) {
-            //Error while requesting db
-            return Q.reject({
-                status: 500
-            });
+            return Q.reject(err);
         });
 
     };

@@ -15,18 +15,9 @@ function thisModule() {
                     required: true
                 },
                 /**
-                 * if nativeLoginIsSet === true, the login was set meaningfully (is not auto-generated) and can be used to identify the user
+                 * if nativeLoginIsSet === true, the login was set meaningfully (is not auto-generated) and can be used to identify the user. The login and password pair can be used for user login, otherwise the native login possibility is locked.
                  */
                 nativeLoginIsSet: {
-                    type: Boolean,
-                    default: false,
-                    index: true,
-                    required: true
-                },
-                /**
-                 * if nativeLoginEnabled === true, the login and password pair can be used for user login, otherwise the native login possibility is locked
-                 */
-                nativeLoginEnabled: {
                     type: Boolean,
                     default: false,
                     index: true,

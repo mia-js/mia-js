@@ -175,7 +175,7 @@ function _doReplacementsDeep(objSource, replacements) {
 
 // Process email.
 var _processEmail = function (data) {
-    return _getConnector(data.configId, "smtp").then(function (connector) {
+    return _getConnector(data.configId, "smtp", Shared.config('environment').mode).then(function (connector) {
         var smtpServer = Emailjs.server.connect(connector);
         var notification = data.notification;
 
@@ -285,22 +285,30 @@ var _processPush = function (data, workerId) {
                 return _sendApn(data, deviceData, workerId);
             }
             else if (deviceType == "android") {
-                _notificationStatusReject(data._id, "Unknown device type");
-                return Q.reject();
+                return _notificationStatusReject(data._id, "Unknown device type").then(function () {
+                    return Q.reject();
+                });
             }
             else {
-                _notificationStatusReject(data._id, "Unknown device type");
-                return Q.reject();
+                return _notificationStatusReject(data._id, "Unknown device type").then(function () {
+                    return Q.reject();
+                });
             }
         }
+        else if (deviceData.device) {
+            //temp workaround
+            return _sendApn(data, deviceData, workerId);
+        }
         else {
-            _notificationStatusReject(data._id, "Unknown device type");
-            return Q.reject();
+            return _notificationStatusReject(data._id, "Unknown device type").then(function () {
+                return Q.reject();
+            });
         }
     }).fail(function (err) {
         var error = err || "Device failure";
-        _notificationStatusReject(data._id, error);
-        return Q.reject();
+        return _notificationStatusReject(data._id, error).then(function () {
+            return Q.reject();
+        });
     });
 };
 

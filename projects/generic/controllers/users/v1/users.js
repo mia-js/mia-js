@@ -51,6 +51,11 @@ function thisModule() {
                         convert: 'lower',
                         required: true
                     },
+                    email: {
+                        desc: 'User‘s login',
+                        type: String,
+                        convert: 'lower'
+                    },
                     password: {
                         desc: 'User‘s password',
                         type: String,
@@ -165,6 +170,11 @@ function thisModule() {
                         type: String,
                         convert: 'lower'
                     },
+                    email: {
+                        desc: 'User‘s login',
+                        type: String,
+                        convert: 'lower'
+                    },
                     password: {
                         desc: 'User‘s password',
                         type: String
@@ -232,10 +242,9 @@ function thisModule() {
         var params = {
             group: req.miajs.userService.group || req.miajs.route.group,
             login: body.login,
-            email: body.login,
+            email: body.email || body.login,
             password: body.password,
             appId: req.miajs.userService.appId || req.miajs.route.group,
-            nativeLoginEnabled: true,
             nativeLoginIsSet: true,
             userProfileData: req.miajs.userService.userProfileData,
             userProfileModel: req.miajs.userService.userProfileModel || UserProfileModel,
@@ -401,7 +410,7 @@ function thisModule() {
         }
         var params = req.miajs.userService.fbLoginParams;
 
-        return Q.all([
+        Q.all([
             (function () {
                 return AuthManager.processProfileData({
                     appId: params.appId,
@@ -534,13 +543,34 @@ function thisModule() {
      * @param next
      */
     self.updateProfile = function (req, res, next) {
+        _updateProfile(req, res, next);
+    };
+
+    /**
+     * Same as updateProfile, but doesn't define any request parameters
+     * @param req
+     * @param res
+     * @param next
+     */
+    self.updateProfileInternal = function (req, res, next) {
+        _updateProfile(req, res, next);
+    };
+
+    /**
+     * Update user profile data.
+     * Uses default UserProfileModel and body data or uses custom req.miajs.userService.model and req.miajs.userService.data if set in previous controller chained by routing
+     * @param req
+     * @param res
+     * @param next
+     */
+    var _updateProfile = function (req, res, next) {
         req.miajs = req.miajs || {};
         req.miajs.userService = req.miajs.userService || {};
         var body = req.miajs.userService.data || req.miajs.validatedParameters.body || {};
         var translator = req.miajs.translator || Translator.default;
 
         //checking preconditions for chaining this controller
-        if (!req.miajs.validatedParameters || !req.miajs.device) {
+        if (!req.miajs.device) {
             Logger.error("Missing session or validatedParameters in req.miajs. Failure in chaining controllers.");
             next({status: 500});
             return;
@@ -554,7 +584,7 @@ function thisModule() {
         var params = {
             group: req.miajs.userService.group || req.miajs.route.group,
             login: body.login,
-            email: body.login,
+            email: body.email,
             etag: req.header('if-match'),
             password: body.password,
             translator: translator,
@@ -562,11 +592,13 @@ function thisModule() {
             userData: req.miajs.userData,
             userProfileData: req.miajs.userService.userProfileData,
             userProfileModel: req.miajs.userService.userProfileModel || UserProfileModel,
-            nativeLoginEnabled: true,
-            nativeLoginIsSet: true,
             thirdPartyTokens: null,
             options: req.miajs.userService.options || _authOptions
         };
+        if (!_.isEmpty(body.login)) {
+            params.login = body.login;
+            params.nativeLoginIsSet = true;
+        }
 
         return AuthManager.updateUserProfileData(params).then(function (userData) {
             if (!userData) {
@@ -593,7 +625,7 @@ function thisModule() {
         var translator = req.miajs.translator || Translator.default;
 
         if (!req.miajs.device) {
-            MiaJs.Logger('err', 'Missing req.miajs.device. Failure in chaining controllers.');
+            Logger.error('Missing req.miajs.device. Failure in chaining controllers.');
             next({status: 500});
             return;
         }
