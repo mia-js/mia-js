@@ -249,17 +249,33 @@ var _sendApn = function (data, deviceData) {
         var notification = data.notification;
         return _getTemplateData(data.configId, "apns", "push", notification.template).then(function (template) {
             //Do replacements
-            template.alert.title = _doReplacements(template.alert.title, notification.replacements);
-            template.alert.body = _doReplacements(template.alert.body, notification.replacements);
+            if (template.alert && template.alert.title) {
+                template.alert.title = _doReplacements(template.alert.title, notification.replacements);
+            }
+            if (template.alert && template.alert.body) {
+                template.alert.body = _doReplacements(template.alert.body, notification.replacements);
+            }
 
             //Handle payload
             var payload = template.payload ? _.merge(template.payload, data.notification.payload) : data.notification.payload;
             payload = _doReplacementsDeep(payload, notification.replacements);
             var pushData = new Apn.Notification();
-            pushData.alert = template.alert;
-            pushData.badge = data.notification.badge || template.badge;
-            pushData.sound = template.sound;
-            pushData.contentAvailable = template["content-available"];
+
+            if (template.alert) {
+                pushData.alert = template.alert;
+            }
+
+            if (data.notification.badge || template.badge) {
+                pushData.badge = data.notification.badge || template.badge;
+            }
+
+            if (template.sound) {
+                pushData.sound = template.sound;
+            }
+
+            if (template["content-available"]) {
+                pushData.contentAvailable = template["content-available"];
+            }
 
             if (!_.isEmpty(payload)) {
                 pushData.payload = payload;
