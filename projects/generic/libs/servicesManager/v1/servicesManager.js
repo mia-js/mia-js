@@ -57,6 +57,11 @@ function thisModule() {
                 if (!_.isEmpty(service.responses)) {
                     serviceInfo.responses = service.responses;
                 }
+
+                if (service.deprecated === true) {
+                    serviceInfo.deprecated = service.deprecated;
+                }
+
                 serviceInfo.authorization = service.authorization;
 
                 serviceInfos.push(serviceInfo);

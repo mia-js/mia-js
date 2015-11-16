@@ -312,7 +312,7 @@ function thisModule() {
             , signatureTimeStamp = signatureToken.substring(64, 74)
             , signature = signatureToken.substring(74, signatureToken.length)
             , group = req.miajs.route.group
-            , maxTokenValidTime = 100000; // Max time token is valid in seconds
+            , maxTokenValidTime = 300; // Max time token is valid in seconds
 
         if (signatureMethod != "sha256") {
             Logger.info("Signature method not allowed");

@@ -2,14 +2,15 @@
  * @description :: Outputs the response as JSON document
  */
 var MiaJs = require('mia-js-core')
-    , _ = require('lodash');
+    , _ = require('lodash')
+    , Translator = MiaJs.GetTranslations;
 
 function thisModule() {
     var self = this;
     self.identity = 'generic-defaultResponse'; // Controller name used in routes, policies and followups
     self.version = '1.0'; // Version number of service
 
-    self.preconditions = {
+    /*self.preconditions = {
         all: {
             parameters: {
                 query: {
@@ -23,7 +24,7 @@ function thisModule() {
                 200: "Success"
             }
         }
-    };
+    };*/
 
     var filterResponse = function (response, filter, arr) {
         var filteredResponse
@@ -75,6 +76,7 @@ function thisModule() {
 
     self.all = function (req, res) {
 
+        var translator = req.miajs.translator || Translator.default;
         // Set response filter. Filter all nodes except give in query param filter
         if (req.query.filter) {
             res.response = filterResponse(res.response, MiaJs.Utils.QueryParser(req.query.filter), false, 1);
@@ -82,6 +84,11 @@ function thisModule() {
 
         var response = {};
         response.status = res.statusCode || 200;
+
+        if (req.miajs && req.miajs.route && req.miajs.route.deprecated === true) {
+            response.deprecated = true;
+            response.notice = translator('generic-translations', 'ServiceIsDeprecated');
+        }
 
         //Add debug data
         if (req && req.header && req.header('debug') == 'true') {

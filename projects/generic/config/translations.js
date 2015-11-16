@@ -111,11 +111,11 @@ function thisModule() {
         },
         KeyInvalidForGroup: {
             de: 'Key ist nicht gültig für diesen Service',
-            en: 'Key key is not invalid for this service'
+            en: 'Key invalid for this service'
         },
         KeyExpired: {
-            de: 'Key ist nicht abgelaufen',
-            en: 'Key key is expired'
+            de: 'Key ist abgelaufen',
+            en: 'Key is expired'
         },
 
         //User
@@ -152,16 +152,20 @@ function thisModule() {
             en: 'Third party account is not acceptable'
         },
         EmailAddressIsNotValidated: {
-            de: 'Your provided e-mail address is not yet validated. Validation email has been sent to you. Please try again after validating your e-mail.',
+            de: 'Die Email adresse ist noch nicht validiert. Eine Validierungsemail wurde Ihnen zugeschickt. Bitte versuchen Sie es noch einmal nachdem die Email Adresse validiert wurde.',
             en: 'Your provided e-mail address is not yet validated. Validation email has been sent to you. Please try again after validating your e-mail.'
         },
         InvalidEmailAddress: {
-            de: 'Invalid email address',
+            de: 'Email adresse ist ungültig',
             en: 'Invalid email address'
         },
         InvalidPasswordResetToken: {
             de: 'Passwort Resettoken ist nicht gültig',
             en: 'Invalid password reset token'
+        },
+        ServiceIsDeprecated: {
+            de: "Dieser Service is markiert als deprecated und der Service wird eingestellt werden. Bitte verwenden Sie diesen Service nicht mehr.",
+            en: "This service is deprecated and will expire. Please do not use this service for new development"
         }
     };
 

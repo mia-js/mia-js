@@ -3,7 +3,7 @@ module.exports = {
     group: 'demo', // Group name
     //name: 'Demo API',  If disabled path is used as name in swaggerUI
     version: '1.0', // Version
-    prefix: ['/demo/v1','/demo/latest'], // Route prefix. Multiple prefixes possible
+    prefix: ['/demo/v1', '/demo/latest'], // Route prefix. Multiple prefixes possible
     routes: {
 
         // API ROUTES
@@ -27,7 +27,52 @@ module.exports = {
                         name: 'generic-defaultResponse',
                         version: '1.0'
                     }
-                ]
+                ],
+                responseSchemes: {
+                    // Response Schemes are optional to describe what scheme the response will look like
+                    success: {
+                        "status": {
+                            type: "Number"
+                        },
+                        response: [
+                            {
+                                _id: {
+                                    type: "String"
+                                },
+                                name: {
+                                    type: "String"
+                                },
+                                status: {
+                                    type: "String"
+                                },
+                                group: {
+                                    type: "String"
+                                },
+                                lastModified: {
+                                    type: "String"
+                                },
+                                created: {
+                                    type: "String"
+                                }
+                            }
+                        ]
+                    },
+                    error: {
+                        "status": {
+                            type: "Number"
+                        },
+                        errors: [
+                            {
+                                code: {
+                                    type: "String"
+                                },
+                                msg: {
+                                    type: "String"
+                                }
+                            }
+                        ]
+                    }
+                }
             },
             create: {
                 identity: 'create-todo',

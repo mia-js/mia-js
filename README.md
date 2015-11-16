@@ -455,7 +455,38 @@ module.exports = {
                         name: 'myCustomErrorController',
                         version: '1.0'
                     }
-                ]
+                ],
+                responseSchemes: {
+                    // Response Schemes are optional to describe what scheme the response will look like
+                    success: {
+                        "status": {
+                            type: "Number"
+                        },
+                        response: {
+                            param1: {
+                                type: "String"
+                            },
+                            param2: {
+                                type: "Number"
+                            }
+                        }
+                    },
+                    error: {
+                        "status": {
+                            type: "Number"
+                        },
+                        errors: [
+                            {
+                                code: {
+                                    type: "String"
+                                },
+                                msg: {
+                                    type: "String"
+                                }
+                            }
+                        ]
+                    }
+                }
             }
         }
     }
@@ -472,7 +503,8 @@ There are some global parameters of your routes file to adjust the routes behavi
 * `envrionment` - *optional* Define environments for a routes file. The routes file is only registered and available public if the environment name matches the current environment name on server startup. You can creates routes for testing purpose and i.e. just deploy them to your staging servers and disable and hide them on your production environment.
 * `prefix` - *optional* You can prefix a route or even use multiple prefixes to make sure not to have conflicts with other route files or other projects. When building api routes we recommend to use the version nummer as part of the prefix i.e. `/icecream/v1/flavours`. It's up to you!
 * `corsHeaders` - Apply CORS headers to a routes file i.e. for Cross Domain Policy. Defining the CORS header automatically enables all routes of this routes definiton file to response to a browsers CORS requests methods OPTIONS
-* `routes` - All of your application routes 
+* `routes` - All of your application routes
+* `decrecated` - *optional* Add this flag to mark all methods of this route as deprecated. The will lead to a notice field when requesting an api and highlighting in [Swagger::Docs](https://github.com/richhollis/swagger-docs) documentation
 
 ##### Routes
 Define multiple routes for your application project. Mia.js has some build in methods and parameters to describe the route. First give your route a name see exmample `./flavours`. This name is directly used as route path and appended to the prefix. You can use variable names inside of your routes path to allow routes like `/icecream/v1/:flavour/ingredient/:name`. Use a `:` as variable prefix of a path variable. A route always needs a request method your route is listening to - use one of the following.
@@ -493,15 +525,18 @@ Define multiple routes for your application project. Mia.js has some build in me
 
 ###### Routes methods parameters
 * `identity` - Identity of this route method. This identity has to be unique in this routes file
+* `decrecated` - *optional* Add this flag to mark a route as deprecated. The will lead to a notice field when requesting the api and highlighting in [Swagger::Docs](https://github.com/richhollis/swagger-docs) documentation
 * `modified` - Date when is route has been modified. Used in generic controllers `generic-listServices`
 * `docs` - *optional* Set to true|false to make this route method available in automatically generated documentation
 * `description` - *optional* Give your route a more details description of what this services does. Used in automatically generated documentation.
 * `environment` - *optional* Define environments for a route method. The route method is only registered and available public if the environment name matches the current environment name on server startup. You can creates routes for testing purpose and just deploy them to your staging servers and disable and hide them on your production environment.
 * `bodyparser {type:'json',limit:'512kb'` - *optional* Mia.js automatically parses a request body as json. To change this behaviour set the bodyparser type to `none` or change the limit of the body size.
 * `controllers` - Array of your project controllers to use for this route
-* `authorization` - Indicates if this route requries authorization. This flag is available in `generic-listServices` controller to indicate that this service is somehow protected and needs authorization.
-* `corsHeaders` - Apply CORS headers to single route i.e. for Cross Domain Policy. Defining the CORS header automatically enables this route to response to a browsers CORS requests methods OPTIONS
-* 
+* `authorization` - *optional* Indicates if this route requries authorization. This flag is available in `generic-listServices` controller to indicate that this service is somehow protected and needs authorization.
+* `corsHeaders` - *optional* Apply CORS headers to single route i.e. for Cross Domain Policy. Defining the CORS header automatically enables this route to response to a browsers CORS requests methods OPTIONS
+* `responseSchemes` - *optional* To describe what the excepted response in case of a successful response or an error response will look like you can specify the response schema. This will be visible in the [Swagger::Docs](https://github.com/richhollis/swagger-docs) documentation
+*
+
 ####### Define controllers of a route method
 Controllers are defined as array in the routes file definition of your route method. The order of elements followes the chaining of your controllers. You can chain as many controllers as you need to perform a request and return a response. Controllers are chained by calling `next()` in a controller file. The last controller should handle the response output i.e. `res.send()` see [Express](https://github.com/strongloop/express)
 

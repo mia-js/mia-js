@@ -18,7 +18,7 @@
     "jasmine-node": "1.11.0",
     "lodash": "2.4.0",
     "memcached": "2.2.0",
-    "mongodb": "2.0.42",
+    "mongodb": "2.0.46",
     "morgan": "1.1.1",
     "nodemon": "1.0.17",
     "node-jsx": "0.13.3",
