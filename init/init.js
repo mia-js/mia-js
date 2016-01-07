@@ -2,8 +2,8 @@
  * Custom logging function like console.log
  */
 
-var Shared = require('mia-js-core/node_modules/shared');
-var Logger = require('mia-js-core/node_modules/logger');
+var Shared = require('mia-js-core/lib/shared');
+var Logger = require('mia-js-core/lib/logger');
 
 function thisModule() {
 

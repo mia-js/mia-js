@@ -1,6 +1,6 @@
 var _ = require('lodash');
-var BaseModel = require("mia-js-core/node_modules/baseModel");
-var Encryption = require("mia-js-core/node_modules/utils").Encryption;
+var BaseModel = require("mia-js-core/lib/baseModel");
+var Encryption = require("mia-js-core/lib/utils").Encryption;
 
 function thisModule() {
 
@@ -253,7 +253,7 @@ function thisModule() {
                     },
                     group: {
                         type: String,
-                        allow: ['phone', 'tablet', 'desktop']
+                        allow: ['phone', 'tablet', 'tv', 'desktop']
                     },
                     userAgent: {
                         type: String,

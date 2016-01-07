@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var Async = require('async');
-var Shared = require('mia-js-core/node_modules/shared');
-var Logger = require('mia-js-core/node_modules/logger');
+var Shared = require('mia-js-core/lib/shared');
+var Logger = require('mia-js-core/lib/logger');
 var DeviceModel = Shared.models('generic-device-model');
 
 function thisModule() {

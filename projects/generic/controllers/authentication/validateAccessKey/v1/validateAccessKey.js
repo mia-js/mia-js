@@ -31,7 +31,7 @@ var _ = require('lodash')
     , AuthService = Shared.libs("generic-deviceAndSessionAuth")
     , Crypto = require('crypto')
     , Url = require('url')
-    , CIDRCheck = require('range_check').in_range
+    , IP = require('ip')
     , Translator = MiaJs.GetTranslations
     , SecretModel = Shared.models('generic-secret-model')
     , DeviceModel = Shared.models('generic-device-model')
@@ -239,7 +239,7 @@ function thisModule() {
         if (deviceData.access && deviceData.access.cidr) {
             //Check CIDRs
             for (var thisCIDR in deviceData.access.cidr) {
-                if (CIDRCheck(ip, deviceData.access.cidr[thisCIDR])) {
+                if (IP.cidrSubnet(deviceData.access.cidr[thisCIDR]).contains(ip)) {
                     // Update device lastModified to mark device as still in use. Only once in 24 hours
                     if (deviceData.lastModified < new Date(Date.now() - 60 * 60 * 24 * 1000)) {
                         AuthService.updateDevice(options, deviceData.id, {});
@@ -440,8 +440,12 @@ function thisModule() {
             , key = req.miajs.validatedParameters.header.key;
 
         if (key.length == 32) {
-            var ip = req.header('X-Forwarded-For') || req.ip
+            var ip = req.headers['x-forwarded-for'] ||
+                req.connection.remoteAddress ||
+                req.socket.remoteAddress ||
+                req.connection.socket.remoteAddress
                 , group = req.miajs.route.group;
+
             // Validate static key token
             _checkAccessKey(options, key).then(function (deviceData) {
                 return _checkAccessKeyAuthConstrains(options, deviceData, ip, group).then(function (deviceData) {

@@ -52,7 +52,7 @@ var _ = require('lodash')
     , Shared = MiaJs.Shared
     , Q = require('q')
     , Emailjs = require("emailjs")
-    , Encryption = require("mia-js-core/node_modules/utils").Encryption
+    , Encryption = require("mia-js-core/lib/utils").Encryption
     , Apn = require('apn')
     , NotificationModel = Shared.models('generic-notifications-model')
     , AuthService = Shared.libs("generic-deviceAndSessionAuth");
@@ -60,11 +60,12 @@ var _ = require('lodash')
 Q.stopUnhandledRejectionTracking();
 
 //Send email
-var _sendMail = function (smtpServer, sender, to, subject, text, html) {
+var _sendMail = function (smtpServer, sender, to, replyTo, subject, text, html) {
     var deferred = Q.defer();
     smtpServer.send({
         text: text,
         from: sender,
+        "reply-to": replyTo,
         to: to,
         subject: subject,
         attachment: [
@@ -187,22 +188,44 @@ var _processEmail = function (data) {
             // Do replacements
             if (notification.replacements && !_.isEmpty(notification.replacements)) {
                 template.html = _doReplacements(template.html, notification.replacements);
+                template.sender = _doReplacements(template.sender, notification.replacements);
+                if (template.replyTo) {
+                    template.replyTo = _doReplacements(template.replyTo, notification.replacements);
+                }
+                else {
+                    template.replyTo = template.sender;
+                }
                 template.subject = _doReplacements(template.subject, notification.replacements);
                 template.text = _doReplacements(template.text, notification.replacements);
+                template.text = template.text.replace(/\n/g, "<br>"); // prevent bare LF issue with smtp
             }
 
-            return _sendMail(smtpServer, template.sender, notification.to, template.subject, template.text, template.html)
+            return _sendMail(smtpServer, template.sender, notification.to, template.replyTo, template.subject, template.text, template.html)
                 .then(function () {
                     Logger.info("Email " + data._id + " send to " + notification.to);
                     _notificationStatusFulfilled(data._id);
                     return Q.resolve();
                 }).fail(function (err) {
-                    //TODO: Write retry functionality if mail fails due to server connection reasons. Use collection field retry and schedule to define next retry
-                    Logger.err("Email " + data._id + " NOT send to " + notification.to);
+                    Logger.error("Email " + data._id + " NOT send to " + notification.to);
+                    if (err && err.code) {
+                        switch (err.code) {
+                            case 1:
+                                _notificationStatusRetry(data._id, err);
+                                return Q.resolve();
+                                break;
+                            case 4:
+                                _notificationStatusRetry(data._id, err);
+                                return Q.resolve();
+                                break;
+                            default:
+                                return Q.reject(err);
+                        }
+                    }
                     return Q.reject(err);
                 });
         });
     }).fail(function (err) {
+        Logger.error(err);
         _notificationStatusReject(data._id, err);
         return Q.reject();
     });
@@ -221,14 +244,14 @@ var _sendApn = function (data, deviceData) {
     return _getConnector(data.configId, "apns", environment).then(function (connector) {
         var service = new Apn.Connection(connector);
         service.on("connected", function () {
-            Logger.info("Connected to APNS ("+environment+")");
+            Logger.info("Connected to APNS (" + environment + ")");
         });
         service.on("transmitted", function (notification, device) {
-            Logger.info("Notification transmitted to: " + device.token.toString("hex"));
+            Logger.info("Notification " + data._id.toString() + " transmitted to: " + device.token.toString("hex"));
             _notificationStatusFulfilled(data._id);
         });
         service.on("transmissionError", function (errCode, notification, device) {
-            Logger.error("Notification caused error: " + errCode + " for device ", device, notification);
+            Logger.error("Notification " + data._id.toString() + " caused error: " + errCode + " for device ", device, notification);
             if (errCode === 8) {
                 Logger.warn("A error code of 8 indicates that the device token is invalid. This could be for a number of reasons - are you using the correct environment? i.e. Production vs. Sandbox");
                 _notificationStatusReject(data._id, "Device token is invalid");

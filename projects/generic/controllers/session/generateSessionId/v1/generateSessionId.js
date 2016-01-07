@@ -45,7 +45,10 @@ function thisModule() {
      */
     self.all = function (req, res, next) {
         var id = req.params['id'],
-            ip = req.header('X-Forwarded-For') || req.ip,
+            ip = req.headers['x-forwarded-for'] ||
+                req.connection.remoteAddress ||
+                req.socket.remoteAddress ||
+                req.connection.socket.remoteAddress,
             groups = req.allowedAccessGroups,
             translator = req.miajs.translator;
 

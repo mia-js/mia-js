@@ -4,12 +4,12 @@
 
 var Q = require('q')
     , _ = require('lodash')
-    , CIDRCheck = require('range_check').in_range
     , MiaJs = require("mia-js-core")
     , Shared = MiaJs.Shared
     , Translator = MiaJs.GetTranslations
     , Logger = MiaJs.Logger
     , Utils = MiaJs.Utils
+    , IP = require('ip')
     , MemberHelpers = Utils.MemberHelpers
     , Encryption = Utils.Encryption
     , ObjectID = require('mongodb').ObjectID
@@ -384,18 +384,18 @@ function thisModule() {
         if (deviceData.session && deviceData.session.cidr) {
             //Check CIDRs
             for (var thisCIDR in deviceData.session.cidr) {
-                if (CIDRCheck(ip, deviceData.session.cidr[thisCIDR])) {
+                if (IP.cidrSubnet(deviceData.session.cidr[thisCIDR]).contains(ip)) {
                     Logger.info('Grant access for device ' + deviceData.id);
                     return Q(deviceData);
                 }
             }
-        }
 
-        return Q.reject({
-            status: 403,
-            err: {'code': 'IPNotAllowed', 'msg': translator('generic-translations', 'IPNotAllowed')}
-        });
-    };
+            return Q.reject({
+                status: 403,
+                err: {'code': 'IPNotAllowed', 'msg': translator('generic-translations', 'IPNotAllowed')}
+            });
+        }
+    }
 
     /**
      * Validates session token

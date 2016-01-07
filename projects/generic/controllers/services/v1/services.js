@@ -40,7 +40,7 @@ function thisModule() {
             var servicesList = ServicesHandler.getServicesInfoByReq(req, hostId, group, version, prefix)
 
             // Convert services v1 to old format due to getSericesInfoByReq has been modified
-            for (service in servicesList) {
+            for (var service in servicesList) {
                 servicesList[service]["requiresSession"] = servicesList[service]["authorization"];
                 delete(servicesList[service]["authorization"]);
                 servicesList[service]["name"] = servicesList[service]["id"]

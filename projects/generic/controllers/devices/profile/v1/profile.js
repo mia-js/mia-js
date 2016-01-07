@@ -69,6 +69,10 @@ function thisModule() {
                             minLength: 1,
                             maxLength: 50
                         },
+                        group: {
+                            type: String,
+                            allow: ['phone', 'tablet', 'tv', 'desktop']
+                        },
                         os: {
                             type: {
                                 type: String,
@@ -101,7 +105,7 @@ function thisModule() {
                             },
                             environment: {
                                 type: String,
-                                allow: ["sandbox","production"]
+                                allow: ["sandbox", "production"]
                             }
                         }
                     }
@@ -166,6 +170,10 @@ function thisModule() {
                             minLength: 1,
                             maxLength: 50
                         },
+                        group: {
+                            type: String,
+                            allow: ['phone', 'tablet', 'tv', 'desktop']
+                        },
                         os: {
                             type: {
                                 type: String,
@@ -198,7 +206,7 @@ function thisModule() {
                             },
                             environment: {
                                 type: String,
-                                allow: ["sandbox","production"]
+                                allow: ["sandbox", "production"]
                             }
                         }
                     }
@@ -215,7 +223,6 @@ function thisModule() {
             , translator = req.miajs.translator;
 
         MemberHelpers.setPathPropertyValue(data, 'device.userAgent', req.headers['user-agent']);
-
         AuthService.createDevice({translator: translator}, data, 5).then(function (id) {
             Logger.info('Device ' + id + ' created');
             res.response = {id: id};

@@ -51,7 +51,7 @@ var _ = require('lodash')
     , BaseCronJob = CronJobs.BaseCronJob
     , Shared = MiaJs.Shared
     , Q = require('q')
-    , Encryption = require("mia-js-core/node_modules/utils").Encryption
+    , Encryption = require("mia-js-core/lib/utils").Encryption
     , NotificationModel = Shared.models('generic-notifications-model');
 
 Q.stopUnhandledRejectionTracking();
@@ -79,7 +79,7 @@ var _recycleNotifications = function () {
     }).then(function (data) {
         var deletedCount = data.deletedCount || 0;
         if (deletedCount > 0) {
-            Logger.info("Removed " + affectedItems + " notifications.");
+            Logger.info("Removed " + deletedCount + " notifications.");
         }
     });
 };

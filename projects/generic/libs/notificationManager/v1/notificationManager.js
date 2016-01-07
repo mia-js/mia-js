@@ -142,7 +142,7 @@ function thisModule() {
         var data = data;
         return {
             address: function (to) {
-                if (_.isEmpty(to) || !to.match(/[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}/)) {
+                if (_.isEmpty(to) || !to.match(/[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/)) {
                     return Q.reject({code: "InvalidEmailAddress", msg: "Invalid email address"});
                 }
                 else {

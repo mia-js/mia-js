@@ -6,14 +6,14 @@ Passthrough, aggregate or modify other external apis or create your own ones in 
 Use multiple project folders to keep track of all your apis and connect them by loose coupling of ids. Mia.js provides predefined functionality like user management, device profile management, session handling, authorization layers or notification handlers (push, email). There is also an iOS and Android SDK available to work with mia.js.
 
 # Installation
-**With [node.js](http://nodejs.org) v.10.x and [mongoDB](https://www.mongodb.org/) >2.6x installed:**
+**With [node.js](http://nodejs.org) 0.10.x or 0.12x and [mongoDB](https://www.mongodb.org/) >2.6x installed:**
 ```sh
 # Get the latest stable release of mia.ja
 $ npm install mia-js
 ```
 
 > ######New release available
-> The v0.8.1 release of mia.js is now available
+> The v0.8.2 release of mia.js is now available
 
 
 # Quick start
@@ -96,6 +96,9 @@ module.exports = {
      // Define multiple stages with different configuration i.e. local, stage, production
     local: {
         logLevel: "info", // none, fatal, error, warn, info, debug, trace
+
+         // Maximum amount of time in milliseconds that the event queue is behind, before consider the application as too busy and reject incoming requests
+        maxLag: 100,
 
         /* Define virtual hosts (vhosts) this application should listen to. Use id in routes file definition to apply a route to a host. Hosts are optional. If a routes file does not have a hostId setting the file is listening to every host pointing to this server
          */

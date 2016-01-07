@@ -8,6 +8,7 @@
 var MiaJs = require('mia-js-core')
     , _ = require('lodash')
     , Shared = MiaJs.Shared
+    , Logger = MiaJs.Logger
     , AuthService = Shared.libs("generic-deviceAndSessionAuth");
 
 function thisModule() {
@@ -42,7 +43,10 @@ function thisModule() {
 
     self.all = function (req, res, next) {
         var sessionId = req.header('session')
-            , ip = req.header('X-Forwarded-For') || req.ip
+            , ip = req.headers['x-forwarded-for'] ||
+                req.connection.remoteAddress ||
+                req.socket.remoteAddress ||
+                req.connection.socket.remoteAddress
             , group = req.miajs.route.group
             , translator = req.miajs.translator;
 
@@ -85,6 +89,7 @@ function thisModule() {
             req.miajs.device = deviceData;
             next();
         }).fail(function (err) {
+            Logger.error(err);
             next(err);
         }).done();
     };

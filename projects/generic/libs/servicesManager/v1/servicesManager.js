@@ -1,4 +1,4 @@
-var Shared = require('mia-js-core/node_modules/shared');
+var Shared = require('mia-js-core/lib/shared');
 
 function thisModule() {
 

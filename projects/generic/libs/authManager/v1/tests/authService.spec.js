@@ -1,9 +1,9 @@
 global.sharedInfo = null;
-var Shared = require('mia-js-core/node_modules/shared')
-    , Logger = require('mia-js-core/node_modules/logger').tag('test')
-    , MongoAdapter = require('mia-js-core/node_modules/dbAdapters').MongoAdapter
-    , DeviceAuth = require('../generic-deviceAndSessionAuth.js')
-    , UserAuth = require('../generic-deviceAndSessionAuth.js');
+var Shared = require('mia-js-core/lib/shared')
+    , Logger = require('mia-js-core/lib/logger').tag('test')
+    , MongoAdapter = require('mia-js-core/lib/dbAdapters').MongoAdapter
+    , DeviceAuth = require('../deviceAndSessionAuth.js')
+    , UserAuth = require('../userAuthManager.js');
 
 // Test validator functions
 describe("AuthManager", function () {
