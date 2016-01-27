@@ -1,5 +1,5 @@
 {
-  "name": "mia.js",
+  "name": "mia-js",
   "description": "mia.js - Middleware API framework",
   "version": "0.8.2",
   "dependencies": {
