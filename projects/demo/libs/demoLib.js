@@ -41,6 +41,23 @@ function thisModule() {
         return deferred.promise;
     };
 
+    // Get a single todo item by object id
+    self.getTodo = function (id) {
+        var deferred = Q.defer();
+
+        var query = {
+            _id: ObjectID(id)
+        };
+
+        ToDoModel.find(query).then(function (docs) {
+            docs.toArray(function (err, result) {
+                return err ? deferred.reject(err) : deferred.resolve(result);
+            })
+        });
+
+        return deferred.promise;
+    };
+
     // Add a toDo item to the db
     self.addToDoItem = function (name, status) {
         var data = {

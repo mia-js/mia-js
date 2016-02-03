@@ -50,6 +50,20 @@ function thisModule() {
                 200: "Success"
             }
         },
+        getToDoItem: {
+            parameters: {
+                path: {
+                    id: {
+                        desc: "Id of todo item",
+                        type: String,
+                        required: true
+                    }
+                }
+            },
+            responses: {
+                200: "Success"
+            }
+        },
         create: {
             parameters: {
                 body: {
@@ -148,6 +162,23 @@ function thisModule() {
             else {
                 return Q(result);
             }
+        }).then(function (result) {
+            res.response = result;
+            next();
+        }).fail(function (err) {
+            next({status: 500});
+        });
+    };
+
+    // List all todo items
+    self.getToDoItem = function (req, res, next) {
+
+        var id = req.miajs.validatedParameters.path.id;
+
+        DemoLib.getTodo(id).then(function (result) {
+            // Set a header
+            res.header("About", Shared.config('demo-config.title'));
+            return Q(result);
         }).then(function (result) {
             res.response = result;
             next();

@@ -74,6 +74,23 @@ module.exports = {
                     }
                 }
             },
+            index: {
+                identity: 'todo',
+                modified: new Date(2015, 7, 14, 12, 0, 0),
+                docs: true,
+                description: "Get single todo",
+                controller: [
+                    {
+                        name: 'demo-toDoHandler',
+                        function: "getToDoItem",
+                        version: '1.0'
+                    },
+                    {
+                        name: 'generic-defaultResponse',
+                        version: '1.0'
+                    }
+                ]
+            },
             create: {
                 identity: 'create-todo',
                 modified: new Date(2015, 7, 14, 12, 0, 0),
