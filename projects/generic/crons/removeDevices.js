@@ -78,7 +78,7 @@ module.exports = BaseCronJob.extend({},
 
         worker: function () {
             var maxInactiveTime = 1; // Time in hours when not activated devices will be removed
-            var maxAbsent = 90; // Time in days when activated but absent devices will be removed
+            var maxAbsent = 365; // Time in days when activated but absent devices will be removed
             var deviceModel = Shared.models('generic-device-model');
             var inactiveDevicesTimeLimit = new Date(Date.now() - (maxInactiveTime * 60 * 60 * 1000));
             var absentDeviceTimeLimit = new Date(Date.now() - (maxAbsent * 60 * 60 * 24 * 1000));

@@ -38,6 +38,10 @@ function thisModule() {
     self.createDevice = function (options, deviceData, retryCount) {
         options = options || {};
         var translator = options.translator || Translator.default;
+
+        deviceData.lastModified = new Date(Date.now());
+        deviceData.created = new Date(Date.now());
+
         return DeviceModel.validate(deviceData).then(function (validatedData) {
             return DeviceModel.insertOne(validatedData).then(function (data) {
                 var deviceDataCreated = data.ops;

@@ -11,11 +11,6 @@ function thisModule() {
     self.all = function (req, res) {
         var builder = new Xml2js.Builder({cdata: true});
         res.response = builder.buildObject(res.response);
-
-        var origin = req.header('Origin');
-        if (origin) {
-            res.set('Access-Control-Allow-Origin', origin);
-        }
         res.set('Content-Type', 'application/xml');
         res.send(res.response, res.statusCode);
     };
