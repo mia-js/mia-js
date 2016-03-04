@@ -3,7 +3,7 @@
 * Added rate limiter functionallity
 * Renamed identifier of generic default output controller
  
-## 0.8.2 (Sepember 18, 2015)
+## 0.8.2 (January 07, 2016)
 
 * Added node 0.12x support
 * Added xml default output controller
