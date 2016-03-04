@@ -71,6 +71,56 @@ function thisModule() {
                 401: ["KeyInvalid", "KeyExpired", "DeviceIdInvalid"],
                 403: ["KeyInvalidForGroup", "SignatureMethodInvalid", "TemporaryDisabled", "IPNotAllowed"]
             }
+        },
+        headerParameters: {
+            parameters: {
+                header: {
+                    key: {
+                        desc: "Authorization access key",
+                        type: String,
+                        required: true
+                    },
+                    signaturemethod: {
+                        desc: "Authorization access key signature method. Default SHA256 if not set",
+                        allow: ["sha256"],
+                        convert: "lower",
+                        type: String
+                    },
+                    requestdate: {
+                        desc: "Date string when client request was initiated i.e. 2015-01-01T00:00:00",
+                        type: Date
+                    }
+                }
+            },
+            responses: {
+                401: ["KeyInvalid", "KeyExpired", "DeviceIdInvalid"],
+                403: ["KeyInvalidForGroup", "SignatureMethodInvalid", "TemporaryDisabled", "IPNotAllowed"]
+            }
+        },
+        queryParameters: {
+            parameters: {
+                query: {
+                    key: {
+                        desc: "Authorization access key",
+                        type: String,
+                        required: true
+                    },
+                    signaturemethod: {
+                        desc: "Authorization access key signature method. Default SHA256 if not set",
+                        allow: ["sha256"],
+                        convert: "lower",
+                        type: String
+                    },
+                    requestdate: {
+                        desc: "Date string when client request was initiated i.e. 2015-01-01T00:00:00",
+                        type: Date
+                    }
+                }
+            },
+            responses: {
+                401: ["KeyInvalid", "KeyExpired", "DeviceIdInvalid"],
+                403: ["KeyInvalidForGroup", "SignatureMethodInvalid", "TemporaryDisabled", "IPNotAllowed"]
+            }
         }
     };
 
@@ -306,8 +356,8 @@ function thisModule() {
     var _validateSignature = function (req) {
         var translator = req.miajs.translator
             , options = {translator: translator}
-            , signatureToken = req.miajs.validatedParameters.header.key
-            , signatureMethod = req.miajs.validatedParameters.header.signaturemethod || "sha256"
+            , signatureToken = req.miajs.accessKeyParameters.key
+            , signatureMethod = req.miajs.accessKeyParameters.signaturemethod || "sha256"
             , deviceId = signatureToken.substring(0, 32)
             , secretId = signatureToken.substring(32, 64)
             , signatureTimeStamp = signatureToken.substring(64, 74)
@@ -337,7 +387,7 @@ function thisModule() {
 
         //Check secretId
         if (_.isEmpty(secretId) || secretId.length < 32) {
-            Logger.info("SecretId is invalid length, given: " + secret);
+            Logger.info("SecretId is invalid length, given: " + secretId);
             return Q.reject({
                 status: 401,
                 err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
@@ -420,7 +470,7 @@ function thisModule() {
     // Calculate timeoffset if header field requestdate is set
     var _clientTimeOffset = function (req) {
         var timeOffset = 0;
-        var deviceDate = new Date(req.miajs.validatedParameters.header.requestdate);
+        var deviceDate = new Date(req.miajs.accessKeyParameters.requestdate);
         var dateNow = new Date(Date.now());
         if (deviceDate != "Invalid Date") {
             timeOffset = deviceDate - dateNow;// Return in milliseconds
@@ -428,17 +478,19 @@ function thisModule() {
         return timeOffset;
     };
 
+
     /**
-     * Validate AccessKey based on dynamic signature or static key
+     * Validate access key, grant access and update device
      * @param req
      * @param res
      * @param next
+     * @private
      */
-    self.all = function (req, res, next) {
+    var _validateAccessKey = function (req, res, next) {
         var translator = req.miajs.translator
             , options = {translator: translator}
             , protocol = req.header('X-Forwarded-Proto') || req.protocol
-            , key = req.miajs.validatedParameters.header.key;
+            , key = req.miajs.accessKeyParameters.key;
 
         if (key.length == 32) {
             var ip = req.headers['x-forwarded-for'] ||
@@ -520,6 +572,46 @@ function thisModule() {
                 next(err);
             }).done();
         }
+    };
+
+    /**
+     * Validate AccessKey based on dynamic signature or static key using parameters in query
+     * @param req
+     * @param res
+     * @param next
+     */
+    self.queryParameters = function (req, res, next) {
+        req.miajs.accessKeyParameters = {
+            key: req.miajs.validatedParameters.query.key,
+            signaturemethod: req.miajs.validatedParameters.query.signaturemethod,
+            requestdate: req.miajs.validatedParameters.query.requestdate
+        };
+        _validateAccessKey(req, res, next);
+    };
+
+    /**
+     * Validate AccessKey based on dynamic signature or static key using parameters in header
+     * @param req
+     * @param res
+     * @param next
+     */
+    self.headerParameters = function (req, res, next) {
+        req.miajs.accessKeyParameters = {
+            key: req.miajs.validatedParameters.header.key,
+            signaturemethod: req.miajs.validatedParameters.header.signaturemethod,
+            requestdate: req.miajs.validatedParameters.header.requestdate
+        };
+        _validateAccessKey(req, res, next);
+    };
+
+    /**
+     * Validate AccessKey based on dynamic signature or static key using parameters in header
+     * @param req
+     * @param res
+     * @param next
+     */
+    self.all = function (req, res, next) {
+        self.headerParameters(req, res, next);
     };
 
 

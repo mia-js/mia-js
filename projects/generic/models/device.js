@@ -161,7 +161,7 @@ function thisModule() {
                     interval: {
                         type: Number
                     },
-                    maxRequest: {
+                    maxRequests: {
                         type: Number
                     }
                 },
