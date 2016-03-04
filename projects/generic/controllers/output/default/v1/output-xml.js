@@ -5,7 +5,7 @@ var Xml2js = require('xml2js');
 
 function thisModule() {
     var self = this;
-    self.identity = 'generic-xmlResponse';
+    self.identity = 'generic-defaultXMLResponse';
     self.version = '1.0';
 
     self.all = function (req, res) {

@@ -1,4 +1,9 @@
 module.exports = {
+
+    title: "Mia.js Demo API",
+    description: "API documentation",
+    version: "1.0",
+
     logLevel: "info", // none, fatal, error, warn, info, debug, trace
 
     /* Define virtual hosts (vhosts) this application should listen to. Use id in routes file definition to apply a route to a host.
@@ -14,6 +19,16 @@ module.exports = {
      host: ["api.example.com", "example-domain.com"]
      }
      ],*/
+
+    // Rate Limiter requests per interval per IP address
+    /*rateLimter: {
+     maxRequests: 1000, // Requests per IP per rate limit window
+     interval: 5 // Rate limit window in minutes
+     },*/
+
+    // Maximum amount of time in milliseconds that the event queue is behind, before consider the application as too busy and reject incoming requests
+    maxLag: 100,
+
     server: {
         http: {
             port: 3000

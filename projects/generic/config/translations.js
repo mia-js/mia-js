@@ -166,6 +166,10 @@ function thisModule() {
         ServiceIsDeprecated: {
             de: "Dieser Service is markiert als deprecated und der Service wird eingestellt werden. Bitte verwenden Sie diesen Service nicht mehr.",
             en: "This service is deprecated and will expire. Please do not use this service for new development"
+        },
+        RateLimitExceededForKey: {
+            de: "Zugriffslimit erreicht für diesen Key",
+            en: "Rate limit exceeded for this key"
         }
     };
 

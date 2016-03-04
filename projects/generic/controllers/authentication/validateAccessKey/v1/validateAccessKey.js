@@ -28,6 +28,7 @@ var _ = require('lodash')
     , MiaJs = require('mia-js-core')
     , Logger = MiaJs.Logger
     , Shared = require('mia-js-core').Shared
+    , RateLimiter = require('mia-js-core').RateLimiter
     , AuthService = Shared.libs("generic-deviceAndSessionAuth")
     , Crypto = require('crypto')
     , Url = require('url')
@@ -441,9 +442,9 @@ function thisModule() {
 
         if (key.length == 32) {
             var ip = req.headers['x-forwarded-for'] ||
-                req.connection.remoteAddress ||
-                req.socket.remoteAddress ||
-                req.connection.socket.remoteAddress
+                    req.connection.remoteAddress ||
+                    req.socket.remoteAddress ||
+                    req.connection.socket.remoteAddress
                 , group = req.miajs.route.group;
 
             // Validate static key token
@@ -453,7 +454,45 @@ function thisModule() {
                     deviceData.timeOffset = _clientTimeOffset(req);
                     req.miajs.device = deviceData;
                     res.header("timestamp", Date.now());
-                    next();
+
+                    //Get rate limit parameters for this device
+                    if (deviceData.rateLimit &&
+                        deviceData.rateLimit.interval &&
+                        _.isNumber(deviceData.rateLimit.interval) &&
+                        parseInt(deviceData.rateLimit.interval) > 0 &&
+                        deviceData.rateLimit.maxRequests &&
+                        _.isNumber(deviceData.rateLimit.maxRequests) &&
+                        parseInt(deviceData.rateLimit.maxRequests) > 0) {
+                        // Check rate limit for this device
+                        return RateLimiter.checkRateLimitByKey(deviceData.id, deviceData.rateLimit.interval, deviceData.rateLimit.maxRequests).then(function (rateLimiterResult) {
+                            if (rateLimiterResult.remaining == -1) {
+                                res.header("X-Rate-Limit-Limit", rateLimiterResult.limit);
+                                res.header("X-Rate-Limit-Remaining", 0);
+                                res.header("X-Rate-Limit-Reset", rateLimiterResult.timeTillReset);
+                                next({
+                                    status: 429,
+                                    err: {
+                                        'code': 'RateLimitExceededForKey',
+                                        'msg': Translator('generic-translations', 'RateLimitExceededForKey')
+                                    }
+                                });
+                            }
+                            else {
+                                res.header("X-Rate-Limit-Limit", rateLimiterResult.limit);
+                                res.header("X-Rate-Limit-Remaining", rateLimiterResult.remaining);
+                                res.header("X-Rate-Limit-Reset", rateLimiterResult.timeTillReset);
+
+                                next();
+
+                            }
+                        }).fail(function () {
+                            // Ignore rate limit due to failure
+                            next();
+                        });
+                    } else {
+                        // Ignore rate limit due to not set for this device
+                        next();
+                    }
                 });
             }).fail(function (err) {
                 if (err.status == 401) {

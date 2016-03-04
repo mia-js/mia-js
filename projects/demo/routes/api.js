@@ -4,6 +4,10 @@ module.exports = {
     //name: 'Demo API',  If disabled path is used as name in swaggerUI
     version: '1.0', // Version
     prefix: ['/demo/v1', '/demo/latest'], // Route prefix. Multiple prefixes possible
+    /*rateLimit: {  //Set rate limit if needed
+        interval: 5,
+        maxRequests: 1000
+    },*/
     routes: {
 
         // API ROUTES
@@ -13,6 +17,10 @@ module.exports = {
                 modified: new Date(2015, 7, 14, 12, 0, 0),
                 docs: true,
                 description: "List todos",
+                /*rateLimit: {
+                    interval: 5,
+                    maxRequests: 1000
+                 },*/
                 controller: [
                     {
                         name: 'demo-checkAccess',
@@ -24,7 +32,7 @@ module.exports = {
                         version: '1.0'
                     },
                     {
-                        name: 'generic-defaultResponse',
+                        name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
                 ],
@@ -86,7 +94,7 @@ module.exports = {
                         version: '1.0'
                     },
                     {
-                        name: 'generic-defaultResponse',
+                        name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
                 ]
@@ -106,7 +114,7 @@ module.exports = {
                         version: '1.0'
                     },
                     {
-                        name: 'generic-defaultResponse',
+                        name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
                 ]
@@ -126,7 +134,7 @@ module.exports = {
                         version: '1.0'
                     },
                     {
-                        name: 'generic-defaultResponse',
+                        name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
                 ]
@@ -146,7 +154,7 @@ module.exports = {
                         version: '1.0'
                     },
                     {
-                        name: 'generic-defaultResponse',
+                        name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
                 ]
@@ -166,7 +174,7 @@ module.exports = {
                         version: '2.0'
                     },
                     {
-                        name: 'generic-defaultResponse',
+                        name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
                 ]

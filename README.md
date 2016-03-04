@@ -96,6 +96,12 @@ module.exports = {
     local: {
         logLevel: "info", // none, fatal, error, warn, info, debug, trace
 
+        // Rate Limiter requests per interval per IP address
+        rateLimter: {
+             maxRequests: 1000, // Requests per IP per rate limit window
+             interval: 5 // Rate limit window in minutes
+        },
+
          // Maximum amount of time in milliseconds that the event queue is behind, before consider the application as too busy and reject incoming requests
         maxLag: 100,
 
@@ -429,6 +435,11 @@ module.exports = {
         "Access-Control-Allow-Headers": "Content-Type",  // See CORS header definition 
         "Access-Control-Allow-Credentials": true  // See CORS header definition 
     },
+    // Rate Limiter requests per interval per IP address
+    rateLimter: {
+        maxRequests: 1000, // Requests per IP per rate limit window
+        interval: 5 // Rate limit window in minutes
+    },
     routes: {
         // Route /unicorn
         './flavours': {
@@ -437,6 +448,10 @@ module.exports = {
                 modified: new Date(2015, 7, 14, 12, 0, 0),
                 docs: true,
                 description: "List of icecream flavours",
+                rateLimter: {
+                        maxRequests: 500, // Requests per IP per rate limit window
+                        interval: 5 // Rate limit window in minutes
+                },
                 controller: [
                     {
                         name: 'generic-accessKeyService',
@@ -505,6 +520,7 @@ There are some global parameters of your routes file to adjust the routes behavi
 * `envrionment` - *optional* Define environments for a routes file. The routes file is only registered and available public if the environment name matches the current environment name on server startup. You can creates routes for testing purpose and i.e. just deploy them to your staging servers and disable and hide them on your production environment.
 * `prefix` - *optional* You can prefix a route or even use multiple prefixes to make sure not to have conflicts with other route files or other projects. When building api routes we recommend to use the version nummer as part of the prefix i.e. `/icecream/v1/flavours`. It's up to you!
 * `corsHeaders` - Apply CORS headers to a routes file i.e. for Cross Domain Policy. Defining the CORS header automatically enables all routes of this routes definiton file to response to a browsers CORS requests methods OPTIONS
+* `rateLimiter` - Limit the request rate for an interval time range and max request for all routes within this routes file. Memcached needed to use rateLimiter
 * `routes` - All of your application routes
 * `decrecated` - *optional* Add this flag to mark all methods of this route as deprecated. The will lead to a notice field when requesting an api and highlighting in [Swagger::Docs](https://github.com/richhollis/swagger-docs) documentation
 
@@ -529,6 +545,7 @@ Define multiple routes for your application project. Mia.js has some build in me
 * `identity` - Identity of this route method. This identity has to be unique in this routes file
 * `decrecated` - *optional* Add this flag to mark a route as deprecated. The will lead to a notice field when requesting the api and highlighting in [Swagger::Docs](https://github.com/richhollis/swagger-docs) documentation
 * `modified` - Date when is route has been modified. Used in generic controllers `generic-listServices`
+* `rateLimiter` - Limit the request rate for an interval time range and max request for this single route. Memcached needed to use rateLimiter
 * `docs` - *optional* Set to true|false to make this route method available in automatically generated documentation
 * `description` - *optional* Give your route a more details description of what this services does. Used in automatically generated documentation.
 * `environment` - *optional* Define environments for a route method. The route method is only registered and available public if the environment name matches the current environment name on server startup. You can creates routes for testing purpose and just deploy them to your staging servers and disable and hide them on your production environment.
@@ -736,6 +753,12 @@ culture: {
                 maxLength: 50
             }
         }
+    },
+
+    // Rate Limiter requests per interval for this device (when using authentication->validateAccessKey controller)
+    rateLimter: {
+         maxRequests: 1000, // Requests for this device per rate limit window
+         interval: 5 // Rate limit window in minutes
     },
 
     device: {

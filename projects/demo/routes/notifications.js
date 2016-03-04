@@ -21,7 +21,7 @@ module.exports = {
                         version: '1.0'
                     },
                     {
-                        name: 'generic-defaultResponse',
+                        name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
                 ]

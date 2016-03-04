@@ -54,6 +54,10 @@ module.exports = {
     NotFound: {
         de: 'Nach was auch immer du suchst, hier ist es leider nicht',
         en: 'Whatever you are looking for it is not here'
+    },
+    RateLimitExceeded: {
+        de: "Zugriffslimit erreicht",
+        en: "Rate limit exceeded"
     }
 
 };

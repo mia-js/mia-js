@@ -7,7 +7,7 @@ var MiaJs = require('mia-js-core')
 
 function thisModule() {
     var self = this;
-    self.identity = 'generic-defaultResponse'; // Controller name used in routes, policies and followups
+    self.identity = 'generic-defaultJSONResponse'; // Controller name used in routes, policies and followups
     self.version = '1.0'; // Version number of service
 
     /*self.preconditions = {

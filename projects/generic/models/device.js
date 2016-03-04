@@ -157,6 +157,14 @@ function thisModule() {
                         convert: 'lower'
                     }
                 },
+                rateLimit: {
+                    interval: {
+                        type: Number
+                    },
+                    maxRequest: {
+                        type: Number
+                    }
+                },
                 access: {
                     key: {
                         type: String,
