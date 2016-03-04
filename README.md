@@ -12,7 +12,7 @@ Use multiple project folders to keep track of all your apis and connect them by 
 Download or clone this repository in a directory
 
 > ######New release available
-> The v0.8.3 release of mia.js is now available
+> The v0.8.4 release of mia.js is now available
 
 
 # Quick start

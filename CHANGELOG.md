@@ -1,4 +1,4 @@
-## 0.8.3 (March 4, 2016)
+## 0.8.4 (March 4, 2016)
 
 * Added rate limiter functionallity
 * Renamed identifier of generic default output controller
