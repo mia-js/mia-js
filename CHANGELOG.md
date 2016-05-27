@@ -1,3 +1,10 @@
+## 0.8.5 (May 27, 2016)
+
+* Added language support for notification templates
+* Bugfix notification processor on APNS error
+* Bugfix notification processor log
+
+
 ## 0.8.4 (March 4, 2016)
 
 * Added rate limiter functionallity

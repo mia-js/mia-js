@@ -21,41 +21,48 @@ function thisModule() {
     self.group = 'example'; // Group this service to a origin
 
     self.notifications = {
+        defaultLanguage: "en",
         connectors: {
             smtp: {
-                user: "",
-                password: "",
-                host: ""
+                local: {
+                    user: "",
+                    password: "",
+                    host: ""
+                }
             },
             apns: {
-                production: false,
-                cert: new Buffer("certString", "utf-8"), // Cert file as buffer
-                key: new Buffer("keyFile", "utf-8"),// Key file as buffer
-                passphrase: ""
+                local: {
+                    production: false,
+                    cert: new Buffer("certString", "utf-8"), // Cert file as buffer
+                    key: new Buffer("keyFile", "utf-8"),// Key file as buffer
+                    passphrase: ""
+                }
             }
         },
         templates: {
-            resetPassword: {
-                push: {
-                    apns: {
-                        alert: {
-                            title: "Passwort zurücksetzen",
-                            body: "Hallo [NAME], so kannst du dein Passwort zurücksetzen"
+            en: { // Language prefix for templates
+                resetPassword: {
+                    push: {
+                        apns: {
+                            alert: {
+                                title: "Passwort zurücksetzen",
+                                body: "Hallo [NAME], so kannst du dein Passwort zurücksetzen"
+                            },
+                            badge: 1,
+                            sound: "default",
+                            "content-available": 1
                         },
-                        badge: 1,
-                        sound: "default",
-                        "content-available": 1
+                        android: {
+                            tbd: "tbd"
+                        }
                     },
-                    android: {
-                        tbd: "tbd"
-                    }
-                },
-                mail: {
-                    smtp: {
-                        sender: "noreply@example.com",
-                        subject: "Passwort zurücksetzen",
-                        html: "HTML Mail with [NAME] replacements",
-                        text: "Dies ist eine HTML Email. Bitte aktivieren Sie HTML um den Inhalt anzuzeigen!"
+                    mail: {
+                        smtp: {
+                            sender: "noreply@example.com",
+                            subject: "Passwort zurücksetzen",
+                            html: "HTML Mail with [NAME] replacements",
+                            text: "Dies ist eine HTML Email. Bitte aktivieren Sie HTML um den Inhalt anzuzeigen!"
+                        }
                     }
                 }
             }

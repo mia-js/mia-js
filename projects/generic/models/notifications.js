@@ -23,6 +23,9 @@ module.exports = BaseModel.extend({
                     type: String,
                     required: true
                 },
+                language: {
+                    type: String
+                },
                 to: {
                     type: String,
                     required: true

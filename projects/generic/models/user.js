@@ -167,7 +167,6 @@ function thisModule() {
                 },
                 {
                     fields: ["group", "thirdParty.provider", "thirdParty.id"],
-                    unique: true,
                     sparse: true
                 },
                 {

@@ -107,6 +107,17 @@ var _notificationStatusReject = function (id, err) {
     });
 };
 
+//Set notification log
+var _notificationAddLog = function (id, info) {
+    return NotificationModel.findOneAndUpdate({_id: id}, {
+        $set: {
+            log: info
+        }
+    }, {
+        partial: true, upsert: false, returnOriginal: false
+    });
+};
+
 //Set notification to retry
 var _notificationStatusRetry = function (id, log, schedule) {
     return NotificationModel.findOneAndUpdate({_id: id}, {
@@ -125,12 +136,33 @@ var _notificationStatusRetry = function (id, log, schedule) {
 };
 
 // Get template data
-var _getTemplateData = function (id, connector, type, name) {
-    var model = Shared.config(id) || {};
-    if (_.isEmpty(model) || !model.templates || !model.templates[name] || _.isEmpty(model.templates[name]) || !model.templates[name][type] || _.isEmpty(model.templates[name][type]) || !model.templates[name][type][connector] || _.isEmpty(model.templates[name][type][connector])) {
-        return Q.reject("No template found");
+var _getTemplateData = function (id, configId, connector, type, notification, language) {
+    var model = Shared.config(configId) || {};
+    var name = notification.template;
+    var defaultLanguage = model.defaultLanguage || "en";
+
+    // Check if template exists
+    if (_.isEmpty(model) || !model.templates || !model.templates[language] || _.isEmpty(model.templates[language]) || !model.templates[language][name] || _.isEmpty(model.templates[language][name]) || !model.templates[language][name][type] || _.isEmpty(model.templates[language][name][type]) || !model.templates[language][name][type][connector] || _.isEmpty(model.templates[language][name][type][connector])) {
+
+        //Fallback to default language
+        if (_.isEmpty(model) || !model.templates || !model.templates[defaultLanguage] || _.isEmpty(model.templates[defaultLanguage]) || !model.templates[defaultLanguage][name] || _.isEmpty(model.templates[defaultLanguage][name]) || !model.templates[defaultLanguage][name][type] || _.isEmpty(model.templates[defaultLanguage][name][type]) || !model.templates[defaultLanguage][name][type][connector] || _.isEmpty(model.templates[defaultLanguage][name][type][connector])) {
+
+            //Check fallback without language prefix
+            if (_.isEmpty(model) || !model.templates || !model.templates[name] || _.isEmpty(model.templates[name]) || !model.templates[name][type] || _.isEmpty(model.templates[name][type]) || !model.templates[name][type][connector] || _.isEmpty(model.templates[name][type][connector])) {
+                return Q.reject("No template found");
+            }
+            else {
+                return Q.resolve(_.cloneDeep(model.templates[name][type][connector]));
+            }
+        }
+        else {
+            _notificationAddLog(id, "Fallback to language " + defaultLanguage + " due to missing localization notification template");
+            return Q.resolve(_.cloneDeep(model.templates[defaultLanguage][name][type][connector]));
+        }
     }
-    return Q.resolve(_.cloneDeep(model.templates[name][type][connector]));
+    else {
+        return Q.resolve(_.cloneDeep(model.templates[language][name][type][connector]));
+    }
 };
 
 //Get connector data
@@ -179,9 +211,8 @@ var _processEmail = function (data) {
     return _getConnector(data.configId, "smtp", Shared.config('environment').mode).then(function (connector) {
         var smtpServer = Emailjs.server.connect(connector);
         var notification = data.notification;
-
         return Q().then(function () {
-            return _getTemplateData(data.configId, "smtp", "mail", notification.template).fail(function () {
+            return _getTemplateData(data._id, data.configId, "smtp", "mail", notification, notification.language).fail(function () {
                 return Q.reject("Invalid template for email");
             });
         }).then(function (template) {
@@ -269,8 +300,14 @@ var _sendApn = function (data, deviceData) {
             Logger.error("Socket connection error. Check config settings", err);
         });
 
+        service.on("error", function (err) {
+            Logger.error("Error occured while sending push notification to APNS", err);
+        });
+
         var notification = data.notification;
-        return _getTemplateData(data.configId, "apns", "push", notification.template).then(function (template) {
+        var language = deviceData && deviceData.culture && deviceData.culture.language ? deviceData.culture.language : null;
+
+        return _getTemplateData(data._id, data.configId, "apns", "push", notification, language).then(function (template) {
             //Do replacements
             if (template.alert && template.alert.title) {
                 template.alert.title = _doReplacements(template.alert.title, notification.replacements);
@@ -304,7 +341,6 @@ var _sendApn = function (data, deviceData) {
                 pushData.payload = payload;
             }
             service.pushNotification(pushData, [deviceData.device.notification.token]);
-        }).then(function () {
             return Q.resolve();
         });
     }).fail(function (err) {

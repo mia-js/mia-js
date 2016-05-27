@@ -12,9 +12,10 @@ function thisModule() {
     self.group = 'demo'; // Group this service to a origin
 
     self.notifications = {
+        defaultLanguage: "en",
         connectors: {
             smtp: {
-                production: {
+                local: {
                     user: "my@domain.com",
                     password: "your password",
                     host: "mail.domain.com"
@@ -27,7 +28,7 @@ function thisModule() {
                     key: new Buffer("your key string"),
                     passphrase: "your password"
                 },
-                sandbox: {
+                local: {
                     production: false,
                     cert: new Buffer("your cert string"),
                     key: new Buffer("your key string"),
@@ -36,37 +37,39 @@ function thisModule() {
             }
         },
         templates: {
-            resetPassword: { // Template name
-                push: { // Template type
-                    apns: {
-                        alert: {
-                            title: "Reset password",
-                            body: "Hi [NAME], you requested a password reset"
+            en: { // Language prefix for templates
+                resetPassword: { // Template name
+                    push: { // Template type
+                        apns: {
+                            alert: {
+                                title: "Reset password",
+                                body: "Hi [NAME], you requested a password reset"
+                            },
+                            badge: 1,
+                            sound: "default",
+                            "content-available": 1
                         },
-                        badge: 1,
-                        sound: "default",
-                        "content-available": 1
+                        android: {
+                            //Not implemented so far but will be soon
+                        }
                     },
-                    android: {
-                        //Not implemented so far but will be soon
+                    mail: { // Template type
+                        smtp: { // SMTP settings to take has to match with connectors.smtp
+                            sender: "My Project <noreply@myproject.com>",
+                            subject: "Reset password",
+                            html: "<html><body><h1>Hi [NAME][LASTNAME], you requested a password reset</h1></body>",
+                            text: "Hi [NAME], you requested a password reset"
+                        }
                     }
                 },
-                mail: { // Template type
-                    smtp: { // SMTP settings to take has to match with connectors.smtp
-                        sender: "My Project <noreply@myproject.com>",
-                        subject: "Reset password",
-                        html: "<html><body><h1>Hi [NAME][LASTNAME], you requested a password reset</h1></body>",
-                        text: "Hi [NAME], you requested a password reset"
-                    }
-                }
-            },
-            welcome: { // Template name
-                mail: { // Template type
-                    smtp: { // SMTP settings to take has to match with connectors.smtp
-                        sender: "My Project <noreply@myproject.com>",
-                        subject: "Welcome to my project",
-                        html: "<html><body><b>Hi [Name][LASTNAME]</b>, we are so happy that you joined our project</body></html>",
-                        text: "Hi [Name] we are so happy that you joined our project"
+                welcome: { // Template name
+                    mail: { // Template type
+                        smtp: { // SMTP settings to take has to match with connectors.smtp
+                            sender: "My Project <noreply@myproject.com>",
+                            subject: "Welcome to my project",
+                            html: "<html><body><b>Hi [Name][LASTNAME]</b>, we are so happy that you joined our project</body></html>",
+                            text: "Hi [Name] we are so happy that you joined our project"
+                        }
                     }
                 }
             }

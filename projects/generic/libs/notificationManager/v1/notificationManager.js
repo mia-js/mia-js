@@ -5,6 +5,7 @@
  NotificationManager.mail({
             configId: "example-templates.notifications",
             template: "resetPassword",
+            language: "en" // OPTIONAL
             replacements: { //OPTIONAL
                 name: "Test",
                 email: "me@example.com"
@@ -18,6 +19,7 @@
  NotificationManager.push({
             configId: "example-templates.notifications",
             template: "resetPassword",
+            language: "en" // OPTIONAL USE DEVICE LANGUAGE SETTINGS AS DEFAULT WHEN NOT SET
             replacements: { //OPTIONAL
                 name: "Test"
             },
@@ -30,6 +32,7 @@
  NotificationManager.push({
             configId: "example-templates.notifications",
             template: "resetPassword",
+            language: "en" // OPTIONAL USE DEVICE LANGUAGE SETTINGS AS DEFAULT WHEN NOT SET
             replacements: { //OPTIONAL
                 name: "Test"
             }
@@ -85,22 +88,22 @@ function thisModule() {
         }
         var config = Shared.config(data.configId);
         // Check if template exists
-        if (_.isEmpty(data.template) || !config.templates || !config.templates[data.template]) {
-            return Q.reject({code: "TemplateNotFound", msg: "Template not found"});
-        }
+        /*if (_.isEmpty(data.template) || !config.templates || !config.templates[data.template]) {
+         return Q.reject({code: "TemplateNotFound", msg: "Template not found"});
+         }*/
 
-        // Check if template exists
+        // Check if schedule exists
         if (data.schedule && (Object.prototype.toString.call(data.schedule) !== "[object Date]" || data.schedule == "Invalid Date")) {
-            return Q.reject({code: "TemplateNotFound", msg: "Template not found"});
+            return Q.reject({code: "NotificationScheduleInvalid", msg: "Notification schedule date is invalid"});
         }
 
         // Check if template has this method
-        if (_.isEmpty(config.templates[data.template][type])) {
-            return Q.reject({
-                code: "MethodNotFoundInTemplate",
-                msg: "Method " + type + " was not found in template"
-            });
-        }
+        /*if (_.isEmpty(config.templates[data.template][type])) {
+         return Q.reject({
+         code: "MethodNotFoundInTemplate",
+         msg: "Method " + type + " was not found in template"
+         });
+         }*/
         return Q.resolve();
     };
 
@@ -126,9 +129,14 @@ function thisModule() {
             created: new Date(Date.now())
         };
 
+        if (data.language && _.isString(data.language)) {
+            formatted.notification.language = data.language;
+        }
+
         if (parseInt(data.badge) >= 0) {
             formatted.notification.badge = data.badge;
         }
+
         return formatted;
     };
 

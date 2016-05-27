@@ -21,7 +21,7 @@ module.exports = {
      ],*/
 
     // Rate Limiter requests per interval per IP address
-    /*rateLimter: {
+    /*rateLimt: {
      maxRequests: 1000, // Requests per IP per rate limit window
      interval: 5 // Rate limit window in minutes
      },*/
