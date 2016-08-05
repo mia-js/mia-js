@@ -48,6 +48,15 @@ module.exports = {
          }*/
     },
     debug: true, // Show more details in error case
+
+    // External Requests Keep Alive Agent Settings
+    /*keepAliveAgentOptions: {
+     maxSockets: 200,
+     maxFreeSockets: 10,
+     timeout: 60000,
+     keepAliveTimeout: 30000 // free socket keepalive for 30 seconds
+     },*/
+
     cronJobs: {
         enabled: true, // Enable/Disable cron jobs as a global setting
         allowedHosts: [] // Define specific hosts (host names) to run cronjobs. Leave empty to start cron on any server running this application
