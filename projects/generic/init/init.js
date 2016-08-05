@@ -2,19 +2,20 @@ var _ = require('lodash');
 var Async = require('async');
 var Shared = require('mia-js-core/lib/shared');
 var Logger = require('mia-js-core/lib/logger');
-var DeviceModel = Shared.models('generic-device-model');
 
 function thisModule() {
 
     var self = this;
 
     self.init = function () {
-        Logger.info("Initializing generic data");
-        _generateSecretTokens();
+        // Check if database connection is available
+        if (Shared.isDbConnectionAvailable() === true) {
+            Logger.info("Initializing generic data");
+            _generateSecretTokens();
+        }
     };
 
     var _generateSecretTokens = function () {
-
         var secretTokenList = [
             {
                 id: '6ff870ad33a86982550543e2f92623c5',

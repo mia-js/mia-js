@@ -1,3 +1,7 @@
+## 0.8.6 (May 27, 2016)
+
+* Updated mia.js-core and generic projects to run mia.js with optional db connection
+
 ## 0.8.5 (May 27, 2016)
 
 * Added language support for notification templates
