@@ -11,10 +11,6 @@ Use multiple project folders to keep track of all your apis and connect them by 
 ## Get the latest stable release of mia.ja
 Download or clone this repository in a directory
 
-> ######New release available
-> The v0.8.5 release of mia.js is now available
-
-
 # Quick start
 
 To run the mia.js demo project first set up a mongoDB and create a database named `mia`.
@@ -261,7 +257,22 @@ Preconditions consists of `parameters` and `responses`. In parameters you can us
 * `path` - Parameters that are expected in the path part of the url i.e. `/icecream/:flavour/...`
 * `header` - Parameters that are expected in the header part of the request
 
-To describe an expected parameter you can use the syntax of the mia.js model definition. See [Available model validation rules[(#modelValidationRules).
+##### Available precondition validation rules
+<a name="modelValidationRules"></a>
+ * `type`      *'Boolean','String','Number','Date','Array'* - defines the type of the value
+ * `subType`   *'Boolean','String','Number','Date','Array'* - defines the type of the value of elements of an object type array
+ * `maxLength` *Number i.e. 32* - Maximum length of chars of a value
+ * `minLength` *Number i.e. 32* - Minimum length of chars of a value
+ * `required`  *true|false* - Set if value is required
+ * `convert`   *'upper','lower'* - Convert value to upper or lower case
+ * `match`     *RegEx] i.e. /[a-zA-Z]{2}/i* - Value must match to regular expression
+ * `default`   *Number|Boolean|String|Function i.e. 'inactive'* - Set a default value if not set
+ * `nullable`  *Boolean* - Defines if a value is allowed to be set to null in case of no given value
+ * `virtual`   *String|Function* - Apply a defined virtual function to convert a value with a custom function and add to values
+ * `max`       *Number i.e. 20* - Max number a value can have, only for numbers
+ * `min`       *Number i.e. 1* - Min number a value must have, only for numbers
+ * `allow`     *Array|Number|String i.e. [2, 3, 4]* - Define allowed values (case-in-sensitiv)
+ * `deny`      *Array|Number|String i.e. [2, 3, 4]* - Denied values that are not allowed (case-in-sensitiv)
 
 ##### Assign to the next controller
 All controllers are chained using the express function `next()`. Append variables to `req` to make them available to the next controller in the routing chain or directly add to `res.response` and use `res.send(res.response, 200)` to output the result. See [Express](https://github.com/strongloop/express) for details.
@@ -395,8 +406,8 @@ module.exports = BaseModel.extend({
     });
 ```
 
-##### Available model validation rules
-<a href="modelValidationRules"></a>
+##### Available db model validation rules
+<a name="modelValidationRules"></a>
  * `type`      *'Boolean','String','Number','Date','Array'* - defines the type of the value
  * `subType`   *'Boolean','String','Number','Date','Array'* - defines the type of the value of elements of an object type array
  * `maxLength` *Number i.e. 32* - Maximum length of chars of a value
@@ -415,7 +426,6 @@ module.exports = BaseModel.extend({
  * `allow`     *Array|Number|String i.e. [2, 3, 4]* - Define allowed values (case-in-sensitiv)
  * `deny`      *Array|Number|String i.e. [2, 3, 4]* - Denied values that are not allowed (case-in-sensitiv)
  * `extend`    *Function* - Define a function that extends a schema definition dynamically i.e. iterate function [1...20] ==> name: 1,{type: Number, default: 0}
-
 
 ## Routes
 Routes are the key functionality to build your application. Define routes of your project in the routes definition of mia.js. The build in routes handler connects all your controllers, registeres the routes and handles route parameters of your application. You can have multiple routes files in your projects `routes` folder to logically seperate routes or create routes with different compilation of chained controllers i.e. routes for version v1, routes for version v2 or routes for testing.
