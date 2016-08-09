@@ -258,7 +258,6 @@ Preconditions consists of `parameters` and `responses`. In parameters you can us
 * `header` - Parameters that are expected in the header part of the request
 
 ##### Available precondition validation rules
-<a name="modelValidationRules"></a>
  * `type`      *'Boolean','String','Number','Date','Array'* - defines the type of the value
  * `subType`   *'Boolean','String','Number','Date','Array'* - defines the type of the value of elements of an object type array
  * `maxLength` *Number i.e. 32* - Maximum length of chars of a value
