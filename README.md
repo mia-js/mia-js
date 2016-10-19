@@ -897,6 +897,9 @@ The static method of the `generic-validateAccessKey` header field `key` is mainl
      "cidr" : [  // use a cidr to restrict this key to an ip range
          "0.0.0.0/0"
      ],
+     "blockcidr" : [  // use a cidr to block ip ranges
+         "0.0.0.0/0"
+     ],
      "groups" : [ // use groups to restrict this key to an routes group
          "demo" 
      ]

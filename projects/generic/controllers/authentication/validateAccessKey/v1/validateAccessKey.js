@@ -286,6 +286,18 @@ function thisModule() {
             }
         }
 
+        //Check if CIDR is on blockcidr
+        if (deviceData.access && deviceData.access.blockcidr) {
+            for (var thisBlockCIDR in deviceData.access.blockcidr) {
+                if (IP.cidrSubnet(deviceData.access.blockcidr[thisBlockCIDR]).contains(ip)) {
+                    return Q.reject({
+                        status: 403,
+                        err: {'code': 'IPNotAllowed', 'msg': translator('generic-translations', 'IPNotAllowed')}
+                    });
+                }
+            }
+        }
+
         // Check if IP address is allowed
         if (deviceData.access && deviceData.access.cidr) {
             //Check CIDRs

@@ -316,6 +316,7 @@ function thisModule() {
                 }
             }
         }).fail(function (err) {
+            //Logger.error(err);
             next(err);
         }).done();
     };
@@ -451,6 +452,7 @@ function thisModule() {
                 });
             });
         }).fail(function (err) {
+            //Logger.error(err);
             next(err);
         });
     };

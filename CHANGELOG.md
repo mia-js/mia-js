@@ -1,3 +1,8 @@
+## 0.8.7 (October 19, 2016)
+
+* Updated mia.js-core and generic projects
+
+
 ## 0.8.6 (May 27, 2016)
 
 * Updated mia.js-core and generic projects to run mia.js with optional db connection

@@ -304,7 +304,6 @@ function thisModule() {
                             deferred.resolve(deviceData);
                         }
                         else {
-                            Logger.info('Error no id');
                             deferred.reject({
                                 status: 403,
                                 err: {

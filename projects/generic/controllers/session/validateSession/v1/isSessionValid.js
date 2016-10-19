@@ -89,7 +89,6 @@ function thisModule() {
             req.miajs.device = deviceData;
             next();
         }).fail(function (err) {
-            Logger.error(err);
             next(err);
         }).done();
     };

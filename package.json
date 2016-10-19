@@ -1,9 +1,9 @@
 {
   "name": "mia-js",
   "description": "mia.js - Middleware API framework",
-  "version": "0.8.6",
+  "version": "0.8.7",
   "dependencies": {
-    "mia-js-core": "0.8.6",
+    "mia-js-core": "0.8.7",
     "apn": "1.7.3",
     "async": "0.2.9",
     "body-parser": "1.12.3",

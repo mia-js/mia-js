@@ -180,6 +180,11 @@ function thisModule() {
                         subType: 'CIDR',
                         index: true
                     },
+                    blockcidr: {
+                        type: Array,
+                        subType: 'CIDR',
+                        index: true
+                    },
                     groups: {
                         type: Array,
                         convert: 'lower'
@@ -230,7 +235,7 @@ function thisModule() {
                     version: {
                         type: String,
                         minLength: 1,
-                        maxLength: 7,
+                        maxLength: 16,
                         match: /^([\d]{1,3}\.)?([\d]{1,3}\.)?([\d]{1,3}\.)?[\d]{1,3}$/i //Match up to 1.2.3.4
                     },
                     vendor: {

@@ -20,8 +20,7 @@ function thisModule() {
                 nativeLoginIsSet: {
                     type: Boolean,
                     default: false,
-                    index: true,
-                    required: true
+                    index: true
                 },
                 messaging: [{
                     type: {
@@ -38,8 +37,8 @@ function thisModule() {
                     validated: {
                         type: Boolean,
                         default: false,
-                        index: true,
-                        required: true
+                        index: true
+                        //,required: true
                     },
                     inspectTokens: {
                         validateToken: {
@@ -77,7 +76,7 @@ function thisModule() {
                 validated: {
                     type: Boolean,
                     default: false,
-                    required: true,
+                    //required: true,
                     index: true
                 },
                 deviceCounts: [{

@@ -206,10 +206,20 @@ function _doReplacementsDeep(objSource, replacements) {
     return objSource;
 }
 
+
+// Email connections
+var _emailConnections = {};
 // Process email.
 var _processEmail = function (data) {
     return _getConnector(data.configId, "smtp", Shared.config('environment').mode).then(function (connector) {
-        var smtpServer = Emailjs.server.connect(connector);
+
+        var connectorId = Encryption.md5(JSON.stringify(connector));
+
+        if (!_apnConnections[connectorId]) {
+            _emailConnections[connector] = Emailjs.server.connect(connector);
+        }
+
+        var smtpServer = _emailConnections[connector];
         var notification = data.notification;
         return Q().then(function () {
             return _getTemplateData(data._id, data.configId, "smtp", "mail", notification, notification.language).fail(function () {
@@ -256,11 +266,13 @@ var _processEmail = function (data) {
                 });
         });
     }).fail(function (err) {
-        Logger.error(err);
         _notificationStatusReject(data._id, err);
         return Q.reject();
     });
 };
+
+// Open connections for APNS
+var  _apnConnections = {};
 
 // Send push notification to Apple Push Notification Services (APNS)
 var _sendApn = function (data, deviceData) {
@@ -273,36 +285,47 @@ var _sendApn = function (data, deviceData) {
     var environment = deviceData.device && deviceData.device.notification && deviceData.device.notification.environment ? deviceData.device.notification.environment : "production";
 
     return _getConnector(data.configId, "apns", environment).then(function (connector) {
-        var service = new Apn.Connection(connector);
-        service.on("connected", function () {
-            Logger.info("Connected to APNS (" + environment + ")");
-        });
-        service.on("transmitted", function (notification, device) {
-            Logger.info("Notification " + data._id.toString() + " transmitted to: " + device.token.toString("hex"));
-            _notificationStatusFulfilled(data._id);
-        });
-        service.on("transmissionError", function (errCode, notification, device) {
-            Logger.error("Notification " + data._id.toString() + " caused error: " + errCode + " for device ", device, notification);
-            if (errCode === 8) {
-                Logger.warn("A error code of 8 indicates that the device token is invalid. This could be for a number of reasons - are you using the correct environment? i.e. Production vs. Sandbox");
-                _notificationStatusReject(data._id, "Device token is invalid");
-            } else {
-                _notificationStatusReject(data._id, "APN Transmission error occured");
-            }
-        });
-        service.on("timeout", function () {
-            Logger.info("Connection Timeout");
-        });
-        service.on("disconnected", function () {
-            Logger.info("Disconnected from APNS");
-        });
-        service.on("socketError", function (err) {
-            Logger.error("Socket connection error. Check config settings", err);
-        });
 
-        service.on("error", function (err) {
-            Logger.error("Error occured while sending push notification to APNS", err);
-        });
+        var connectorId = Encryption.md5(JSON.stringify(connector));
+
+        // Reuse connection or register new APN connection if not exists
+        if (!_apnConnections[connectorId]) {
+            _apnConnections[connectorId] = new Apn.Connection(connector);
+
+            _apnConnections[connectorId].on("connected", function () {
+                Logger.info("Connected to APNS (" + environment + ")");
+            });
+            _apnConnections[connectorId].on("transmitted", function (notification, device) {
+                var messageId = notification.payload.messageId;
+                Logger.info("Notification " + messageId.toString() + " transmitted to: " + device.token.toString("hex"));
+                _notificationStatusFulfilled(messageId);
+            });
+            _apnConnections[connectorId].on("transmissionError", function (errCode, notification, device) {
+                var messageId = notification.payload.messageId;
+                Logger.error("Notification " + messageId.toString() + " caused error: " + errCode + " for device ", device, notification);
+                if (errCode === 8) {
+                    Logger.warn("A error code of 8 indicates that the device token is invalid. This could be for a number of reasons - are you using the correct environment? i.e. Production vs. Sandbox");
+                    _notificationStatusReject(messageId, "Device token is invalid");
+                } else {
+                    _notificationStatusReject(messageId, "APN Transmission error occured");
+                }
+            });
+            _apnConnections[connectorId].on("timeout", function () {
+                Logger.info("Connection Timeout");
+            });
+            _apnConnections[connectorId].on("disconnected", function () {
+                Logger.info("Disconnected from APNS");
+            });
+            _apnConnections[connectorId].on("socketError", function (err) {
+                Logger.error("Socket connection error. Check config settings", err);
+            });
+
+            _apnConnections[connectorId].on("error", function (err) {
+                Logger.error("Error occured while sending push notification to APNS", err);
+            });
+        }
+
+        var service = _apnConnections[connectorId];
 
         var notification = data.notification;
         var language = deviceData && deviceData.culture && deviceData.culture.language ? deviceData.culture.language : null;
@@ -319,6 +342,7 @@ var _sendApn = function (data, deviceData) {
             //Handle payload
             var payload = template.payload ? _.merge(template.payload, data.notification.payload) : data.notification.payload;
             payload = _doReplacementsDeep(payload, notification.replacements);
+            payload.messageId = data._id;
             var pushData = new Apn.Notification();
 
             if (template.alert) {
