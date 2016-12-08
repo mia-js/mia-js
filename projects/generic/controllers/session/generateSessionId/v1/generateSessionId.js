@@ -8,6 +8,7 @@
 var MiaJs = require('mia-js-core');
 var Shared = MiaJs.Shared;
 var AuthService = Shared.libs("generic-deviceAndSessionAuth")
+    , IPAddressHelper = MiaJs.Utils.IPAddressHelper;
 
 function thisModule() {
     var self = this;
@@ -44,13 +45,10 @@ function thisModule() {
      * Request accesskey
      */
     self.all = function (req, res, next) {
-        var id = req.params['id'],
-            ip = req.headers['x-forwarded-for'] ||
-                req.connection.remoteAddress ||
-                req.socket.remoteAddress ||
-                req.connection.socket.remoteAddress,
-            groups = req.allowedAccessGroups,
-            translator = req.miajs.translator;
+        var id = req.params['id']
+            , ip = IPAddressHelper.getClientIP(req)
+            , groups = req.allowedAccessGroups
+            , translator = req.miajs.translator;
 
         AuthService.generateSessionId({translator: translator}, id, ip, groups, 5).then(function (sessionId) {
             res.response = {

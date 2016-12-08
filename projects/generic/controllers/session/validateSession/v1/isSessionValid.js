@@ -9,7 +9,8 @@ var MiaJs = require('mia-js-core')
     , _ = require('lodash')
     , Shared = MiaJs.Shared
     , Logger = MiaJs.Logger
-    , AuthService = Shared.libs("generic-deviceAndSessionAuth");
+    , AuthService = Shared.libs("generic-deviceAndSessionAuth")
+    , IPAddressHelper = MiaJs.Utils.IPAddressHelper;
 
 function thisModule() {
     var self = this;
@@ -43,10 +44,7 @@ function thisModule() {
 
     self.all = function (req, res, next) {
         var sessionId = req.header('session')
-            , ip = req.headers['x-forwarded-for'] ||
-                req.connection.remoteAddress ||
-                req.socket.remoteAddress ||
-                req.connection.socket.remoteAddress
+            , ip = IPAddressHelper.getClientIP(req)
             , group = req.miajs.route.group
             , translator = req.miajs.translator;
 

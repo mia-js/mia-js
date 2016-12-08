@@ -29,6 +29,7 @@ var _ = require('lodash')
     , Logger = MiaJs.Logger
     , Shared = require('mia-js-core').Shared
     , RateLimiter = require('mia-js-core').RateLimiter
+    , IPAddressHelper = MiaJs.Utils.IPAddressHelper
     , AuthService = Shared.libs("generic-deviceAndSessionAuth")
     , Crypto = require('crypto')
     , Url = require('url')
@@ -393,7 +394,7 @@ function thisModule() {
             Logger.info("DeviceId is invalid length, given: " + deviceId);
             return Q.reject({
                 status: 401,
-                err: {'code': 'DeviceIdInvalid', 'msg': translator('generic-translations', 'DeviceIdInvalid')}
+                err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
             });
         }
 
@@ -505,10 +506,7 @@ function thisModule() {
             , key = req.miajs.accessKeyParameters.key;
 
         if (key.length == 32) {
-            var ip = req.headers['x-forwarded-for'] ||
-                    req.connection.remoteAddress ||
-                    req.socket.remoteAddress ||
-                    req.connection.socket.remoteAddress
+            var ip = IPAddressHelper.getClientIP(req)
                 , group = req.miajs.route.group;
 
             // Validate static key token

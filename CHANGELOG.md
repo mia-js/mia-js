@@ -1,3 +1,8 @@
+## 0.8.9 (Dezember 8, 2016)
+
+* Updated mia.js-core and generic projects
+* Removed unneeded node-modules
+
 ## 0.8.7 (October 19, 2016)
 
 * Updated mia.js-core and generic projects
