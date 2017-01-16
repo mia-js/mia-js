@@ -1,9 +1,9 @@
 <a href="#"><img src="http://7factory.github.io/mia-js/images/miajs.png" title="mia.js"/></a>
 
-mia.js is an API framework based on [node.js](http://nodejs.org), [Express](https://github.com/strongloop/express) and [mongoDB](https://www.mongodb.org/) that makes it easy to build custom or enterprise-grade apis and web frontends.
+mia.js is an API framework based on [node.js](http://nodejs.org), [Express](https://github.com/strongloop/express) and [mongoDB](https://www.mongodb.org/) that makes it easy to build custom or enterprise-grade api's and web frontend's.
 Focus of mia.js is to work as middleware backend for mobile apps to have all your communication in one place and avoid overloading your mobile apps.
-Passthrough, aggregate or modify other external apis or create your own ones in mia.js and provide them bundled as your project api.
-Use multiple project folders to keep track of all your apis and connect them by loose coupling of ids. Mia.js provides predefined functionality like user management, device profile management, session handling, authorization layers or notification handlers (push, email). There is also an iOS and Android SDK available to work with mia.js.
+Pass-through, aggregate or modify other external api's or create your own one in mia.js and provide them bundled as your project api.
+Use multiple project folders to keep track of all your api's and connect them by loose coupling of ids. Mia.js provides predefined functionality like user management, device profile management, session handling, authorization layers or notification handlers (push, email). There is also an iOS and Android SDK available to work with mia.js.
 
 # Installation
 **Install [node.js](http://nodejs.org) 0.10.x or 0.12x and [mongoDB](https://www.mongodb.org/) >2.6x**
@@ -30,17 +30,17 @@ $ node server.js local
 ```
 
 At this point, if you visit [http://localhost:3000/docs](http://localhost:3000/docs) you will see the [Swagger::Docs](https://github.com/richhollis/swagger-docs) documentation of the demo project api.
-To visit the demo frontend based on facebooks React.js that uses the demo api go to [http://localhost:3000/web/](http://localhost:3000/web/)
+To visit the demo frontend based on facebook's React.js that uses the demo api go to [http://localhost:3000/web/](http://localhost:3000/web/)
 
 # Features
   * Easy routing and nesting of controllers
   * Hierarchically chaining of controllers
-  * Manage and connect controller by ids not by physical existance in a folder
+  * Manage and connect controller by ids not by physical existence in a folder
   * Supports multiple projects folders
   * Build-in cron job handler
   * Predefined functionality for device profile handling
   * Predefined functionality for user management
-  * Notifications Handler for email and push (iOS ready, Anroid will follow soon)
+  * Notifications Handler for email and push (iOS ready, Android will follow soon)
   * Define database models for auto validation of mongoDB collections
   * Use preconditions for automatically validate request data
   * Auto-generates swagger docs based on routing definitions file
@@ -50,14 +50,14 @@ To visit the demo frontend based on facebooks React.js that uses the demo api go
 Configuration can be done on a global and on a project level. To customize the global environment settings modify the files in the directory `config/*`.
 Mia.js comes with a boilerplate configuration for the included demo project application and some demos of how to use mia.js generic controllers.
 
-#### Global environment configuration **
+#### Global environment configuration
 You can define multiple environments like local, stage, production or your own with different environment configurations. See `config/system.js` to modify the following parameters:
 
   * Paths of mia.js project working directories
   * HTTP/HTTPS server settings like port, ssl 
   * Virtual hosts to run multiple domains on same application server
   * CronJob configuration
-  * MongoDB settings like replica sets, ports, hostnames 
+  * MongoDB settings like replica sets, ports, host-names 
   * Memcache settings
   * Default culture and language settings
   * Logging level
@@ -116,7 +116,7 @@ module.exports = {
         server: { // Optional define http, https or both
             http: { 
                 port: 3000, // Port for http
-                redir: true // Fforward all traffic to https
+                redir: true // Forward all traffic to https
             }
             , https: { // Optional define http, https or both
                 port: 4000, // Port for https
@@ -133,7 +133,7 @@ module.exports = {
         debug: true, // Show more details in error case
         cronJobs: {
             enabled: true, // Enable/Disable cron jobs as a global setting
-            allowedHosts: [] // Define specific hosts (host names) to run cronjobs. Leave empty to start cron on any server running this application
+            allowedHosts: [] // Define specific hosts (host names) to run cron-jobs. Leave empty to start cron on any server running this application
         },
 
         //Wrap each request function in a try catch block to catch all application exceptions automatically
@@ -182,28 +182,27 @@ Mia.js is designed to support multiple languages for response and error handling
   *  `projects` - Contains your projects
 
 # Project structure
-A project is a folder with all your controllers, functions and other files in one place that belong logically together. Create as many projects as you like by creating sub directories with a name of your choise with the following structure within the folder `projects`. 
+A project is a folder with all your controllers, functions and other files in one place that logically belong together. Create as many projects as you like by creating sub directories with a name of your choice with the following structure within the folder `projects`. 
 
   *  `config` - *optional* - Project configurations, i.e. global project variables like api keys or host names or translation strings for error and response handling or notification templates for push or email messaging
   *  `controllers` - Contains your project controllers. Controllers can be chained in routing.
-  *  `crons` - *optional* - Project cronjobs
+  *  `crons` - *optional* - Project cron-jobs
   *  `init` - *optional* - Generate project data. All files providing a function `init()` are called on server startup.
   *  `libs` - *optional* - Extract functions to lib files to make them reusable in your project or global in all projects.
   *  `models` - *optional* - Define custom mongoDB database models to validate and modify data before writing them to the database
   *  `public` - *optional* - Put public assets or frontend web applications in this folder. This folder will be available public using the url like `/{YOUR PROJECT}/assets/`
   *  `routes` - Define all your project routes and define which controllers to call within this route. Controllers can be chained simply by definition in your projects route files. All routes files in this directory will be registered at server startup.
 
-All files inside the project working directories are connected by ids and version number. So feel free to create sub directories or drag around your files as you need them. Thats cool - huh?
+All files inside the project working directories are connected by ids and version number. So feel free to create sub directories or drag around your files as you need them. That's cool - huh?
 
 If you put all project specific content in a project folder you can easily move your whole project to any other mia.js server or even split up your projects later to deploy them on single servers.
 
 ### Config
-Usually projects have to deal with config variables like api keys, hostnames, external urls or localization keys. All files in the config directory gets parsed on server startup so you can use them on runtime in your controller functions by referencing `Shared` - see [Globals](#globals). 
+Usually projects have to deal with config variables like api keys, host-names, external urls or localization keys. All files in the config directory gets parsed on server startup so you can use them on runtime in your controller functions by referencing `Shared` - see [Globals](#globals). 
 
 ### Controllers
-Create your own api or web application by writing controllers placed in the sub directory `controllers` of your project folder. To organize your project you can use subdirectries at any depth as well. A controller is a small segment that is performing a certain task i.e. request an external api or getting results from an internal data base or simply just returns some text. Controllers can be chained in the routes definition files. So you can split up all your
-functionality you need in multiple controllers and chain them. You can reuse controllers in routes i.e. write a controller that validates an access key and prefix this controller to every single route.
-Due to chaining you can also do things like: A controller gets data from a source, the second controller in the chain modified this data and a thrid controller is responding the request and outputs your data as a json, xml or text document. Whatever you need, whatever you like!
+Create your own api or web application by writing controllers placed in the sub directory `controllers` of your project folder. To organize your project you can use sub-directories at any depth as well. A controller is a small segment that is performing a certain task i.e. request an external api or getting results from an internal database or simply just returning some text. Controllers can be chained in the routes definition files. So you can split up all your needed functionality in multiple controllers and chain them. You can reuse controllers in routes i.e. write a controller that validates an access key and prefix this controller to every single route.
+Due to chaining you can also do things like: A controller gets data from a source, the second controller in the chain modified this data and a third controller is responding the request and outputs your data as a json, xml or text document. Whatever you need, whatever you like!
 
 #### Defining a controller
 <a name="definingAController"></a>
@@ -227,7 +226,7 @@ function thisModule() {
                         convert: "lower"
                     }
                 }
-            }
+            },
             responses: {
                 200: "Success"
             }
@@ -251,7 +250,7 @@ To define a controller you need to set some variables like identity, version and
 ##### Use preconditions
 When using preconditions you can define what is necessary to run this controller.
 If a condition does not match mia.js returns a qualified error response to the requesting client and prevents this code to run.
-Preconditions consists of `parameters` and `responses`. In parameters you can use the folling segments:
+Preconditions consists of `parameters` and `responses`. In parameters you can use the following segments:
 * `query` - Parameters that are expected in the query part of the url i.e. `/icecream?sortBy=flavour`
 * `body` - Parameters that are expected in the body part of the request
 * `path` - Parameters that are expected in the path part of the url i.e. `/icecream/:flavour/...`
@@ -270,15 +269,15 @@ Preconditions consists of `parameters` and `responses`. In parameters you can us
  * `virtual`   *String|Function* - Apply a defined virtual function to convert a value with a custom function and add to values
  * `max`       *Number i.e. 20* - Max number a value can have, only for numbers
  * `min`       *Number i.e. 1* - Min number a value must have, only for numbers
- * `allow`     *Array|Number|String i.e. [2, 3, 4]* - Define allowed values (case-in-sensitiv)
- * `deny`      *Array|Number|String i.e. [2, 3, 4]* - Denied values that are not allowed (case-in-sensitiv)
+ * `allow`     *Array|Number|String i.e. [2, 3, 4]* - Define allowed values (case-in-sensitive)
+ * `deny`      *Array|Number|String i.e. [2, 3, 4]* - Denied values that are not allowed (case-in-sensitive)
 
 ##### Assign to the next controller
 All controllers are chained using the express function `next()`. Append variables to `req` to make them available to the next controller in the routing chain or directly add to `res.response` and use `res.send(res.response, 200)` to output the result. See [Express](https://github.com/strongloop/express) for details.
 You can use a predefined json output controller available in `generic` project to respond to a request or write your own output controller i.e. to render html, xml or even soap.
 
-### Crons
-Mia.js comes with a build in cron job manager to support cron jobs. If you like to run tasks timebased like clean up a database or send data to an external api you can define a cron job and it will run at the time you defined. Mia.js handles job execution and job concurrency on all servers your applications is currently running so all you need to set up is time and number of instances that should run this job. You can also define a single server to run all your crons defined in mia.js global configuration.
+### Cron-Jobs
+Mia.js comes with a build in cron job manager to support cron jobs. If you like to run tasks time-based like clean up a database or send data to an external api you can define a cron job and it will run at the time you defined. Mia.js handles job execution and job concurrency on all servers your applications is currently running so all you need to set up is time and number of instances that should run this job. You can also define a single server to run all your cron-jobs defined in mia.js global configuration.
 
 #### Defining a cron job
 To define a cron job place a file in the folder `crons` and add the following code
@@ -306,27 +305,26 @@ module.exports = BaseCronJob.extend({},
         debugOutput: false, // set to true to get detailed output of job startup and terminating
         allowedHosts: [], // define hosts to run this job. Leave empty if every host is allowed to
 
-        maxInstanceNumberTotal: 1, // max number of paralell running instances on all application host 
-        maxInstanceNumberPerServer: 1, // max number of paralell running instances on this host
+        maxInstanceNumberTotal: 1, // max number of parallel running instances on all application host 
+        maxInstanceNumberPerServer: 1, // max number of parallel running instances on this host
 
         identity: 'randomlyGenerateNewIcecreamFlavours', // Job name
 
         worker: function () {
             // RUN A TASK HERE
-            return Q(); // Cronjob has to return a promise
+            return Q(); // Cron-job has to return a promise
         },
         created: '2015-07-14T12:00:00', // Creation date
         modified: '2015-07-14T12:00:00' // Last modified date
     }
 );
 
-}
 module.exports = new thisModule();
 ```
-The task that is executed timebases should be placed in the function `worker`.
+The task that is executed time-based should be placed in the function `worker`.
 
 ### Init
-Sometimes you need to set some initial data to run your project i.e. write access keys to a database or do some logging. Simply create a file in the init project folder and provide a function called `init()`. All files inside this folder gets parsed and excecuted on server startup.
+Sometimes you need to set some initial data to run your project i.e. write access keys to a database or do some logging. Simply create a file in the init project folder and provide a function called `init()`. All files inside this folder gets parsed and executed on server startup.
 
 #### Defining a init function
 ```js
@@ -359,7 +357,7 @@ module.exports = new thisModule();
 ```
 
 ### Models
-When handling with user generated data you always have to deal with validation to achieve consistency. Particularly when using a NoSQL datebase like mongoDB you have to take care that your data in a table or collection is somehow equal to use indexing and speed up your application. Mia.js supports models to define what your data should look like. The build-in base model component and model validator of mia-js core module takes care of consistency by validating the data and can also modfiy your data i.e. by adding default values or calling custom functions on a model object. You can also definde your indexes for your database inside your model definition file. The collection is autoadded to the database on first usage if it does not exists and all indexed are set up automatically. When ever you want something to be stored to your database just use the mia.js base model functions that handls all for you.
+When handling with user generated data you always have to deal with validation to achieve consistency. Particularly when using a NoSQL database like mongoDB you have to take care that your data in a table or collection is somehow equal to use indexing and speed up your application. Mia.js supports models to define what your data should look like. The build-in base model component and model validator of mia-js core module takes care of consistency by validating the data and can also modify your data i.e. by adding default values or calling custom functions on a model object. You can also defined your indexes for your database inside your model definition file. The collection is auto-added to the database on first usage if it does not exists and all indexed are set up automatically. When ever you want something to be stored to your database just use the mia.js base model functions that handles all for you.
 
 #### Defining a model
 
@@ -389,8 +387,8 @@ module.exports = BaseModel.extend({
         Add compound indexes as followed:
         ,compoundIndexes: [
          {
-         fields: ["name", "group"],
-         unique: true
+             fields: ["name", "group"],
+             unique: true
          }
          ]
          */
@@ -422,12 +420,12 @@ module.exports = BaseModel.extend({
  * `virtual`   *String|Function* - Apply a defined virtual function to convert a value with a custom function and add to values
  * `max`       *Number i.e. 20* - Max number a value can have, only for numbers
  * `min`       *Number i.e. 1* - Min number a value must have, only for numbers
- * `allow`     *Array|Number|String i.e. [2, 3, 4]* - Define allowed values (case-in-sensitiv)
- * `deny`      *Array|Number|String i.e. [2, 3, 4]* - Denied values that are not allowed (case-in-sensitiv)
+ * `allow`     *Array|Number|String i.e. [2, 3, 4]* - Define allowed values (case-in-sensitive)
+ * `deny`      *Array|Number|String i.e. [2, 3, 4]* - Denied values that are not allowed (case-in-sensitive)
  * `extend`    *Function* - Define a function that extends a schema definition dynamically i.e. iterate function [1...20] ==> name: 1,{type: Number, default: 0}
 
 ## Routes
-Routes are the key functionality to build your application. Define routes of your project in the routes definition of mia.js. The build in routes handler connects all your controllers, registeres the routes and handles route parameters of your application. You can have multiple routes files in your projects `routes` folder to logically seperate routes or create routes with different compilation of chained controllers i.e. routes for version v1, routes for version v2 or routes for testing.
+Routes are the key functionality to build your application. Define routes of your project in the routes definition of mia.js. The build in routes handler connects all your controllers, registers the routes and handles route parameters of your application. You can have multiple routes files in your projects `routes` folder to logically separate routes or create routes with different compilation of chained controllers i.e. routes for version v1, routes for version v2 or routes for testing.
 
 #### Defining a route
 <a name="definingARoute"></a>
@@ -436,7 +434,7 @@ module.exports = {
     group: 'demo', // Group name
     name: 'My icecream API',  // if disabled path is used as name in api documentation
     version: '1.0', // Version
-    hostId: ['myDomain1','myDomain2'] // Optional if vhosts are defined in global mia.js config.
+    hostId: ['myDomain1','myDomain2'], // Optional if vhosts are defined in global mia.js config.
     environment: ['local','production'], // Define environments where this route file should be registered
     prefix: ['/icecream/v1','/icecream/latest'], // Route prefix. Multiple prefixes possible
     corsHeaders: { // Optionally set CORS headers to routes definition or to a single route
@@ -518,7 +516,7 @@ module.exports = {
     }
 };
 ```
-In this example a route is registerd with the method `GET` and the paths `/icecream/v1/flavours` and `/icecream/latest/flavours`. 
+In this example a route is registered with the method `GET` and the paths `/icecream/v1/flavours` and `/icecream/latest/flavours`. 
 ##### Routes parameters
 There are some global parameters of your routes file to adjust the routes behaviour.
 
@@ -527,14 +525,14 @@ There are some global parameters of your routes file to adjust the routes behavi
 * `hostId` - When using vhosts in mia.js global configuration you can bind all routes of this route file to a specific vhost i.e. my.domain.tld. In consequence this route is only available for requests coming from this domain. You can assign multiple hostIds to a route. Notice: Use a host ID here not a domain name. Domains names for vhosts should be defined in mia.js global config matching to a hostId.
 * `version` - Mia.js is designed to work with versioning. Giving your routes file and also your controllers a version number makes it easy to use versioning for your route by simply duplicating the routes file and make your modifications.
 * `envrionment` - *optional* Define environments for a routes file. The routes file is only registered and available public if the environment name matches the current environment name on server startup. You can creates routes for testing purpose and i.e. just deploy them to your staging servers and disable and hide them on your production environment.
-* `prefix` - *optional* You can prefix a route or even use multiple prefixes to make sure not to have conflicts with other route files or other projects. When building api routes we recommend to use the version nummer as part of the prefix i.e. `/icecream/v1/flavours`. It's up to you!
-* `corsHeaders` - Apply CORS headers to a routes file i.e. for Cross Domain Policy. Defining the CORS header automatically enables all routes of this routes definiton file to response to a browsers CORS requests methods OPTIONS
+* `prefix` - *optional* You can prefix a route or even use multiple prefixes to make sure not to have conflicts with other route files or other projects. When building api routes we recommend to use the version number as part of the prefix i.e. `/icecream/v1/flavours`. It's up to you!
+* `corsHeaders` - Apply CORS headers to a routes file i.e. for Cross Domain Policy. Defining the CORS header automatically enables all routes of this routes definition file to response to a browsers CORS requests methods OPTIONS
 * `rateLimit` - Limit the request rate for an interval time range and max request for all routes within this routes file. Memcached needed to use rateLimit
 * `routes` - All of your application routes
 * `decrecated` - *optional* Add this flag to mark all methods of this route as deprecated. The will lead to a notice field when requesting an api and highlighting in [Swagger::Docs](https://github.com/richhollis/swagger-docs) documentation
 
 ##### Routes
-Define multiple routes for your application project. Mia.js has some build in methods and parameters to describe the route. First give your route a name see exmample `./flavours`. This name is directly used as route path and appended to the prefix. You can use variable names inside of your routes path to allow routes like `/icecream/v1/:flavour/ingredient/:name`. Use a `:` as variable prefix of a path variable. A route always needs a request method your route is listening to - use one of the following.
+Define multiple routes for your application project. Mia.js has some build in methods and parameters to describe the route. First give your route a name see example `./flavours`. This name is directly used as route path and appended to the prefix. You can use variable names inside of your routes path to allow routes like `/icecream/v1/:flavour/ingredient/:name`. Use a `:` as variable prefix of a path variable. A route always needs a request method your route is listening to - use one of the following.
 
 ###### Routes methods
 * `list` - GET request method, alias of `get`
@@ -558,15 +556,15 @@ Define multiple routes for your application project. Mia.js has some build in me
 * `docs` - *optional* Set to true|false to make this route method available in automatically generated documentation
 * `description` - *optional* Give your route a more details description of what this services does. Used in automatically generated documentation.
 * `environment` - *optional* Define environments for a route method. The route method is only registered and available public if the environment name matches the current environment name on server startup. You can creates routes for testing purpose and just deploy them to your staging servers and disable and hide them on your production environment.
-* `bodyparser {type:'json',limit:'512kb'` - *optional* Mia.js automatically parses a request body as json. To change this behaviour set the bodyparser type to `none` or change the limit of the body size.
+* `bodyparser {type:'json',limit:'512kb'` - *optional* Mia.js automatically parses a request body as json. To change this behaviour set the body-parser type to `none` or change the limit of the body size.
 * `controllers` - Array of your project controllers to use for this route
-* `authorization` - *optional* Indicates if this route requries authorization. This flag is available in `generic-listServices` controller to indicate that this service is somehow protected and needs authorization.
+* `authorization` - *optional* Indicates if this route requires authorization. This flag is available in `generic-listServices` controller to indicate that this service is somehow protected and needs authorization.
 * `corsHeaders` - *optional* Apply CORS headers to single route i.e. for Cross Domain Policy. Defining the CORS header automatically enables this route to response to a browsers CORS requests methods OPTIONS
 * `responseSchemes` - *optional* To describe what the excepted response in case of a successful response or an error response will look like you can specify the response schema. This will be visible in the [Swagger::Docs](https://github.com/richhollis/swagger-docs) documentation
 *
 
 ####### Define controllers of a route method
-Controllers are defined as array in the routes file definition of your route method. The order of elements followes the chaining of your controllers. You can chain as many controllers as you need to perform a request and return a response. Controllers are chained by calling `next()` in a controller file. The last controller should handle the response output i.e. `res.send()` see [Express](https://github.com/strongloop/express)
+Controllers are defined as array in the routes file definition of your route method. The order of elements follows the chaining of your controllers. You can chain as many controllers as you need to perform a request and return a response. Controllers are chained by calling `next()` in a controller file. The last controller should handle the response output i.e. `res.send()` see [Express](https://github.com/strongloop/express)
 
 * `name` - Identity of the controller alias the field `identity` in your controller file. We should rename this ;-)
 * `version` - Version of the controller
@@ -601,9 +599,9 @@ Mia.js comes with a build-in notification manager to handle email and push notif
 When a url request is running mia.js processes the chain of controllers defined in the routes file. Mia.js automatically appends runtime data to the [Express](https://github.com/strongloop/express) variable `req` available in `req.miajs` so it is available in your project controllers.
 
   *  `req.miajs.route` - All route variables like current controller id, version, routes group name, current url and many more
-  *  `req.miajs.validatesParameters` - *optional* When defining preconditions in your controller all defined request data automatically gets validated and passed to `req.miajs.validatedParameters`. So you don't need to take care of invalid data. Your controller only gets those varibales that are defined in this particular controller. The next following controller might have defined different preconditions so the variable `req.miajs.validatedParameters` might have a different value.
+  *  `req.miajs.validatesParameters` - *optional* When defining preconditions in your controller all defined request data automatically gets validated and passed to `req.miajs.validatedParameters`. So you don't need to take care of invalid data. Your controller only gets those variables that are defined in this particular controller. The next following controller might have defined different preconditions so the variable `req.miajs.validatedParameters` might have a different value.
   *  `req.miajs.userData` - *optional* If using a predefined `generic-users` controller the variable contains the requesting users profile.
-  *  `req.miajs.device` - *optional* When using the predefined `generic-validateAccessKey` controller a requesting devices profile data is automatically added to this variable and is available for all follwing chained controllers to deal with device specifiy request.
+  *  `req.miajs.device` - *optional* When using the predefined `generic-validateAccessKey` controller a requesting devices profile data is automatically added to this variable and is available for all following chained controllers to deal with device specific request.
 
 
 # Generic Controllers
@@ -614,13 +612,13 @@ Mia.js comes with some predefined generic controllers to make your life a little
 * `generic-listServices` - Outputs a JSON object of all available services in the project route file where you defined this controller as a machine-readable services listing.
 * `generic-deviceProfile` - Creates a device profile for the requesting client and returns a device id as identifier. When using `generic-validateAccessKey` or `generic-accessKeyService` this service is mandatory. Device profile data of a requesting device is available in all chained controllers during a request. 
 * `generic-validateAccessKey` - Requires and validates a client generated signature key to secure the communication between a requesting client and your api methods. There is an iOS and Android SDK available to work with the `generic-validateAccessKey` controller. 
-* `generic-users` - Provides user management services like signup, login, facebook-login (thridparty logins), password reset, user profile services. Simple use one of there functions of this controller to enhance your project.
+* `generic-users` - Provides user management services like signup, login, facebook-login (third-party logins), password reset, user profile services. Simple use one of there functions of this controller to enhance your project.
 * `generic-evaluateOptionalUserLogin` - Verifies a device if requesting device is logged in a user account and appends the user profile data of this user to gloabl variable `req.miajs.userData`. When using this controller a logged in user is optional and the next controller is called in any case.
-* `generic-validateUserLogin` - Verifies a device if requesting device is logged in a user account and appends the user profile data of this user to gloabl variable `req.miajs.userData`. When using this controller a logged in user is mandatory and and error is returned to the user if the user is not logged in.
+* `generic-validateUserLogin` - Verifies a device if requesting device is logged in a user account and appends the user profile data of this user to global variable `req.miajs.userData`. When using this controller a logged in user is mandatory and and error is returned to the user if the user is not logged in.
 
 Deprecated generic controllers
 Mia.js offers some controllers, that are already deprecated so we do not describe them in detail but you can use them anyway. 
-* `generic-accessKeyService` - *deprecate* Validates a client generated access key token based on a device profile id and a client deposited secret token. This key is static per device and does not change over time. Use this i.e. to protect angains unauthorized access of 'generic-generateSession'.
+* `generic-accessKeyService` - *deprecate* Validates a client generated access key token based on a device profile id and a client deposited secret token. This key is static per device and does not change over time. Use this i.e. to protect against unauthorized access of 'generic-generateSession'.
 * `generic-generateSession` - *deprecate* Generate a session key and attach it to the requesting devices profile. When using `generic-generateSession` this use of the service `generic-deviceProfile` is mandatory. 
 * `generic-validateSession` - *deprecate* Validates a server generated session key (see `generic-generateSession`) to authorize a device to access a service.
 
@@ -628,7 +626,7 @@ Mia.js offers some controllers, that are already deprecated so we do not describ
 
 ## generic-defaultResponse
 #### Function: `all` (available for all request method)
-Outputs the [Express](https://github.com/strongloop/express) variable `res.response` as JSON document and sets http response code `200` by default. To set different http response code modify the variable `res.statusCode` in one of the prefixed controllers. Additionally `generic-defaultResponse` registeres a query variable named `filter` to filter the response by JSON element name. If debug mode is enabled in global environment configuration and the request header field `debug` is set to true additional debug information is returned in the request response.
+Outputs the [Express](https://github.com/strongloop/express) variable `res.response` as JSON document and sets http response code `200` by default. To set different http response code modify the variable `res.statusCode` in one of the prefixed controllers. Additionally `generic-defaultResponse` registers a query variable named `filter` to filter the response by JSON element name. If debug mode is enabled in global environment configuration and the request header field `debug` is set to true additional debug information is returned in the request response.
 
 ## generic-listServices
 #### Function: `list` (available for request method `list`)
@@ -687,12 +685,12 @@ Mia.js supports a machine-readable version of a projects routes file. Clients ca
 ```
 
 ## generic-deviceProfile
-In order to deliver device specifiy content i.e. image urls depending on the device screen resolution or culture code specifiy localisations mia.js supports device profiles. It is always recommended to know who is performing the current request and you don't want to pass to much data with every request redundant like language and region of the requesting device.
-To use device profiles add a route to your projects routes file and use the functions of this controller. Ensure that your clients call the register device route on first usage of your application api to initally create a device profile with all relevant profile data.
+In order to deliver device specific content i.e. image urls depending on the device's screen resolution or culture code specific localisations mia.js supports device profiles. It is always recommended to know who is performing the current request and you don't want to pass to much data with every request redundant like language and region of the requesting device.
+To use device profiles add a route to your projects routes file and use the functions of this controller. Ensure that your clients call the register device route on first usage of your application api to initially create a device profile with all relevant profile data.
 `generic-deviceProfile` controller offers two functions to register and update a devices profile. When using generic authorization controllers `generic-deviceProfile` is mandatory and the requesting devices profile data is automatically fetched and made available for all following chained controllers in the variable `req.miajs.device`.
 
 #### Function: `create` (available for request method `create`)
-Use this function to register a device initially. Submit device profile data in the request body - all parameters are optional. If you register a device profile without passing body data you will a least receive a device id to identify the requesting device. We recommend to use this device id on client side to identify your device so you might persit this id somehow. If you use the generic controllers `generic-accessKeyService` the device id is mandatory and used to authorize the registered device.
+Use this function to register a device initially. Submit device profile data in the request body - all parameters are optional. If you register a device profile without passing body data you will a least receive a device id to identify the requesting device. We recommend to use this device id on client side to identify your device so you might persist this id somehow. If you use the generic controllers `generic-accessKeyService` the device id is mandatory and used to authorize the registered device.
 
 **Using device create in routes file**
 ```js
@@ -727,7 +725,7 @@ module.exports = {
 
 ###### Device profile parameters available to pass in body
 ```js
-culture: {
+    culture: {
         code: {
             type: String,
             minLength: 5,
@@ -850,15 +848,15 @@ module.exports = {
 
 ### generic-validateAccessKey
 ##### Function: `all` (available for all request method)
-To protect your api against unauthorized access you can use the generic controller `generic-validateAccessKey` as prefix for every route method. See expample [Defining a route](#definingARoute).<br/>
+To protect your api against unauthorized access you can use the generic controller `generic-validateAccessKey` as prefix for every route method. See example [Defining a route](#definingARoute).<br/>
 **IMPORTANT:** Using the mia.js iOS and Android SDK you'll get all the access and device profile handling out of the box.<br/>
 <br/>
 Using this controller as prefix a header field `key` is automatically required with the request. There are two way of using the `key` field. One is using a client-side generates signature and the other is use a static key (length 32 char) that is directly bound to a device profile.
 
 ###### Signature method
-What this controller does in particular is validating the signature in the header field `key` and matches it agains the request url and method and device profile id to grant access. The `key` signature is generated with every request on client side and consists of the following parameters:
+What this controller does in particular is validating the signature in the header field `key` and matches it against the request url and method and device profile id to grant access. The `key` signature is generated with every request on client side and consists of the following parameters:
 
->signatur=[deviceId]+[secretId]+[timestamp]+HASH([deviceId] + [secret] + [timeStamp] + [requestMethod] + [baseUrl] + [urlPath] + HASH([bodyHash])).toLowerCase())
+>signature=[deviceId]+[secretId]+[timestamp]+HASH([deviceId] + [secret] + [timeStamp] + [requestMethod] + [baseUrl] + [urlPath] + HASH([bodyHash])).toLowerCase())
  
 **Fields**
 * deviceId = Id of device, see device register service, length 32 char
@@ -872,10 +870,10 @@ What this controller does in particular is validating the signature in the heade
 **Notice**
 Query parameters must be encoded as UTF-8 to avoid hash conflicts on server side. Make sure that all data inside the hash is converted to lower case. The timestamp is used to block requests that are older than a defined expire time. Make sure that the client has the correct UTC time. If not the request will fail and the server returns the current server datetime as header field "date". Uses this date to make a time correction client side and retry the request with adjusted date time. It is also possible to use a different hash algorithm than SHA256. This can be set in header field "signatureMethod". Currently this functionality is not fully implemented so default is SHA256.<br/>
 <br/>
->We know this sounds complicated so we really recommend to use the iOS or Android SDKs. But why do we do all of this? First we don't want someone to get access to your services. So we need somehow an access key. But to prevent man-in-the-middle attacts and manipulation during your request the whole request url and parameters are hashed inside the signature. So the signature is dynamicly generated and changes with every request - it is not a static key. Due to there is a secret part that is deposed on client and not submitted with the request any man-in-the-middle can not modify the request without breaking the signature hash or regenerate a modified hash by him self. To prevent replay attachs a time component is added to the signature. 
+>We know this sounds complicated so we really recommend to use the iOS or Android SDKs. But why do we do all of this? First we don't want someone to get access to your services. So we need somehow an access key. But to prevent man-in-the-middle attacks and manipulation during your request the whole request url and parameters are hashed inside the signature. So the signature is dynamically generated and changes with every request - it is not a static key. Due to there is a secret part that is deposed on client and not submitted with the request any man-in-the-middle can not modify the request without breaking the signature hash or regenerate a modified hash by him self. To prevent replay attacks a time component is added to the signature. 
 
 **Secrets**
-Authorization requieres secret tokens and secrets ids deposed on client device. These tokens consits of random strings with a length of 32 chars. They can be group specific to be valid only for certain groups (see groups settings in your routes file). Give the secret and the secret id to the client developer. Make sure that the secret stays secret and never gets published. The secret id is visible unencrypted in the `key` signature when using autorization. The secret itself is only used to create the hash part. To create your own secrets we recommend to add them manually to the `secrets` collection of the database or add them to the `init` controller of your project. This is what a secret entry looks like in the `secrets` collection of the database:
+Authorization requires secret tokens and secrets ids deposed on client device. These tokens consists of random strings with a length of 32 chars. They can be group specific to be valid only for certain groups (see groups settings in your routes file). Give the secret and the secret id to the client developer. Make sure that the secret stays secret and never gets published. The secret id is visible unencrypted in the `key` signature when using authorization. The secret itself is only used to create the hash part. To create your own secrets we recommend to add them manually to the `secrets` collection of the database or add them to the `init` controller of your project. This is what a secret entry looks like in the `secrets` collection of the database:
 
 ```
 {
@@ -907,7 +905,7 @@ The static method of the `generic-validateAccessKey` header field `key` is mainl
 ```
 
 ### generic-users
-Mia.js comes with build-in user manangement controllers to handle signup, login, manage user profiles and assign device profiles to a user profile. To prevent redudant data send with every request mia.js uses device profiles to identify a requesting device by a device id hashed in the `key` signature when using using the `generic-validateAccessKey` controller. A device can be assigned to a user profile and so be marked i.e. as logged in user. In your controllers you can respond to this by giving access to a service or deny access to users who are not logged in. Use the `generic-evaluateOptionalUserLogin` or `generic-validateUserLogin` controllers as prefix of your route to validate the login status of a device and get access in the following chained controllers to the user profile data. 
+Mia.js comes with build-in user management controllers to handle signup, login, manage user profiles and assign device profiles to a user profile. To prevent redundant data send with every request mia.js uses device profiles to identify a requesting device by a device id hashed in the `key` signature when using using the `generic-validateAccessKey` controller. A device can be assigned to a user profile and so be marked i.e. as logged in user. In your controllers you can respond to this by giving access to a service or deny access to users who are not logged in. Use the `generic-evaluateOptionalUserLogin` or `generic-validateUserLogin` controllers as prefix of your route to validate the login status of a device and get access in the following chained controllers to the user profile data. 
 
 #####Example route of a signup process#####
 <a name="ExampleRouteOfASignupProcess"></a>
@@ -964,33 +962,34 @@ module.exports = {
 ```
 So what is happening here. First we use the controller `generic-validateAccessKey` so that no unauthorized device is using this service. Second we call a controller `custom-userProfile` what is the identifier of your custom controller (see `self.identifier` in your controller file) with a function `prepareParametersForSignup` (name it as you like). This controller aggregates some custom signup settings and makes it available to the following controllers. Lets take a look at the function `prepareParametersForSignup` in particular
 ```js
-   var _options = { // all options are optional
+    var _options = { // all options are optional
         salt: '04473ac659ffaf31a4be2dc03ece0934lwe67q3b2cdvk23vkadv', // a hash used for password hashing of the user profile
         maxDeviceCount: 5, // Max number of devices allowed for this user profile
-        loginOnSignUp: true // set to no if you just want to sign up and login later seperatly
-   };
+        loginOnSignUp: true // set to no if you just want to sign up and login later separately
+    };
     
-   self.prepareParametersForSignup = function (req, res, next) {
-    var data = req.miajs.validatedParameters.body;
-    // Set userProfile variables to use in generic user controller signUp method
-    req.miajs.userService = {};
-    req.miajs.userService.userProfileData = data;
-    req.miajs.userService.options = _options;
-    req.miajs.userService.userProfileModel = UserProfileModel;
-    req.miajs.userService.group = req.miajs.route.group;
-    req.miajs.userService.appId = req.miajs.route.group;
-
-    // Add some custom data:
-    req.miajs.userService.userProfileData.createdAt = new Date(Date.now());
-    req.miajs.userService.userProfileData.updatedAt = new Date(Date.now());
-
-    next();
+    self.prepareParametersForSignup = function (req, res, next) {
+        var data = req.miajs.validatedParameters.body;
+        // Set userProfile variables to use in generic user controller signUp method
+        req.miajs.userService = {};
+        req.miajs.userService.userProfileData = data;
+        req.miajs.userService.options = _options;
+        req.miajs.userService.userProfileModel = UserProfileModel;
+        req.miajs.userService.group = req.miajs.route.group;
+        req.miajs.userService.appId = req.miajs.route.group;
+    
+        // Add some custom data:
+        req.miajs.userService.userProfileData.createdAt = new Date(Date.now());
+        req.miajs.userService.userProfileData.updatedAt = new Date(Date.now());
+    
+        next();
+    };
 ```
 The function `prepareParametersForSignup` fills a variable `req.miajs.userService` with a some of configurations i.e. the `userProfileModel` that should be used for the user data and the variable `userProfileData` that contains the request body data submitted by the client. If you do not want to adjust the signup parameters or add custom user profile data to the user profile you can remove the `prepareParametersForSignup` controller from your routes file and directly call the `generic-users` controller.
-Next the `generic-users` with function `setParametersForSignup` is called to set all collected data followed by the `signUp` function which creates the user profile. After successfull signup you can call i.e. a custom controller function like `onSignupSuccessful` (name it as you like) to return the profile or send a welcome email to the user. At the end a `generic-defaultResponse` controller is called to response the request. 
+Next the `generic-users` with function `setParametersForSignup` is called to set all collected data followed by the `signUp` function which creates the user profile. After successful signup you can call i.e. a custom controller function like `onSignupSuccessful` (name it as you like) to return the profile or send a welcome email to the user. At the end a `generic-defaultResponse` controller is called to response the request. 
 
 #### Using a custom user profile data model#####
-If you want to add some custom fields to a user profile i.e. phone number, fist name, last name, image url or whatever you need to fullfill your task you can create a custom user profile model. Just create a file in the folder `models` of your project and define the model. To use the model pass it in the variable `req.miajs.userProfileModel` before routing to the function `signUp` of generic controller `generic-users`.
+If you want to add some custom fields to a user profile i.e. phone number, fist name, last name, image url or whatever you need to fulfill your task you can create a custom user profile model. Just create a file in the folder `models` of your project and define the model. To use the model pass it in the variable `req.miajs.userProfileModel` before routing to the function `signUp` of generic controller `generic-users`.
 
 Example of a custom user profile model
 <a name="ExampleOfACustomUserProfileModel"></a>
@@ -1032,11 +1031,11 @@ module.exports = thisModule();
 This controller needs to be placed before routing to `signUp` of generic controller `generic-users` to assign and validate all user profile data. See [Example route of a signup process](#ExampleRouteOfASignupProcess)
 
 #### Function: `signUp` (available for all request methods as custom function)
-Signup adds the user profile to the database and returns the user profile data in the variable `req.miajs.userData` on successfull sign up. You can use this variable in all your following chained controllers defined in your routes file. So if you want to response the request with the user profile data simple write a controller that adds this variable to `res.response`. If the option `loginOnSignUp` is set to true `signUp` automatically assigns the currently requesting device id to the user profile. See [Example route of a signup process](#ExampleRouteOfASignupProcess) 
+Signup adds the user profile to the database and returns the user profile data in the variable `req.miajs.userData` on successful sign up. You can use this variable in all your following chained controllers defined in your routes file. So if you want to response the request with the user profile data simple write a controller that adds this variable to `res.response`. If the option `loginOnSignUp` is set to true `signUp` automatically assigns the currently requesting device id to the user profile. See [Example route of a signup process](#ExampleRouteOfASignupProcess) 
 
 
 #### Function: `loginUserWithFacebook` (available for all request methods as custom function)
-Mia.js supports login with facebook. You can do a facebook login simmilar to the signup example above. To use facebook mia.js requires a facebook token to automatically fetch the users profile data. 
+Mia.js supports login with facebook. You can do a facebook login similar to the signup example above. To use facebook mia.js requires a facebook token to automatically fetch the users profile data. 
 
 **Using loginUserWithFacebook in routes file**
 ```js
@@ -1097,7 +1096,7 @@ var FacebookLoginProvider = Shared.libs('generic-fbLoginProvider');
    var _options = { // all options are optional
         salt: '04473ac659ffaf31a4be2dc03ece0934lwe67q3b2cdvk23vkadv', // a hash used for password hashing of the user profile
         maxDeviceCount: 5, // Max number of devices allowed for this user profile
-        loginOnSignUp: true // set to no if you just want to sign up and login later seperatly
+        loginOnSignUp: true // set to no if you just want to sign up and login later separately
    };
     
    self.prepareParametersForSignup = function (req, res, next) {
@@ -1105,7 +1104,7 @@ var FacebookLoginProvider = Shared.libs('generic-fbLoginProvider');
         req.miajs.userService = req.miajs.userService || {};
         var body = req.miajs.validatedParameters.body || {};
 
-       var fields = "name,id,email"; // Define the fieldnames of facebook graph api to fetch.
+       var fields = "name,id,email"; // Define the field-names of facebook graph api to fetch.
         FacebookLoginProvider.checkCredentialsAndLoadProfile(body.fbUserToken, "v2.4", fields).then(function (params) {
             // Prepare user data
             req.miajs.userService.options = _options;
@@ -1114,7 +1113,7 @@ var FacebookLoginProvider = Shared.libs('generic-fbLoginProvider');
             req.miajs.userService.thirdPartyLogin = params.thirdPartyLogin;
             req.miajs.userService.email = params.email;
             var now = new Date(Date.now());
-            // Facebook login can be used initially to create an account or to update or merge with an existsing profile
+            // Facebook login can be used initially to create an account or to update or merge with an existing profile
             req.miajs.userService.onMerge = {
                 userProfileData: {
                     name: params.me.name,
@@ -1133,9 +1132,10 @@ var FacebookLoginProvider = Shared.libs('generic-fbLoginProvider');
         }).fail(function (err) {
             next(err);
         }).done();
+    };
 ```
 
-The function above prepares and fetches all user data from facebooks graph api using the generic lib function `checkCredentialsAndLoadProfile` and passes all the collected data to the next controller. `setParametersForFbLogin` prepares and validates all parameters and the controller function `loginUserWithFacebook` creates the user profile.
+The function above prepares and fetches all user data from facebook's graph api using the generic lib function `checkCredentialsAndLoadProfile` and passes all the collected data to the next controller. `setParametersForFbLogin` prepares and validates all parameters and the controller function `loginUserWithFacebook` creates the user profile.
 If a login already exists in user database collection as non-facebook user profile mia.js merges and updates the user profile data if the user profile has been validated before. Otherwise a merge and login is rejected due to security policy.
 
 #### Function: `setParametersForFbLogin` (available for all request methods as custom function)
@@ -1205,11 +1205,11 @@ self.login = function (req, res, next) {
 };
 ```
 
-Next the generic controller `generic-users` with the function `login` is called to assing the current device to the user profile. Optionally use a chained conroller function like `getProfile` i.e. to response the request with the user profile data or whatever you like to response the request with.
+Next the generic controller `generic-users` with the function `login` is called to assing the current device to the user profile. Optionally use a chained controller function like `getProfile` i.e. to response the request with the user profile data or whatever you like to response the request with.
 When a device requests a service with prefixed `generic-validateAccessKey` you can lookup if the device is currently in logged-in state and is assigned to a user profile by prefix the generic controllers `generic-evaluateOptionalUserLogin` or `generic-validateUserLogin`.
 
 #### Function: `logout` (available for all request method as custom function)
-To decouple a device from a user profile create a route in your projects route file that calles the `logout` function of controller `generic-users`. The device id gets removed from the list of known devices of the users profile. Due to the connection between device and user is decouple now you can not access services anymore that require a logged-in user.
+To decouple a device from a user profile create a route in your projects route file that calls the `logout` function of controller `generic-users`. The device id gets removed from the list of known devices of the users profile. Due to the connection between device and user is decouple now you can not access services anymore that require a logged-in user.
 
 **Using logout in routes file**
 ```js
@@ -1249,9 +1249,9 @@ module.exports = {
 ```
 
 #### Function: `requestPasswordReset` (available for all request methods as custom function)
-Resetting a password is a functionality you should provide to your customers. Mia.js does **not** define the way a password is resetted. When requesting a password reset the `requestPasswordReset` of the `generic-users` controller lookups up the user profile and adds a reset token to the user profile. This token is passed to the next controller following defined in your projects route file in the variable `req.miajs.userData.inspectTokens.passwordResetToken.token`. It's up to you how to send the token to the user. 
+Resetting a password is a functionality you should provide to your customers. Mia.js does **not** define the way a password is reset. When requesting a password reset the `requestPasswordReset` of the `generic-users` controller look-ups up the user profile and adds a reset token to the user profile. This token is passed to the next controller following defined in your projects route file in the variable `req.miajs.userData.inspectTokens.passwordResetToken.token`. It's up to you how to send the token to the user. 
 
->**Example usage:** Send an email to the users email address given in his user profile with a link to click. The link opens a micropage that lets the user reset the password and set a new one. Submit the new password and the reset token to an api route of your project using the `resetPassword` function of `generic-users` that accepts those parameters and resets the password. You could also send a push notification to the user or reset the password in an app ui view.
+>**Example usage:** Send an email to the users email address given in his user profile with a link to click. The link opens a micro-page that lets the user reset the password and set a new one. Submit the new password and the reset token to an api route of your project using the `resetPassword` function of `generic-users` that accepts those parameters and resets the password. You could also send a push notification to the user or reset the password in an app ui view.
 
 **Using request a password reset in routes file**
 ```js
@@ -1328,7 +1328,7 @@ module.exports = {
 >This service does not need `generic-validateAccessKey` due to the user needs to have a valid password reset token for his account and this service might get called from a website or a client app directly.
 
 #### Function: `getProfile` (available for all request method as custom function)
-The user profile data consist of several parts. A global profile management model with data like all assigned devices, login and password and a custom profile part (if you use one) connected to the variables `req.miajs.userService.group` and `req.miajs.userService.appId`. If you have assign a custom model (see [Example of a custom user profile model](#ExampleOfACustomUserProfileModel)) you can access this section by using the function `getProfile` of the `generic-users` contoller.
+The user profile data consist of several parts. A global profile management model with data like all assigned devices, login and password and a custom profile part (if you use one) connected to the variables `req.miajs.userService.group` and `req.miajs.userService.appId`. If you have assign a custom model (see [Example of a custom user profile model](#ExampleOfACustomUserProfileModel)) you can access this section by using the function `getProfile` of the `generic-users` controller.
 
 **Using get profile reset in routes file**
 ```js
@@ -1440,7 +1440,7 @@ self.updateProfile = function (req, res, next) {
 After setting your custom adjustments call the function `updateProfile` in `generic-users` controller and the user profile get updated with the new data. You only need to pass the parameters that changed. We recommend to use preconditions to define what data this services expects in body part of a request.
 
 #### Function: `deleteAccount` (available for all request methods as custom function)
-If you want to provider the functionality to delete a user account create a route in your projects route file that calles the function `deleteAccount` of the controller `generic-users`.
+If you want to provider the functionality to delete a user account create a route in your projects route file that calls the function `deleteAccount` of the controller `generic-users`.
 
 **Using deleteAccount in routes file**
 ```js
@@ -1483,11 +1483,11 @@ module.exports = {
 If you need to do some kind of custom clean up after a user account gets deleted we recommend to create a cron job or chain a controller after calling the `deleteAccount` function that removes data that was related to the users profile.
 
 #### Function: `validateUser` (available for all request methods as custom function)
-When a user account is created using `signUp` function a validation token is generated and assigned to the email adress in the user profile. To validate an email address and the account itself somehow pass this token to the user.
+When a user account is created using `signUp` function a validation token is generated and assigned to the email address in the user profile. To validate an email address and the account itself somehow pass this token to the user.
 
->**Example usage:** Send an email to the users email address given in the user profile with a validation link to click. The link opens a micropage that passes the validation token from the email to an api route of your project using the `validateUser` function of `generic-users` that accepts the validation token. You could also send a push notification to the user or validate the user profile by calling the `validateUser` route by an app.
+>**Example usage:** Send an email to the users email address given in the user profile with a validation link to click. The link opens a micro-page that passes the validation token from the email to an api route of your project using the `validateUser` function of `generic-users` that accepts the validation token. You could also send a push notification to the user or validate the user profile by calling the `validateUser` route by an app.
 
-The validation token in the user profile usuably is accessable in the variable:  `req.miajs.userData.messaging[i].inspectTokens.validateToken.token`
+The validation token in the user profile usually is accessible in the variable:  `req.miajs.userData.messaging[i].inspectTokens.validateToken.token`
 
 **Using validateUser in routes file**
 ```js
@@ -1526,8 +1526,8 @@ module.exports = {
 #### Function: `invalidateUser` (available for all request methods as custom function)
 Invalidate a user profile is pretty similar to `validateUser` but obviously is doing the opposite. 
 
->**Example usage:** If a user account is created using an email address of a user that does not own this email adress you could send an email to the given email address with a link to validate the user profile and a second link to remove it. 
-The link in the email opens a micropage that passes the invalidation token from the email to an api route of your project using the `invalidateUser` function of `generic-users` that accepts the invalidation token. The user profile gets removed. You could also send a push notification to the user or invalidate the user profile by calling the `invalidateUser` route by an app.
+>**Example usage:** If a user account is created using an email address of a user that does not own this email address you could send an email to the given email address with a link to validate the user profile and a second link to remove it. 
+The link in the email opens a micro-page that passes the invalidation token from the email to an api route of your project using the `invalidateUser` function of `generic-users` that accepts the invalidation token. The user profile gets removed. You could also send a push notification to the user or invalidate the user profile by calling the `invalidateUser` route by an app.
 You can find the validation token in the user profile and as response i.e. of `signUp` in the variable `req.miajs.userData.inspectTokens.invalidateToken.token`
 
 The invalidation token in the user profile usuably is accessable in the variable: 
@@ -1594,7 +1594,7 @@ The user auth manager bundles function concerning the autorization and user prof
 * `deleteUser` - Input login, group, deletes a user profile
 * `prepareDataForSignup` - Input params, validates params before using signup
 * `signUpUser` - Input params, creates a user profile
-* `signupWithThirdPartyProvider`- Input params, creates a user profile based on thrid party provider i.e. facebook
+* `signupWithThirdPartyProvider`- Input params, creates a user profile based on third party provider i.e. facebook
 * `validateUser` - Input token - sets a user profile and user profile email address to validated when token is valid
 * `invalidateUser` - Input token - sets user profile to deleted when invalidate token is valid
 * `getPasswordResetToken` - Input login, group, returns a password reset token and adds it to the user profile
@@ -1616,7 +1616,7 @@ Provides functions to create device profiles and session tokens.
 With mia.js comes a build-in notification manager. You can call its functions from everywhere in your controllers to add notifications to a messaging queue collection in database that gets processed by the notification handler cron. Currently mia.js supports notification via email and push. 
 
 ### Notification Manager configuration
-To use the notification manager lib you need to provide some notification settings in your project. Create a file and add the following syntax. We recommend to create this file in your project in folder `config` to make it accessable with global variable `Shared.config('notification-templates')`
+To use the notification manager lib you need to provide some notification settings in your project. Create a file and add the following syntax. We recommend to create this file in your project in folder `config` to make it accessible with global variable `Shared.config('notification-templates')`
 ```js
 function thisModule() {
     var self = this;
@@ -1684,7 +1684,7 @@ module.exports = new thisModule();
 ```
 
 ### Example of a notification
-To create a notification use the following sniplet in your project controller whereever this action should be initiated
+To create a notification use the following sniplet in your project controller wherever this action should be initiated
 ```js
 var NotificationManager = Shared.libs("generic-notificationManager");
 NotificationManager.mail({
@@ -1701,7 +1701,7 @@ NotificationManager.mail({
 
 There multiple way to send a notification. First you always initialize the notification with the type of the message see `mail` in the example above or use `push` for a push notification. Then you put in the notification parameters.
 
-* `configId` - String with the identifier of your config file where you defined notificaction settings
+* `configId` - String with the identifier of your config file where you defined notification settings
 * `template` - Name of the template to use for this notification
 * `replacemants` - To replace parts of your predefined template message use replacements. All variables in your message text with bracket i.e. [name] will be replaced by the value
 * `schedule` - define a time when to deliver the notification. If this field is missing the notification is send immediately
@@ -1719,10 +1719,10 @@ When a notification is successfully added to the notification queue in the datab
 
 
 ## generic-servicesManager 
-This lib function returns a maschine-readable version of your routes file listing. It provides the function `getFilteredServicesInfo` to return a structed object.
+This lib function returns a machine-readable version of your routes file listing. It provides the function `getFilteredServicesInfo` to return a structured object.
 
 ## generic-fbLoginProvider
-When using login and signup functionality of mia.js this function is used to fetch data from facebooks graph api. To fetch data from the api it requires a valid facebook auth token.
+When using login and signup functionality of mia.js this function is used to fetch data from facebook's graph api. To fetch data from the api it requires a valid facebook auth token.
 
 # Core Functions
 A essential node-module of mia.js is the the mia-js-core module. This module offers several functionalities you can also use within your custom controllers.
@@ -1740,7 +1740,7 @@ Cached looksup the identifier in your memcache server and returns the value as a
 # Database collections
 If you use the generic controllers or generic libs of mia.js it creates several database collections to handle all tasks. 
 
-* `cronJobTypes` - Handling of cronjob startup and runtime
+* `cronJobTypes` - Handling of cron-job startup and runtime
 * `devices` - Device profiles of registered devices
 * `errorLogEntries` - Collect error log entries 
 * `notifications` - Notification Queue. See for status of your notifications
