@@ -6,7 +6,7 @@ Pass-through, aggregate or modify other external api's or create your own one in
 Use multiple project folders to keep track of all your api's and connect them by loose coupling of ids. Mia.js provides predefined functionality like user management, device profile management, session handling, authorization layers or notification handlers (push, email). There is also an iOS and Android SDK available to work with mia.js.
 
 # Installation
-**Install [node.js](http://nodejs.org) 0.10.x or 0.12x and [mongoDB](https://www.mongodb.org/) >2.6x**
+**Install [node.js](http://nodejs.org) 0.10.x,0.12x,4.xx,5.xx,6.xx and [mongoDB](https://www.mongodb.org/) >2.6x**
 
 ## Get the latest stable release of mia.ja
 Download or clone this repository in a directory
