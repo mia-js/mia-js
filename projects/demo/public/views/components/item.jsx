@@ -52,15 +52,16 @@ module.exports = React.createClass({
         e.preventDefault();
         var id = e.target.getAttribute('data-id');
         if (this.state.lastValue != e.target.value) {
+            var value = e.target.value;
             var data = {
-                name: e.target.value
+                name: value
             };
             this.updateItem(id, data, function (err, data) {
                 if (err) {
                     this.props.handleRefresh({type: "danger", message: "Can not edit item on server"});
                 }
                 else {
-                    this.setState({lastValue: e.target.value});
+                    this.setState({lastValue: value});
                     this.props.handleRefresh();
                 }
             }.bind(this));
