@@ -1,3 +1,8 @@
+## 0.9.3 (November 30, 2017)
+* Implemented cronjob to sync database indexes with those defined in model schema
+* Added Babel to use ES6+ syntax
+* Updated MongoDB config object
+
 ## 0.8.9 (Dezember 8, 2016)
 
 * Updated mia.js-core and generic projects

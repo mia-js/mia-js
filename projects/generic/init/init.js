@@ -1,7 +1,7 @@
 var _ = require('lodash');
-var Async = require('async');
-var Shared = require('mia-js-core/lib/shared');
-var Logger = require('mia-js-core/lib/logger');
+var MiaJs = require('mia-js-core');
+var Shared = MiaJs.Shared;
+var Logger = MiaJs.Logger;
 
 function thisModule() {
 
@@ -12,6 +12,7 @@ function thisModule() {
         if (Shared.isDbConnectionAvailable() === true) {
             Logger.info("Initializing generic data");
             _generateSecretTokens();
+            _startUpEnsureIndexes();
         }
     };
 
@@ -37,6 +38,30 @@ function thisModule() {
                 }).done();
             }
         );
+    };
+
+    var _startUpEnsureIndexes = function () {
+        Logger.info("Going to check startup config for ensureIndexes cronjob");
+        var env = Shared.config('environment');
+        var MemberHelpers = MiaJs.Utils.MemberHelpers;
+        var startUp = MemberHelpers.getPathPropertyValue(env, 'cronJobs.ensureIndexes.startUp');
+        if (startUp) {
+            var cronJobExecutionModel = Shared.models('generic-cronJobExecutionModel');
+            cronJobExecutionModel.findOneAndUpdate({
+                typeName: 'generic-ensureIndexes'
+            }, {$set: {'config.forceRun': true}})
+                .then(result => {
+                    if (result.ok !== 1) {
+                        Logger.error('An error occurred while enabling startup run on generic-ensureIndexes cronjob', result);
+                    }
+                    Logger.info('Startup run on generic-ensureIndexes cronjob successfully enabled');
+                })
+                .catch(error => {
+                    Logger.error('An error occurred while enabling startup run on generic-ensureIndexes cronjob', error);
+                });
+        } else {
+            Logger.info('Cronjob generic-ensureIndexes is not configured to run on startup');
+        }
     };
 
     return self;

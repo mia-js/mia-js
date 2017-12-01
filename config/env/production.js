@@ -59,7 +59,12 @@ module.exports = {
 
     cronJobs: {
         enabled: true, // Enable/Disable cron jobs as a global setting
-        allowedHosts: [] // Define specific hosts (host names) to run cronjobs. Leave empty to start cron on any server running this application
+        allowedHosts: [], // Define specific hosts (host names) to run cronjobs. Leave empty to start cron on any server running this application
+        ensureIndexes: {
+            enabled: false,
+            startUp: false,
+            background: true
+        }
     },
 
 //Wrap each request function in a try catch block to catch all application exceptions automatically
@@ -87,24 +92,16 @@ module.exports = {
         mia: {
             url: 'mongodb://api:api@localhost:27017/mia',
             options: {
-                db: {
-                    w: 1 //write acknowledgement
-                },
-                server: {
-                    poolSize: 15
-                }
+                w: 1, //write acknowledgement
+                poolSize: 15
             }
         }
         // Tests db
         /*,tests: {
          url: 'mongodb://api:api@localhost:27017/tests',
          options: {
-         db: {
-         w: 1 //write acknowledgement
-         },
-         server: {
+         w: 1, //write acknowledgement
          poolSize: 15
-         }
          }
          }*/
     }

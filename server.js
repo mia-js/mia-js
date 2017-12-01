@@ -1,3 +1,7 @@
+// Wrap application in babel to enhance ES6 to node
+require('babel-core/register');
+require('babel-polyfill');
+
 var MiaJs = require('mia-js-core').Run;
 
 //Start mia.js
