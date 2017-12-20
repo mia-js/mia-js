@@ -1,3 +1,7 @@
+## 0.9.4 (December 20, 2017)
+* Refactored frontend demo project (/web) to use React.js v16 and all the fun stuff like redux, server-side-rendering, isomorphic style loading, declarative routing, etc
+* Replaced grunt with webpack as build tool
+
 ## 0.9.3 (November 30, 2017)
 * Implemented cronjob to sync database indexes with those defined in model schema
 * Added Babel to use ES6+ syntax

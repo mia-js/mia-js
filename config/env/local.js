@@ -27,7 +27,7 @@ module.exports = {
      },*/
 
     // Maximum amount of time in milliseconds that the event queue is behind, before consider the application as too busy and reject incoming requests
-    maxLag: 100,
+    //maxLag: 100,
 
     server: {
         http: {
@@ -105,5 +105,11 @@ module.exports = {
          poolSize: 15
          }
          }*/
+    },
+    webpack: {
+        skip: true, // When TRUE whole webpack compilation is skipped
+        purge: false, // When TRUE prior bundle files will be purged before compiling
+        watchMode: false, // TRUE for development: Watching the files and pushing it to the client via HMR
+        verbose: false // When FALSE only some general info, warnings and errors are shown
     }
 };
