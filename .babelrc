@@ -4,5 +4,8 @@
   ],
   "plugins": [
     "transform-async-to-generator"
+  ],
+  "ignore": [
+    "**/*.dist.js"
   ]
 }

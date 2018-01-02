@@ -1,8 +1,13 @@
+/**
+ * Testsuite
+ *
+ * Currently not working because of missing database connection.
+ */
 var Jasmine = require('jasmine-node')
     , fs = require('fs')
     , _String = require('underscore.string')
     , Trycatch = require('trycatch')
-    , Logger = require("mia-js-core/node_modules/logger");
+    , Logger = require("mia-js-core/lib/logger");
 
 Trycatch(function () {
     //take third argument (if available), otherwise take second argument, otherwise nothing
@@ -15,6 +20,7 @@ Trycatch(function () {
 
     Jasmine.executeSpecsInFolder({
         specFolders: [fullPath],
+        regExpSpec: /.*\.spec\.js/,
         onComplete: function (runner, log) {
             if (runner.results().failedCount == 0) {
 
@@ -39,9 +45,6 @@ Trycatch(function () {
          consolidate: true
          }*/
     });
-
-
-
 
 }, function (err) {
     Logger('err', err);
