@@ -84,7 +84,7 @@ module.exports = BaseCronJob.extend({},
             var absentDeviceTimeLimit = new Date(Date.now() - (maxAbsent * 60 * 60 * 24 * 1000));
 
             //Delete session node if session is expired
-            return deviceModel.removeMany({
+            return deviceModel.deleteMany({
                     $or: [
                         {
                             'status': 'inactive',

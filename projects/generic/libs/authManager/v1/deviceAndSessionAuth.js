@@ -12,7 +12,7 @@ var Q = require('q')
     , IP = require('ip')
     , MemberHelpers = Utils.MemberHelpers
     , Encryption = Utils.Encryption
-    , ObjectID = require('mongodb').ObjectID
+    , ObjectID = require('mia-js-core/lib/dbAdapters').MongoObjectID
     , SecretModel = Shared.models('generic-secret-model')
     , DeviceModel = Shared.models('generic-device-model');
 

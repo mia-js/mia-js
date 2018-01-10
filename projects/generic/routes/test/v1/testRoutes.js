@@ -6,7 +6,7 @@ module.exports = {
     name: 'Tests',
     version: ver,
     prefix: '/api/tests/generic/v1',
-    environment: ["local","int"],
+    environment: ["test"],
     routes: {
 
         //users

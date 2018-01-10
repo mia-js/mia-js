@@ -97,14 +97,6 @@ module.exports = {
                 poolSize: 15
             }
         }
-        // Tests db
-        /*,tests: {
-         url: 'mongodb://api:api@localhost:27017/tests',
-         options: {
-         w: 1, //write acknowledgement
-         poolSize: 15
-         }
-         }*/
     },
     webpack: {
         skip: true, // When TRUE whole webpack compilation is skipped

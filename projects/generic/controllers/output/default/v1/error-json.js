@@ -17,7 +17,7 @@ function thisModule() {
 
     self.all = function (err, req, res) {
         var output = ErrorHandler.handleError(err, req, res);
-        res.send(output.response, output.status);
+        res.status(output.status).send(output.response);
     };
 
     return self;

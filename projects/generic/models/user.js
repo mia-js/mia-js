@@ -197,13 +197,7 @@ function thisModule() {
                     fields: ["status", "accessTokens.appId", "accessTokens.device.id"]
                 },
                 {
-                    fields: ["_id", "accessTokens.appId", "accessTokens.device.id"]
-                },
-                {
                     fields: ["_id", "status", "accessTokens.appId", "accessTokens.device.id"]
-                },
-                {
-                    fields: ["status", "accessTokens.appId", "accessTokens.device.id"]
                 }
             ]
         },
@@ -212,10 +206,11 @@ function thisModule() {
             identity: 'generic-user-model', // Model name
             version: '1.0', // Version number
             created: '2014-10-31T19:00:00', // Creation date
-            modified: '2014-10-31T19:00:00', // Last modified date
+            modified: '2017-01-10T15:00:00', // Last modified date
             collectionName: 'users'
         });
 
     return model;
 }
+
 module.exports = thisModule();

@@ -7,13 +7,16 @@ var MiaJs = require('mia-js-core')
 Q.stopUnhandledRejectionTracking();
 
 describe("Testing user service", function () {
+    var env = Shared.config('environment');
     var _protocol = "http";
     var _hostName = "localhost";
-    var _port = 3000;
+    var _port = env.server.http.port;
+    var random = Encryption.randHash();
     var _userData = {
-        login: 'test_' + Encryption.randHash(),
+        login: 'test_' + random,
         password: "a0657b9b264d02091618d21cfa91e92f",
-        deviceName: "node-test"
+        deviceName: "node-test",
+        email: 'test_' + random + '@test.abc'
     };
     var _secretId = '6ff870ad33a86982550543e2f92623c5';
     var _secret = '10f2bde9a138ef5aeed40812b0a1594b';
@@ -80,7 +83,8 @@ describe("Testing user service", function () {
                     body: {
                         login: _userData.login,
                         password: _userData.password,
-                        deviceName: _userData.deviceName
+                        deviceName: _userData.deviceName,
+                        email: _userData.email
                     },
                     timeout: 10000
                 });
@@ -106,7 +110,7 @@ describe("Testing user service", function () {
                     options: {
                         hostname: _hostName,
                         port: _port,
-                        path: "/api/tests/generic/v1/users/me/login",
+                        path: "/api/tests/generic/v1/users/me/login/native",
                         method: 'POST',
                         headers: {'session': _sessionId}
                     },

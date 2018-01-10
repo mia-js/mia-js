@@ -82,7 +82,7 @@ module.exports = BaseCronJob.extend({},
 
             var maxAge = new Date(Date.now() - (5 * 60 * 1000)); // older than 5 minutes
 
-            return ToDoModel.removeMany(
+            return ToDoModel.deleteMany(
                 {
                     'lastModified': {$lte: maxAge}
                 },
