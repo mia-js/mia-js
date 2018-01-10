@@ -9,7 +9,7 @@ var Q = require('q')
     , Shared = MiaJs.Shared
     , Logger = MiaJs.Logger.tag('demo')
     , Utils = MiaJs.Utils
-    , ObjectID = require('mongodb').ObjectID
+    , ObjectID = require('mia-js-core/lib/dbAdapters').MongoObjectID
     , ToDoModel = Shared.models('todos-model');
 
 function thisModule() {
@@ -118,7 +118,7 @@ function thisModule() {
         var query = {
             _id: ObjectID(id)
         };
-        return ToDoModel.removeOne(query).then(function (data) {
+        return ToDoModel.deleteOne(query).then(function (data) {
             var deletedCount = data.deletedCount || 0;
             return deletedCount == 1 ? Q.resolve() : Q.reject();
         }).fail(function (err) {

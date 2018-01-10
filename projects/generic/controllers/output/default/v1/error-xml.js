@@ -21,7 +21,7 @@ function thisModule() {
         var builder = new Xml2js.Builder({cdata: true});
         output.response = builder.buildObject({error: output.response});
         res.set('Content-Type', 'application/xml');
-        res.send(output.response, output.status);
+        res.status(output.status).send(output.response);
     };
 
     return self;

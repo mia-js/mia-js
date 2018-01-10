@@ -19,7 +19,7 @@ function thisModule() {
         }
 
         res.set('Content-Type', 'application/xml');
-        res.send(res.response, res.statusCode);
+        res.status(res.statusCode).send(res.response);
     };
 
     return self;

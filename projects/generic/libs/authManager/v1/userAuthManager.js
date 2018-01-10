@@ -13,7 +13,7 @@ var Q = require('q')
     , MemberHelpers = Utils.MemberHelpers
     , Encryption = Utils.Encryption
     , Qext = Utils.Qext
-    , ObjectID = require('mongodb').ObjectID
+    , ObjectID = require('mia-js-core/lib/dbAdapters').MongoObjectID
     , UserModel = Shared.models('generic-user-model')
     , UserProfileModel = Shared.models('generic-userProfile-model')
     , DeviceModel = Shared.models('generic-device-model');
@@ -201,7 +201,10 @@ function thisModule() {
         params = _.clone(params);
 
         return Q().then(function () {
-            var userProfile;
+            if (_.isUndefined(params.userProfileData) || _.isEmpty(params.userProfileData)) {
+                //No validation needed because there is no data
+                return Q({});
+            }
             if (_.isObject(params.userProfileModel) && params.userProfileModel != UserProfileModel) {
                 //Use custom model
                 params.userProfileData = params.userProfileData || {};
@@ -939,8 +942,7 @@ function thisModule() {
                 deviceCounts: [],
                 thirdParty: [],
                 profile: {},
-                inspectTokens: {},
-                messaging: []
+                inspectTokens: {}
             },
             $unset: {
                 passHash: 1

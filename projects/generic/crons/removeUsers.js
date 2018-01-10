@@ -40,7 +40,7 @@ module.exports = BaseCronJob.extend({},
             var userModel = Shared.models('generic-user-model');
 
             //Delete user accounts marked as deleted
-            return userModel.removeMany(
+            return userModel.deleteMany(
                 {
                     'status': 'deleted'
                 },

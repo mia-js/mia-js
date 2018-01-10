@@ -1,3 +1,9 @@
+## 0.9.5 (January 10, 2018)
+* Updated mia-js-core to version 0.9.10
+* MongoDB and driver update (3.6.1/3.0.1)
+* Reactivated jasmine tests, see "npm test"
+* Refactored express deprecations
+
 ## 0.9.4 (December 20, 2017)
 * Refactored frontend demo project (/web) to use React.js v16 and all the fun stuff like redux, server-side-rendering, isomorphic style loading, declarative routing, etc
 * Replaced grunt with webpack as build tool

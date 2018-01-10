@@ -1,7 +1,4 @@
-global.sharedInfo = null;
-var Shared = require('mia-js-core/lib/shared')
-    , Logger = require('mia-js-core/lib/logger').tag('test')
-    , MongoAdapter = require('mia-js-core/lib/dbAdapters').MongoAdapter
+var Logger = require('mia-js-core/lib/logger').tag('test')
     , DeviceAuth = require('../deviceAndSessionAuth.js')
     , UserAuth = require('../userAuthManager.js');
 
@@ -11,25 +8,12 @@ describe("AuthManager", function () {
         , createdSessionId
         , loadedDeviceData1
         , loadedDeviceData2
-        , loadedDeviceData3
-        , loadedUserData;
+        , loadedDeviceData3;
 
     it("must be defined", function (next) {
         expect(DeviceAuth).toBeDefined();
         expect(UserAuth).toBeDefined();
         next();
-    });
-
-    describe("Initialize", function () {
-        it("do inits", function (next) {
-            //initialize config
-            Shared.initializeConfig('/config', process.argv[2]);
-            //create new mongo db Adapter
-            var mongoDbAdapter = new MongoAdapter();
-            //register adapter
-            Shared.registerDbAdapter('mongo', mongoDbAdapter);
-            next();
-        });
     });
 
     describe("Device Section", function () {
@@ -118,15 +102,40 @@ describe("AuthManager", function () {
             });
 
             it("signUpUser", function (next) {
-                UserAuth.signUpUser({
-                    login: 'login1',
-                    group: 'group1',
-                    email: 'test@test.abc',
-                    password: 'password1'
-                }, options).then(function (userData) {
+                UserAuth.hashCredentials('group1', 'password1', options)
+                    .then(passHash => {
+                        return UserAuth.signUpUser({
+                            login: 'login1',
+                            group: 'group1',
+                            email: 'test@test.abc',
+                            passHash: passHash,
+                            nativeLoginIsSet: true
+                        }, options)
+                    })
+                    .then(function (userData) {
+                        expect(userData).not.toBeNull();
+                        createdUserData = userData;
+                        Logger.info(userData);
+                        next();
+                    }).fail(function (err) {
+                    Logger.error(err);
+                    expect(false).toBeTruthy();
+                    next();
+                }).done();
+            });
+
+            it("_registerAccessTokenCheckingMaxDevices", function (next) {
+                UserAuth._registerAccessTokenCheckingMaxDevices(createdUserData._id, {
+                        token: 'abc',
+                        appId: 'app1',
+                        device: {
+                            id: '123',
+                            name: '1234',
+                            tokenIssueDate: new Date(Date.now())
+                        }
+                    },
+                    maxDeviceCount).then(function (userData) {
                     expect(userData).not.toBeNull();
-                    createdUserData = userData;
-                    Logger.info(userData);
                     next();
                 }).fail(function (err) {
                     Logger.error(err);
@@ -146,33 +155,13 @@ describe("AuthManager", function () {
                         }
                     },
                     maxDeviceCount).then(function (userData) {
-                        expect(userData).not.toBeNull();
-                        next();
-                    }).fail(function (err) {
-                        Logger.error(err);
-                        expect(false).toBeTruthy();
-                        next();
-                    }).done();
-            });
-
-            it("_registerAccessTokenCheckingMaxDevices", function (next) {
-                UserAuth._registerAccessTokenCheckingMaxDevices(createdUserData._id, {
-                        token: 'abc',
-                        appId: 'app1',
-                        device: {
-                            id: '123',
-                            name: '1234',
-                            tokenIssueDate: new Date(Date.now())
-                        }
-                    },
-                    maxDeviceCount).then(function (userData) {
-                        expect(userData).toBeNull();
-                        next();
-                    }).fail(function (err) {
-                        Logger.error(err);
-                        expect(false).toBeTruthy();
-                        next();
-                    }).done();
+                    expect(userData).toBeNull();
+                    next();
+                }).fail(function (err) {
+                    Logger.error(err);
+                    expect(false).toBeTruthy();
+                    next();
+                }).done();
             });
 
             it("_registerAccessTokenCheckingMaxDevices", function (next) {
@@ -186,18 +175,7 @@ describe("AuthManager", function () {
                         }
                     },
                     maxDeviceCount).then(function (userData) {
-                        expect(userData).not.toBeNull();
-                        next();
-                    }).fail(function (err) {
-                        Logger.error(err);
-                        expect(false).toBeTruthy();
-                        next();
-                    }).done();
-            });
-
-            it("_isUserLoggedInOnDeviceByLoginAndGroup", function (next) {
-                UserAuth._isUserLoggedInOnDeviceByLoginAndGroupWithId(createdUserData._id, '456', 'app1').then(function (isLoggedIn) {
-                    expect(isLoggedIn).toBeTruthy();
+                    expect(userData).not.toBeNull();
                     next();
                 }).fail(function (err) {
                     Logger.error(err);
@@ -209,17 +187,6 @@ describe("AuthManager", function () {
             it("logoutAnyUserFromDevice", function (next) {
                 UserAuth.logoutAnyUserFromDevice('456', 'app1').then(function (userData) {
                     expect(userData).not.toBeNull();
-                    next();
-                }).fail(function (err) {
-                    Logger.error(err);
-                    expect(false).toBeTruthy();
-                    next();
-                }).done();
-            });
-
-            it("_isUserLoggedInOnDeviceByLoginAndGroup", function (next) {
-                UserAuth._isUserLoggedInOnDeviceByLoginAndGroupWithId(createdUserData._id, '456', 'app1').then(function (isLoggedIn) {
-                    expect(isLoggedIn).toBeFalsy();
                     next();
                 }).fail(function (err) {
                     Logger.error(err);
@@ -244,17 +211,22 @@ describe("AuthManager", function () {
             });
 
             it("signUpUser", function (next) {
-                UserAuth.signUpUser({
-                    login: 'login2',
-                    group: 'group2',
-                    email: 'test2@test.abc',
-                    password: 'password2'
-                }, options).then(function (userData) {
-                    expect(userData).not.toBeNull();
-                    createdUserData1 = userData;
-                    Logger.info(userData);
-                    next();
-                }).fail(function (err) {
+                UserAuth.hashCredentials('group2', 'password2', options)
+                    .then(passHash => {
+                        return UserAuth.signUpUser({
+                            login: 'login2',
+                            group: 'group2',
+                            email: 'test2@test.abc',
+                            passHash: passHash,
+                            nativeLoginIsSet: true
+                        }, options);
+                    })
+                    .then(function (userData) {
+                        expect(userData).not.toBeNull();
+                        createdUserData1 = userData;
+                        Logger.info(userData);
+                        next();
+                    }).fail(function (err) {
                     Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
@@ -271,17 +243,22 @@ describe("AuthManager", function () {
             });
 
             it("signUpUser", function (next) {
-                UserAuth.signUpUser({
-                    login: 'login3',
-                    group: 'group2',
-                    email: 'test3@test.abc',
-                    password: 'password2'
-                }, options).then(function (userData) {
-                    expect(userData).not.toBeNull();
-                    createdUserData2 = userData;
-                    Logger.info(userData);
-                    next();
-                }).fail(function (err) {
+                UserAuth.hashCredentials('group2', 'password3', options)
+                    .then(passHash => {
+                        return UserAuth.signUpUser({
+                            login: 'login3',
+                            group: 'group2',
+                            email: 'test3@test.abc',
+                            passHash: passHash,
+                            nativeLoginIsSet: true
+                        }, options);
+                    })
+                    .then(function (userData) {
+                        expect(userData).not.toBeNull();
+                        createdUserData2 = userData;
+                        Logger.info(userData);
+                        next();
+                    }).fail(function (err) {
                     Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
@@ -289,7 +266,15 @@ describe("AuthManager", function () {
             });
 
             it("login user 1 on device 1", function (next) {
-                UserAuth.loginUser('login2', 'group2', 'password2', deviceId1, 'app3', 'Phone1', options).then(function (loginResult) {
+                UserAuth.loginUser({
+                    login: 'login2',
+                    group: 'group2',
+                    password: 'password2',
+                    deviceId: deviceId1,
+                    appId: 'app3',
+                    deviceName: 'Phone1',
+                    options: options
+                }).then(function (loginResult) {
                     expect(loginResult).not.toBeNull();
                     next();
                 }).fail(function (err) {
@@ -300,7 +285,15 @@ describe("AuthManager", function () {
             });
 
             it("login user 1 on device 2", function (next) {
-                UserAuth.loginUser('login2', 'group2', 'password2', deviceId2, 'app3', 'Phone2', options).then(function (loginResult) {
+                UserAuth.loginUser({
+                    login: 'login2',
+                    group: 'group2',
+                    password: 'password2',
+                    deviceId: deviceId2,
+                    appId: 'app3',
+                    deviceName: 'Phone2',
+                    options: options
+                }).then(function (loginResult) {
                     expect(loginResult).not.toBeNull();
                     next();
                 }).fail(function (err) {
@@ -311,7 +304,15 @@ describe("AuthManager", function () {
             });
 
             it("login user 2 on device 2", function (next) {
-                UserAuth.loginUser('login3', 'group2', 'password2', deviceId2, 'app3', 'Phone2', options).then(function (loginResult) {
+                UserAuth.loginUser({
+                    login: 'login3',
+                    group: 'group2',
+                    password: 'password3',
+                    deviceId: deviceId2,
+                    appId: 'app3',
+                    deviceName: 'Phone2',
+                    options: options
+                }).then(function (loginResult) {
                     expect(loginResult).not.toBeNull();
                     UserAuth.isUserLoggedInOnDeviceByLoginAndGroup('login3', 'group2', deviceId2, 'app3').then(function (userData) {
                         expect(userData).not.toBeNull();
@@ -328,7 +329,15 @@ describe("AuthManager", function () {
             });
 
             it("login user 1 on device 2", function (next) {
-                UserAuth.loginUser('login2', 'group2', 'password2', deviceId2, 'app3', 'Phone2', options).then(function (loginResult) {
+                UserAuth.loginUser({
+                    login: 'login2',
+                    group: 'group2',
+                    password: 'password2',
+                    deviceId: deviceId2,
+                    appId: 'app3',
+                    deviceName: 'Phone2',
+                    options: options
+                }).then(function (loginResult) {
                     expect(loginResult).not.toBeNull();
                     UserAuth.isUserLoggedInOnDeviceByLoginAndGroup('login2', 'group2', deviceId2, 'app3').then(function (userData) {
                         expect(userData).not.toBeNull();
@@ -345,150 +354,4 @@ describe("AuthManager", function () {
             });
         });
     });
-
-
-//describe("User Section", function () {
-//    var options = {salt: 'abcd', maxDevicesAllowed: 2};
-//
-//    describe("Test individual functions", function () {
-//        it("_hashCredentials", function (next) {
-//            UserAuth.hashCredentials('login1', 'password1', options).then(function (hash) {
-//                expect(hash).toBeDefined();
-//                Logger.info('User credentials hash: ' + hash);
-//                next();
-//            });
-//        });
-//
-//        it("_getUserDataByLoginAndGroup", function (next) {
-//            UserAuth.getUserData('login1').then(function (userData) {
-//                expect(userData).toBeDefined();
-//                next();
-//            });
-//        });
-//
-//        it("_checkUsersCredentials", function (next) {
-//            UserAuth.checkUsersCredentials('login1', 'password1', options).then(function (userData) {
-//                expect(userData).toBeDefined();
-//                next();
-//            });
-//        });
-//
-//        it("deleteUser", function (next) {
-//            UserAuth.deleteUser('login1').then(function () {
-//                next();
-//            }).fail(function (err) {
-//                Logger.error(err);
-//                next();
-//            });
-//        });
-//
-//        it("signUpUser", function (next) {
-//            UserAuth.signUpUser('login1', 'password1', options).then(function (userData) {
-//                expect(userData).toBeDefined();
-//                Logger.info(userData);
-//                next();
-//            }).fail(function (err) {
-//                Logger.error(err);
-//                next();
-//            });
-//        });
-//
-//        it("_getUserDataByLoginAndGroup", function (next) {
-//            UserAuth.getUserData('login1').then(function (userData) {
-//                expect(userData).toBeDefined();
-//                loadedUserData = userData;
-//                Logger.info(userData);
-//                next();
-//            }).fail(function (err) {
-//                Logger.error(err);
-//                expect(false).toBeTruthy();
-//                next();
-//            });
-//        });
-//    });
-//
-//    describe("Test user workflows", function () {
-//        it("No user is logged in on a device1", function (next) {
-//            UserAuth.isUserLoggedInOnADevice('login1', loadedDeviceData1.id).then(function (loginCheckResult) {
-//                expect(loginCheckResult).toBeDefined();
-//                var deviceData = loginCheckResult.deviceData;
-//                var isLoggedIn = loginCheckResult.isLoggedIn;
-//                expect(isLoggedIn).toBeFalsy();
-//                Logger.info(loginCheckResult);
-//                next();
-//            }).fail(function (err) {
-//                Logger.error(err);
-//                expect(false).toBeTruthy();
-//                next();
-//            });
-//        });
-//
-//        it("Login user on device 1", function (next) {
-//            UserAuth.loginUser('login1', 'password1', loadedDeviceData1, 'Phone1', options).then(function (loginData) {
-//                expect(loginData).toBeDefined();
-//                expect(loginData.accessToken).toBeDefined();
-//                expect(loginData.userData).toBeDefined();
-//                Logger.info('Access token: ' + accessToken);
-//                next();
-//            }).fail(function (err) {
-//                Logger.error(err);
-//                expect(false).toBeTruthy();
-//                next();
-//            });
-//        });
-//
-//        it("User now is logged in on device 1", function (next) {
-//            UserAuth.isUserLoggedInOnADevice('login1', loadedDeviceData1.id).then(function (loginCheckResult) {
-//                expect(loginCheckResult).toBeDefined();
-//                var deviceData = loginCheckResult.deviceData;
-//                var isLoggedIn = loginCheckResult.isLoggedIn;
-//                expect(isLoggedIn).toBeTruthy();
-//                Logger.info(loginCheckResult);
-//                next();
-//            }).fail(function (err) {
-//                Logger.error(err);
-//                expect(false).toBeTruthy();
-//                next();
-//            });
-//        });
-//
-//        it("Login same user on another device 2", function (next) {
-//            UserAuth.loginUser('login1', 'password1', loadedDeviceData2, 'Phone1', options).then(function (loginData) {
-//                expect(loginData).toBeDefined();
-//                expect(loginData.accessToken).toBeDefined();
-//                expect(loginData.userData).toBeDefined();
-//                Logger.info('Access token: ' + accessToken);
-//                next();
-//            }).fail(function (err) {
-//                Logger.error(err);
-//                expect(false).toBeTruthy();
-//                next();
-//            });
-//        });
-//
-//        it("Login same user with wrong password on device 2", function (next) {
-//            UserAuth.loginUser('login1', 'password2', loadedDeviceData2, 'Phone1', options).then(function (loginData) {
-//                expect(loginData).not.toBeDefined();
-//                Logger.info('Access token: ' + accessToken);
-//                next();
-//            }).fail(function (err) {
-//                Logger.error(err);
-//                expect(true).toBeTruthy();
-//                next();
-//            });
-//        });
-//
-//        it("Login same user on another device 3 - should exceed max device number", function (next) {
-//            UserAuth.loginUser('login1', 'password1', loadedDeviceData3, 'Phone3', options).then(function (loginData) {
-//                expect(loginData).not.toBeDefined();
-//                Logger.info('Access token: ' + accessToken);
-//                next();
-//            }).fail(function (err) {
-//                Logger.error(err);
-//                expect(true).toBeTruthy();
-//                next();
-//            });
-//        });
-//    });
-//});
 });

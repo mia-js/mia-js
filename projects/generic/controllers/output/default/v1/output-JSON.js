@@ -36,7 +36,7 @@ function thisModule() {
             res.setHeader('Cache-Control', 'public, max-age=' + res.cached.timeleft);
         }
 
-        res.send(response, response.status);
+        res.status(response.status).send(response);
     };
 
     return self;

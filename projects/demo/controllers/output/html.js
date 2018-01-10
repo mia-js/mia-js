@@ -11,7 +11,7 @@ function thisModule() {
 
     self.all = function (req, res) {
         res.response = '<!DOCTYPE html>' + res.response;
-        res.send(res.response, 200);
+        res.send(res.response);
     };
 
     return self;

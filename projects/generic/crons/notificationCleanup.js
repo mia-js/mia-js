@@ -63,7 +63,7 @@ Q.stopUnhandledRejectionTracking();
 var _recycleNotifications = function () {
     var removeAfter = 60; //in minutes
     var removeTimeLimit = new Date(Date.now() - (removeAfter * 60 * 1000));  // Removes notification after 1h
-    return NotificationModel.removeMany({
+    return NotificationModel.deleteMany({
         $or: [
             {
                 'status': 'rejected',
