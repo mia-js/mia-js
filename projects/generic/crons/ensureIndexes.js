@@ -83,16 +83,18 @@ const _ensureIndexes = (model, modelIndexes, dbIndexes, modifiedIndexes) => {
                     // Index already exists with different options
                     Logger.warn(error.message + ' in model "' + model.identity + '"');
 
-                    let splittedErrorMessage = error.message.split(' ');
+                    let splittedErrorMessage = error.errmsg.split(' '); //FIXME: Find better solution to get indexName than parsing error.message. Maybe with higher mongodb versions
                     let dbIndexName = splittedErrorMessage[3];
                     let modelIndex = _findIndexByName(dbIndexName, modelIndexes);
 
-                    modifiedIndexes.push(modelIndex);
+                    if (modelIndex) {
+                        modifiedIndexes.push(modelIndex);
 
-                    if (debug) {
-                        let dbIndex = _findIndexByName(dbIndexName, dbIndexes);
-                        Logger.debug('Database index:', dbIndex);
-                        Logger.debug('Model index:', modelIndex);
+                        if (debug) {
+                            let dbIndex = _findIndexByName(dbIndexName, dbIndexes);
+                            Logger.debug('Database index:', dbIndex);
+                            Logger.debug('Model index:', modelIndex);
+                        }
                     }
 
                 } else {
@@ -102,7 +104,7 @@ const _ensureIndexes = (model, modelIndexes, dbIndexes, modifiedIndexes) => {
                 Logger.info('All indexes are existing for model "' + model.identity + '"');
             }
             return resolve();
-        }, envConfig.background);
+        }, envConfig.useBackgroundMode);
     });
 };
 
@@ -153,7 +155,7 @@ const _recreateIndexes = (model, modifiedIndexes) => {
             recreationPromises.push(model.dropIndex(index.name)
                 .then(() => {
                     return new Promise((resolve, reject) => {
-                        model.ensureIndexes([index], envConfig.background, error => {
+                        model.ensureIndexes([index], envConfig.useBackgroundMode, error => {
                             if (error) return reject(error);
                             return resolve();
                         });
@@ -208,20 +210,20 @@ module.exports = BaseCronJob.extend({},
             const env = Shared.config('environment');
 
             envConfig = env.cronJobs.ensureIndexes || {
-                enabled: false,
-                startUp: false,
-                background: true
+                autoStart: false,
+                runOnStartup: false,
+                useBackgroundMode: true
             };
 
             debug = actualConfig.debugOutput;
 
-            if (envConfig.enabled) {
+            if (envConfig.autoStart || actualConfig.forceRun == true) {
                 const models = Shared.models();
                 let modelPromises = [];
 
                 Logger.info('Start running...');
 
-                if (envConfig.background) {
+                if (envConfig.useBackgroundMode) {
                     Logger.info('New indexes will be created in background');
                 } else {
                     Logger.warn('New indexes will be created in foreground, all other operations on the database will be blocked!');
@@ -235,7 +237,7 @@ module.exports = BaseCronJob.extend({},
                         let dbIndexes = [];
                         let modifiedIndexes = [];
 
-                        if (debug) dbIndexes = await model.indexes();
+                        dbIndexes = await model.indexes();
 
                         modelPromises.push(
                             /**

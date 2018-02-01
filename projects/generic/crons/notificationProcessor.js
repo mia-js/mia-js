@@ -341,7 +341,7 @@ var _sendApn = function (data, deviceData) {
 
             //Handle payload
             var payload = template.payload ? _.merge(template.payload, data.notification.payload) : data.notification.payload;
-            payload = _doReplacementsDeep(payload, notification.replacements);
+            payload = _doReplacementsDeep(payload, notification.replacements) || {};
             payload.messageId = data._id;
             var pushData = new Apn.Notification();
 
@@ -369,7 +369,7 @@ var _sendApn = function (data, deviceData) {
         });
     }).fail(function (err) {
         _notificationStatusReject(data._id, err);
-        return Q.reject();
+        return Q.reject(err);
     });
 
 

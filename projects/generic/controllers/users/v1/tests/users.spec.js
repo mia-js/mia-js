@@ -231,4 +231,3 @@ describe("Testing user service", function () {
     _login();
     _deleteUser();
 });
-

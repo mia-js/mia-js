@@ -6,6 +6,7 @@
 var Q = require('q')
     , _ = require('lodash')
     , MiaJs = require("mia-js-core")
+    , ObjectID = require('mia-js-core/lib/dbAdapters').MongoObjectID
     , Shared = MiaJs.Shared
     , Translator = MiaJs.GetTranslations
     , Logger = MiaJs.Logger
@@ -13,7 +14,6 @@ var Q = require('q')
     , MemberHelpers = Utils.MemberHelpers
     , Encryption = Utils.Encryption
     , Qext = Utils.Qext
-    , ObjectID = require('mia-js-core/lib/dbAdapters').MongoObjectID
     , UserModel = Shared.models('generic-user-model')
     , UserProfileModel = Shared.models('generic-userProfile-model')
     , DeviceModel = Shared.models('generic-device-model');

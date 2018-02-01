@@ -27,7 +27,7 @@ function thisModule() {
 
     self.checkCredentialsAndLoadProfile = function (fbToken, version, fields) {
         var fields = defaultQueryFields(fields);
-        version = version || "v2.2";
+        version = version || "v2.9";
         var fb = new FbGraph.Facebook(fbToken, version);
         return Q.ninvoke(fb, "graph", "/me?fields=" + fields).then(function (me) {
             return Q({
@@ -42,7 +42,7 @@ function thisModule() {
     };
 
     self.getUserPicture = function (fbToken, fbId, version, queryParams) {
-        version = version || "v2.2";
+        version = version || "v2.9";
         var fb = new FbGraph.Facebook(fbToken, version);
         return Q.ninvoke(fb, "graph", "/" + fbId + "/picture?redirect=false" + (queryParams ? ("&" + queryParams) : "")).then(function (result) {
             return Q(result.data);

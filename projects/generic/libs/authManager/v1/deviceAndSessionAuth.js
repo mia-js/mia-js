@@ -10,9 +10,7 @@ var Q = require('q')
     , Logger = MiaJs.Logger
     , Utils = MiaJs.Utils
     , IP = require('ip')
-    , MemberHelpers = Utils.MemberHelpers
     , Encryption = Utils.Encryption
-    , ObjectID = require('mia-js-core/lib/dbAdapters').MongoObjectID
     , SecretModel = Shared.models('generic-secret-model')
     , DeviceModel = Shared.models('generic-device-model');
 
@@ -38,12 +36,13 @@ function thisModule() {
     self.createDevice = function (options, deviceData, retryCount) {
         options = options || {};
         var translator = options.translator || Translator.default;
+        var deviceModel = options.deviceModel || DeviceModel;
 
         deviceData.lastModified = new Date(Date.now());
         deviceData.created = new Date(Date.now());
 
-        return DeviceModel.validate(deviceData).then(function (validatedData) {
-            return DeviceModel.insertOne(validatedData).then(function (data) {
+        return deviceModel.validate(deviceData).then(function (validatedData) {
+            return deviceModel.insertOne(validatedData).then(function (data) {
                 var deviceDataCreated = data.ops;
                 if (deviceDataCreated[0] && deviceDataCreated[0].id) {
                     return Q(deviceDataCreated[0].id);
@@ -79,12 +78,13 @@ function thisModule() {
     self.updateDevice = function (options, id, deviceData) {
         options = options || {};
         var translator = options.translator || Translator.default;
+        var deviceModel = options.deviceModel || DeviceModel;
 
         deviceData.id = id;
         deviceData.lastModified = new Date(Date.now());
 
-        return DeviceModel.validate(deviceData, {partial: true, flat: true}).then(function (validatedData) {
-            return DeviceModel.updateOne({id: id}, {$set: validatedData}).then(function (data) {
+        return deviceModel.validate(deviceData, {partial: true, flat: true}).then(function (validatedData) {
+            return deviceModel.updateOne({id: id}, {$set: validatedData}).then(function (data) {
                 var nModified = data.result && data.result.nModified ? data.result.nModified : 0;
                 if (nModified == 0) {
                     return Q.reject({

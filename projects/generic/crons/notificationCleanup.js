@@ -123,12 +123,12 @@ var _resetNotifications = function () {
 var _retryNotificationsTerminate = function () {
     return NotificationModel.updateMany({
         'status': 'retry',
-        'retry': {'$gt': 10}
+        'retry': {'$gt': 25}
     }, {
         '$set': {
             'status': 'rejected',
             'workerId': null,
-            'log': "Gave up after 10 retries"
+            'log': "Gave up after 25 retries"
         }
     }, {
         partial: true,

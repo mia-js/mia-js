@@ -158,6 +158,28 @@ function thisModule() {
                         return _pushToQueue(_notificationDataFormater(data, to, type));
                     });
                 }
+            },
+            user: function (userId) {
+                if (_.isEmpty(userId)) {
+                    return Q.reject({code: "EmptyUserId", msg: "No user id given"});
+                }
+                return _validateNotificationSettings(data, type).then(function () {
+                    return AuthManager.getUserDataById(userId).then(function (userData) {
+                        if (!_.isEmpty(userData)) {
+                            var funcArray = [];
+                            var messaging = userData.messaging || [];
+                            messaging.forEach(function (messageType) {
+                                if (messageType.type == 'email' && !_.isEmpty(messageType.value) && messageType.value.match(/[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/)) {
+                                    funcArray.push(_pushToQueue(_notificationDataFormater(data, messageType.value, type)));
+                                }
+                            });
+                            return Q.all(funcArray);
+                        }
+                        else {
+                            return Q.reject({code: "NoUserDevices", msg: "User is not logged in on any device"});
+                        }
+                    });
+                })
             }
         };
     };

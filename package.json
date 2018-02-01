@@ -1,7 +1,7 @@
 {
   "name": "mia-js",
   "description": "mia.js - Middleware API framework",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "dependencies": {
     "apn": "^1.7.3",
     "async": "^2.1.4",
@@ -15,7 +15,7 @@
     "fibers": "^1.0.7",
     "ip": "^1.1.0",
     "lodash": "^2.4.0",
-    "mia-js-core": "^1.0.2",
+    "mia-js-core": "^1.0.5",
     "q": "^1.4.1",
     "superagent": "^0.18.2",
     "trycatch": "^1.5.11",

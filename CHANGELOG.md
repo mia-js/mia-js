@@ -1,3 +1,10 @@
+## 0.9.7 (February 1, 2018)
+
+* Updated mia-js-core to version 1.0.5
+* Set different value fpr cache control generic controller
+* Split up output and cache controllers
+* Serval bugfixes in generic
+
 ## 0.9.6 (January 12, 2018)
 
 * Updated mia-js-core to version 1.0.1

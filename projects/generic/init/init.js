@@ -44,7 +44,7 @@ function thisModule() {
         Logger.info("Going to check startup config for ensureIndexes cronjob");
         var env = Shared.config('environment');
         var MemberHelpers = MiaJs.Utils.MemberHelpers;
-        var startUp = MemberHelpers.getPathPropertyValue(env, 'cronJobs.ensureIndexes.startUp');
+        var startUp = MemberHelpers.getPathPropertyValue(env, 'cronJobs.ensureIndexes.runOnStartup');
         if (startUp) {
             var cronJobExecutionModel = Shared.models('generic-cronJobExecutionModel');
             cronJobExecutionModel.findOneAndUpdate({

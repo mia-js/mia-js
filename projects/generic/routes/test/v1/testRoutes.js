@@ -32,6 +32,10 @@ module.exports = {
                         version: '1.0'
                     },
                     {
+                        name: 'generic-cachingCacheControl',
+                        version: '1.0'
+                    },
+                    {
                         name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
@@ -54,6 +58,10 @@ module.exports = {
                     {
                         name: 'generic-users',
                         function: 'getProfile',
+                        version: '1.0'
+                    },
+                    {
+                        name: 'generic-cachingCacheControl',
                         version: '1.0'
                     },
                     {
@@ -82,6 +90,10 @@ module.exports = {
                         version: '1.0'
                     },
                     {
+                        name: 'generic-cachingCacheControl',
+                        version: '1.0'
+                    },
+                    {
                         name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
@@ -104,6 +116,10 @@ module.exports = {
                     {
                         name: 'generic-users',
                         function: 'deleteAccount',
+                        version: '1.0'
+                    },
+                    {
+                        name: 'generic-cachingCacheControl',
                         version: '1.0'
                     },
                     {
@@ -131,6 +147,10 @@ module.exports = {
                         version: '1.0'
                     },
                     {
+                        name: 'generic-cachingCacheControl',
+                        version: '1.0'
+                    },
+                    {
                         name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
@@ -152,6 +172,10 @@ module.exports = {
                     {
                         name: 'generic-users',
                         function: 'loginUserWithFacebook',
+                        version: '1.0'
+                    },
+                    {
+                        name: 'generic-cachingCacheControl',
                         version: '1.0'
                     },
                     {
@@ -179,6 +203,10 @@ module.exports = {
                         version: '1.0'
                     },
                     {
+                        name: 'generic-cachingCacheControl',
+                        version: '1.0'
+                    },
+                    {
                         name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
@@ -200,6 +228,10 @@ module.exports = {
                     {
                         name: 'generic-users',
                         function: 'requestPasswordReset',
+                        version: '1.0'
+                    },
+                    {
+                        name: 'generic-cachingCacheControl',
                         version: '1.0'
                     },
                     {
@@ -227,6 +259,10 @@ module.exports = {
                         version: '1.0'
                     },
                     {
+                        name: 'generic-cachingCacheControl',
+                        version: '1.0'
+                    },
+                    {
                         name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
@@ -244,6 +280,10 @@ module.exports = {
                     {
                         name: 'generic-users',
                         function: "validateUser",
+                        version: '1.0'
+                    },
+                    {
+                        name: 'generic-cachingCacheControl',
                         version: '1.0'
                     },
                     {
@@ -267,6 +307,10 @@ module.exports = {
                         version: '1.0'
                     },
                     {
+                        name: 'generic-cachingCacheControl',
+                        version: '1.0'
+                    },
+                    {
                         name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
@@ -285,6 +329,10 @@ module.exports = {
                     {
                         name: 'generic-listServices',
                         version: '2.0'
+                    },
+                    {
+                        name: 'generic-cachingCacheControl',
+                        version: '1.0'
                     },
                     {
                         name: 'generic-defaultJSONResponse',
@@ -311,6 +359,10 @@ module.exports = {
                         version: '1.0'
                     },
                     {
+                        name: 'generic-cachingCacheControl',
+                        version: '1.0'
+                    },
+                    {
                         name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
@@ -331,6 +383,10 @@ module.exports = {
                         version: '1.0'
                     },
                     {
+                        name: 'generic-cachingCacheControl',
+                        version: '1.0'
+                    },
+                    {
                         name: 'generic-defaultJSONResponse',
                         version: '1.0'
                     }
@@ -348,6 +404,10 @@ module.exports = {
                     },
                     {
                         name: 'generic-deviceProfile',
+                        version: '1.0'
+                    },
+                    {
+                        name: 'generic-cachingCacheControl',
                         version: '1.0'
                     },
                     {

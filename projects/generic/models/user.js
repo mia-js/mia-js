@@ -206,7 +206,7 @@ function thisModule() {
             identity: 'generic-user-model', // Model name
             version: '1.0', // Version number
             created: '2014-10-31T19:00:00', // Creation date
-            modified: '2017-01-10T15:00:00', // Last modified date
+            modified: '2017-12-29T11:00:00', // Last modified date
             collectionName: 'users'
         });
 
