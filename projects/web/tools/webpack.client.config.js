@@ -13,6 +13,7 @@ const getConfig = mode => {
     const webpackLoaders = require('./webpack/webpack.loaders.config')('client', mode);
 
     let config = {
+        mode: mode === 'watch' ? 'development' : 'production',
         name: bundleName,
         entry: [
             path.resolve(__dirname, './../../../node_modules/babel-polyfill'),
@@ -27,7 +28,7 @@ const getConfig = mode => {
         },
         devtool: mode === 'watch' ? 'eval-source-map' : 'eval',
         module: {
-            loaders: webpackLoaders
+            rules: webpackLoaders
         },
         plugins: [
             new webpack.HotModuleReplacementPlugin(),

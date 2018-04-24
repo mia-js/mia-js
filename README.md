@@ -5,10 +5,12 @@ Focus of mia.js is to work as middleware backend for mobile apps to have all you
 Pass-through, aggregate or modify other external api's or create your own one in mia.js and provide them bundled as your project api.
 Use multiple project folders to keep track of all your api's and connect them by loose coupling of ids. Mia.js provides predefined functionality like user management, device profile management, session handling, authorization layers or notification handlers (push, email). There is also an iOS and Android SDK available to work with mia.js.
 
-# Installation
-**Install [node.js](http://nodejs.org) 0.10.x,0.12x,4.xx,5.xx,6.xx and [mongoDB](https://www.mongodb.org/) >2.6x**
+You can use it to serve isomorphic frontend apps too. Thanks to webpack you can even use hot module replacement right in the server which will speed up your development pace.
 
-## Get the latest stable release of mia.ja
+# Installation
+**Install [node.js](http://nodejs.org) >6.xx and [mongoDB](https://www.mongodb.org/) >2.6x**
+
+## Get the latest stable release of mia.js
 Download or clone this repository in a directory
 
 # Quick start
@@ -27,10 +29,20 @@ Start mia.js
 ```bash
 # Run mia.js with node.js in local mode. Pass environment mode as argument.
 $ node server.js local
+
+# Or just type
+$ npm start
+
+# Start the development server (HMR) with
+$ npm run dev-server
 ```
 
 At this point, if you visit [http://localhost:3000/docs](http://localhost:3000/docs) you will see the [Swagger::Docs](https://github.com/richhollis/swagger-docs) documentation of the demo project api.
 To visit the demo frontend based on facebook's React.js that uses the demo api go to [http://localhost:3000/web/](http://localhost:3000/web/)
+
+# Development
+If you experience a non responsive IDE during development with mia.js please ignore the pattern `.webpack`. You can do this via your IDE or project settings.
+Especially if you want to use HMR in the server itself.
 
 # Features
   * Easy routing and nesting of controllers
@@ -44,6 +56,9 @@ To visit the demo frontend based on facebook's React.js that uses the demo api g
   * Define database models for auto validation of mongoDB collections
   * Use preconditions for automatically validate request data
   * Auto-generates swagger docs based on routing definitions file
+  * Compile and serve individual frontend projects using the WebpackCompiler lib [[Read more]](#compile-and-serve-individual-frontend-projects-using-the-webpackcompiler-lib)
+  * Use [hot module replacement (HMR)](https://webpack.js.org/concepts/hot-module-replacement/) to speed up development [[Read more]](#hot-module-replacement)
+  * Write cutting edge syntax powered by [Babel](https://babeljs.io)
 
 
 # Configuration
@@ -1747,10 +1762,77 @@ If you use the generic controllers or generic libs of mia.js it creates several 
 * `secrets` - Secrets are used for authorisation and validation of devices against your application
 * `users` - User profiles of registered users
 
+# Compile and serve individual frontend projects using the WebpackCompiler lib
+Thanks to the WebpackCompiler lib which is shipped with mia-js-core you can put webpack config files right into individual project folders. This way mia-js takes responsibility of the build process, watches for file changes and applies them to the running bundles using HMR.
+An example frontend project called "web" is included.<br/>
+Within this project there is a simple web app written in [React](https://reactjs.org). It's isomorphic what means that the same app can run on the server as well as in the browser. Therefore we have two compilation targets, server and client.
+Additionally you can have a production version (for building into the file system without watching and HMR) and/or a development version (for building into memory, watching for changes to files and apply them using HMR).
+Place these config files directly in the root of the project folder, like so:
 
++-- My Awesome Project<br/>
+| +-- config<br/>
+| +-- controllers<br/>
+| +-- ...<br/>
+| +-- webpack.client.fs.config.js<br/>
+| +-- webpack.client.watch.config.js<br/>
+| +-- webpack.server.fs.config.js<br/>
+| +-- webpack.server.watch.config.js<br/>
 
+Where `*.fs.*` presents production builds and `*.watch.*` development builds. Every single file is optional.<br/>
+Please find an example configuration for every file in the "web" project. To prevent code duplication most of the configuration can be found in the "tools" folder.
+  
+# Hot Module Replacement
+For an introduction to hot module replacement you can look [here](https://webpack.js.org/concepts/hot-module-replacement/).<br/>
+With mia.js HMR can be used in two different places. First place is the development build of individual projects where file changes will be watched, recompiled and pushed into the bundles. Here we are using webpack's own "HotModuleReplacement" plugin which makes use of the [integrated HMR API](https://webpack.js.org/api/hot-module-replacement/) to replace modules in memory on the fly. This use case is very straight forward, recommended by webpack and very well documented on various websites.<br/>
+The other place is in the server itself where we don't execute the webpack build but our server code and therefore we can't take advantage of the injected HMR API. You'll get more details about this solution in the next paragraph.
 
+## Server implementation
+The following lines will give you some background information about how we implemented HMR into the server.
 
+### The goal
+The goal was to write project code which immediately comes to effect without restarting the server.
 
+### The Challenge
+Loose coupling of dependencies. With mia.js all your modules (controllers, libs, etc) can have an unique identifier therefore you don't need to know where they actually are in the file system. With that you have to use something like `Shared.libs('Some-Lib')` to do the actual import into another module.
+So every project file is required by the Shared lib on server start and residents in memory until the server is shut down - similar to the require cache in node.js.
+Another difficulty is the fact that mia-js-core does this all from within the node_modules folder and normally you do ignore everything in there for the webpack build.
 
+### Overview of components
+- **StaticDependencies lib**: For creating a file which requires all the dependencies (which are basically project files/modules) and another file which maps those dependencies to their unique identifiers
+- **A Babel plugin** to transpile `Shared.X('Y')` imports to proper CommonJS requires
+- **A Webpack plugin** to handle the actual HMR
+- **WebpackCompiler lib**: Connecting the dots
 
+### Process overview
+The whole process happens in parallel during server start if you specify `hmr` as the third node argument or simply use `npm run dev-server`.
+1. Creation of the static dependencies file into `node_modules/mia-js-core/lib/webpackCompiler/.webpack`
+2. Creation of the mappings file into the same directory (this directory will be emptied on every server start)
+3. Require static dependencies file (using file path as string)
+4. Compilation of server bundle using Babel loader and our Babel plugin
+5. Right now webpack knows the whole dependency tree
+6. Watching for file changes and trigger our Webpack plugin
+7. HMR is happening!
+
+### A closer look into the Webpack plugin (HotMia)
+Besides replacing the changed module within the Shared lib there can be more work to do depending on the type of module:
+
+#### Config module
+Replaced in Shared only.
+
+#### Init module
+Replaced in Shared. However init modules are going to be executed during server start only.
+
+#### Routes module
+Replaced in Shared and express routers (there can be multiple via vhosts) will be reinitialized.
+
+#### Model module
+Replaced in Shared only.
+
+#### Lib module
+Replaced in Shared only.
+
+#### Controller module
+Replaced in Shared and express routers (there can be multiple via vhosts) will be reinitialized.
+
+#### Cron module
+Old cronjob will be properly stopped and replaced in Shared. New version of cronjob will be started.
