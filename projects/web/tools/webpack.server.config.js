@@ -13,6 +13,7 @@ const getConfig = mode => {
     const webpackLoaders = require('./webpack/webpack.loaders.config')('server', mode);
 
     let config = {
+        mode: mode === 'watch' ? 'development' : 'production',
         name: bundleName,
         entry: path.resolve(__dirname, '../src/server.jsx'),
         output: {
@@ -35,7 +36,7 @@ const getConfig = mode => {
             })
         ],
         module: {
-            loaders: webpackLoaders
+            rules: webpackLoaders
         },
         plugins: [
             new webpack.LoaderOptionsPlugin({

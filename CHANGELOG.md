@@ -1,3 +1,8 @@
+## 1.0.0 (April 24, 2018)
+* Updated mia-js-core to version 2.1.0
+* Updated Babel and webpack to latest versions
+* Updated README.md to reflect latest features
+
 ## 0.9.7 (February 1, 2018)
 
 * Updated mia-js-core to version 1.0.5

@@ -2,20 +2,33 @@ const path = require('path');
 const reStyle = /\.(css|less|scss|sss)$/;
 
 const getLoaders = (bundle, mode) => {
+
+    let babelLoader = {
+        test: /.jsx?$/,
+        loader: 'babel-loader',
+        exclude: path.resolve(__dirname, '../../../../node_modules/'),
+        query: {
+            presets: [
+                // Configure babel-preset-env for server bundle
+                [path.resolve(__dirname, '../../../../node_modules/@babel/preset-env'), {
+                    targets: {node: true}
+                }],
+                path.resolve(__dirname, '../../../../node_modules/babel-preset-react')
+            ],
+            plugins: [
+                path.resolve(__dirname, '../../../../node_modules/babel-plugin-transform-class-properties'),
+                path.resolve(__dirname, '../../../../node_modules/babel-plugin-transform-object-rest-spread'),
+            ]
+        }
+    };
+
+    if (bundle === 'client') {
+        // Configure babel-preset-env for client bundle
+        babelLoader['query']['presets'][0][1] = {targets: {browsers: ['> 0.5%', 'last 2 versions', 'Firefox ESR']}};
+    }
+
     return [
-        {
-            test: /.jsx?$/,
-            loader: 'babel-loader',
-            exclude: path.resolve(__dirname, '../../../../node_modules/'),
-            query: {
-                presets: [
-                    path.resolve(__dirname, '../../../../node_modules/babel-preset-es2015'),
-                    path.resolve(__dirname, '../../../../node_modules/babel-preset-react'),
-                    path.resolve(__dirname, '../../../../node_modules/babel-preset-stage-2')
-                ],
-                plugins: []
-            }
-        },
+        babelLoader,
         // Rules for Style Sheets
         {
             test: reStyle,
