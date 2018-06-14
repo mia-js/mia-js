@@ -64,9 +64,9 @@ function thisModule() {
                 req.allowedAccessGroups = [req.miajs.route.group];
             }
             next();
-        }).fail(function (err) {
+        }).catch(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     return self;

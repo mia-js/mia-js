@@ -556,13 +556,13 @@ function thisModule() {
                         next();
                     }
                 });
-            }).fail(function (err) {
+            }).catch(function (err) {
                 if (err.status == 401) {
                     res.setHeader('WWW-Authenticate', 'Token realm="' + protocol.toLowerCase() + "://" + req.headers.host.toLowerCase() + req.miajs.route.prefix + '"');
                 }
                 res.header("timestamp", Date.now());
                 next(err);
-            }).done();
+            });
         }
         else {
             // Validate dynamic signature hash token
@@ -574,13 +574,13 @@ function thisModule() {
                     res.header("timestamp", Date.now());
                     next();
                 });
-            }).fail(function (err) {
+            }).catch(function (err) {
                 if (err.status == 401) {
                     res.setHeader('WWW-Authenticate', 'Token realm="' + protocol.toLowerCase() + "://" + req.headers.host.toLowerCase() + req.miajs.route.prefix + '"');
                 }
                 res.header("timestamp", Date.now());
                 next(err);
-            }).done();
+            });
         }
     };
 

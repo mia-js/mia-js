@@ -315,10 +315,9 @@ function thisModule() {
                     next();
                 }
             }
-        }).fail(function (err) {
-            //Logger.error(err);
+        }).catch(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     /**
@@ -359,9 +358,9 @@ function thisModule() {
                 _getUserAccountResponse(req, res, userData, params.appId);
                 next();
             }
-        }).fail(function (err) {
+        }).catch(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     self.setParametersForFbLogin = function (req, res, next) {
@@ -451,8 +450,7 @@ function thisModule() {
                     }
                 });
             });
-        }).fail(function (err) {
-            //Logger.error(err);
+        }).catch(function (err) {
             next(err);
         });
     };
@@ -479,9 +477,9 @@ function thisModule() {
 
         AuthManager.logoutAnyUserFromDevice(deviceId, group).then(function (userData) {
             next();
-        }).fail(function (err) {
+        }).catch(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     /**
@@ -532,9 +530,9 @@ function thisModule() {
                     next();
                 }
             }
-        }).fail(function (err) {
+        }).catch(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     /**
@@ -610,7 +608,7 @@ function thisModule() {
                 _getUserAccountResponse(req, res, userData, params.appId);
             }
             next();
-        }).fail(function (err) {
+        }).catch(function (err) {
             next(err);
         });
     };
@@ -640,9 +638,9 @@ function thisModule() {
 
         AuthManager.deleteUser(userData.login, userData.group).then(function () {
             next();
-        }).fail(function (err) {
+        }).catch(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     /**
@@ -675,12 +673,12 @@ function thisModule() {
                     }
                 });
             }
-        }).fail(function (err) {
+        }).catch(function (err) {
             if (err.status == 401) {
                 _setAuthentificateHeader(req, res);
             }
             next(err);
-        }).done();
+        });
     };
 
     var _setAuthentificateHeader = function (req, res) {
@@ -718,12 +716,12 @@ function thisModule() {
                     }
                 });
             }
-        }).fail(function (err) {
+        }).catch(function (err) {
             if (err.status == 401) {
                 _setAuthentificateHeader(req, res);
             }
             next(err);
-        }).done();
+        });
     };
 
     /**
@@ -753,12 +751,12 @@ function thisModule() {
                     }
                 });
             }
-        }).fail(function (err) {
+        }).catch(function (err) {
             if (err.status == 401) {
                 _setAuthentificateHeader(req, res);
             }
             next(err);
-        }).done();
+        });
     };
 
     /**
@@ -788,12 +786,12 @@ function thisModule() {
                     }
                 });
             }
-        }).fail(function (err) {
+        }).catch(function (err) {
             if (err.status == 401) {
                 _setAuthentificateHeader(req, res);
             }
             next(err);
-        }).done();
+        });
     };
 
     return self;

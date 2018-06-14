@@ -47,9 +47,9 @@ function thisModule() {
                 req.miajs.userData = userData;
                 next();
             }
-        }).fail(function (err) {
+        }).catch(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     return self;

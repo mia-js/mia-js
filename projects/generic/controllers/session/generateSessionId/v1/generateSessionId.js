@@ -55,9 +55,9 @@ function thisModule() {
                 sessionId: sessionId
             };
             next();
-        }).fail(function (err) {
+        }).catch(function (err) {
             next(err);
-        }).done();
+        });
     };
 
     return self;
