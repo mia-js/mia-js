@@ -228,10 +228,10 @@ function thisModule() {
             res.response = {id: id};
             res.header("timestamp", Date.now());
             next();
-        }).fail(function (err) {
+        }).catch(function (err) {
             res.header("timestamp", Date.now());
             next(err);
-        }).done();
+        });
     };
 
     self.update = function (req, res, next) {
@@ -260,7 +260,7 @@ function thisModule() {
                 res.header("timestamp", Date.now());
                 return next();
             })
-            .fail(function (err) {
+            .catch(function (err) {
                 res.header("timestamp", Date.now());
                 next(err);
             })

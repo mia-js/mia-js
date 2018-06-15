@@ -1,3 +1,7 @@
+## 1.0.2 (May 23, 2018)
+* Interoperation between native promises and Q promises
+* Bumped mia-js-core version to 2.1.2
+
 ## 1.0.1 (May 16, 2018)
 * Updated mia-js-core to version 2.1.1
 
