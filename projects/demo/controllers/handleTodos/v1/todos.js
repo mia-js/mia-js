@@ -165,7 +165,7 @@ function thisModule() {
         }).then(function (result) {
             res.response = result;
             next();
-        }).fail(function (err) {
+        }).catch(function (err) {
             next({status: 500});
         });
     };
@@ -182,7 +182,7 @@ function thisModule() {
         }).then(function (result) {
             res.response = result;
             next();
-        }).fail(function (err) {
+        }).catch(function (err) {
             next({status: 500});
         });
     };
@@ -195,7 +195,7 @@ function thisModule() {
         DemoLib.addToDoItem(name, status).then(function (result) {
             res.response = result;
             next();
-        }).fail(function (err) {
+        }).catch(function (err) {
             if (err) {
                 // Exmaple of settings a custom status code and auto parse error
                 next({
@@ -216,7 +216,7 @@ function thisModule() {
         var status = req.miajs.validatedParameters.body.status;
         DemoLib.updateToDoItem(id, name, status).then(function () {
             next();
-        }).fail(function (err) {
+        }).catch(function (err) {
             if (err && err.code == "11000") {
                 next(err);
             }
@@ -236,7 +236,7 @@ function thisModule() {
 
         DemoLib.deleteToDoItem(id).then(function () {
             next();
-        }).fail(function (err) {
+        }).catch(function (err) {
             if (err) {
                 next({status: 500});
             }

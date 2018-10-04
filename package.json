@@ -1,7 +1,7 @@
 {
   "name": "mia-js",
   "description": "mia.js - Middleware API framework",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "dependencies": {
     "@babel/core": "7.0.0-beta.42",
     "@babel/polyfill": "7.0.0-beta.42",
@@ -13,7 +13,7 @@
     "fbgraphapi": "0.5.0",
     "ip": "1.1.0",
     "lodash": "4.17.2",
-    "mia-js-core": "2.1.2",
+    "mia-js-core": "2.2.0",
     "q": "1.4.1",
     "superagent": "0.18.2",
     "trycatch": "1.5.11",
@@ -53,7 +53,7 @@
     "webpack-node-externals": "1.6.0"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "node server.js local",
     "test": "node runTests.js test",
     "dev-server": "node server.js local hmr"
   },

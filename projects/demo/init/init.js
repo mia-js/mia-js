@@ -39,7 +39,7 @@ function thisModule() {
                 secretToken.insertOne(token).then(function (result) {
                     // New session token saved to db
                     Logger.info('Written secretId ' + token.id + ' to db.');
-                }).fail(function (err) {
+                }).catch(function (err) {
                     if (err.code != 11000) {
                         Logger.error('Error while writing initial data secrets to db');
                     }
@@ -78,7 +78,7 @@ function thisModule() {
                     })
                 });
             }
-        }).fail(function (err) {
+        }).catch(function (err) {
             Logger.error(err);
         });
     };

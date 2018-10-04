@@ -28,6 +28,7 @@ module.exports = {
             timeout: 500
         }
     },
+    skipDatabaseIndexingOnNewCollections: true,
     defaultMongoDatabase: 'miaTest',
     mongoDatabases: {
         miaTest: {

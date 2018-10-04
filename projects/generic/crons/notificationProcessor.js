@@ -222,7 +222,7 @@ var _processEmail = function (data) {
         var smtpServer = _emailConnections[connector];
         var notification = data.notification;
         return Q().then(function () {
-            return _getTemplateData(data._id, data.configId, "smtp", "mail", notification, notification.language).fail(function () {
+            return _getTemplateData(data._id, data.configId, "smtp", "mail", notification, notification.language).catch(function () {
                 return Q.reject("Invalid template for email");
             });
         }).then(function (template) {
@@ -246,7 +246,7 @@ var _processEmail = function (data) {
                     Logger.info("Email " + data._id + " send to " + notification.to);
                     _notificationStatusFulfilled(data._id);
                     return Q.resolve();
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.error("Email " + data._id + " NOT send to " + notification.to);
                     if (err && err.code) {
                         switch (err.code) {
@@ -265,7 +265,7 @@ var _processEmail = function (data) {
                     return Q.reject(err);
                 });
         });
-    }).fail(function (err) {
+    }).catch(function (err) {
         _notificationStatusReject(data._id, err);
         return Q.reject();
     });
@@ -367,7 +367,7 @@ var _sendApn = function (data, deviceData) {
             service.pushNotification(pushData, [deviceData.device.notification.token]);
             return Q.resolve();
         });
-    }).fail(function (err) {
+    }).catch(function (err) {
         _notificationStatusReject(data._id, err);
         return Q.reject(err);
     });
@@ -403,7 +403,7 @@ var _processPush = function (data, workerId) {
                 return Q.reject();
             });
         }
-    }).fail(function (err) {
+    }).catch(function (err) {
         var error = err || "Device failure";
         return _notificationStatusReject(data._id, error).then(function () {
             return Q.reject();
@@ -483,7 +483,7 @@ module.exports = BaseCronJob.extend({},
                     else {
                         return Q();
                     }
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.error(err);
                     return Q().reject();
                 });

@@ -33,7 +33,7 @@ function thisModule() {
             }
         }).address("me@domain.com").then(function () {
             next();
-        }).fail(function (err) {
+        }).catch(function (err) {
             //Error handling. Will only fail if not possible to add to queue
             Logger.error(err);
             next({status: 500});

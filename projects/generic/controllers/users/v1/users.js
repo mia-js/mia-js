@@ -257,7 +257,7 @@ function thisModule() {
         AuthManager.prepareDataForSignup(params).then(function (params) {
             req.miajs.userService.signupParams = params;
             next();
-        }).done();
+        });
     };
 
     var _getUserAccountResponse = function (req, res, userData, appId) {

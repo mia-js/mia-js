@@ -208,7 +208,7 @@ function thisModule() {
             if (_.isObject(params.userProfileModel) && params.userProfileModel != UserProfileModel) {
                 //Use custom model
                 params.userProfileData = params.userProfileData || {};
-                return params.userProfileModel.validate(params.userProfileData).fail(function (err) {
+                return params.userProfileModel.validate(params.userProfileData).catch(function (err) {
                     return Q.reject({status: 400, err: err});
                 });
             }
@@ -222,7 +222,7 @@ function thisModule() {
                 if (params.options && params.options.setCreatedAt === true) {
                     params.userProfileData.createdAt = now;
                 }
-                return UserProfileModel.validate(params.userProfileData).fail(function (err) {
+                return UserProfileModel.validate(params.userProfileData).catch(function (err) {
                     return Q.reject({status: 400, err: err});
                 });
             }

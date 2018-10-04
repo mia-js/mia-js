@@ -26,11 +26,11 @@ describe("AuthManager", function () {
                         Logger.info("Created device: " + deviceId);
                         createdDeviceId = deviceId;
                         next();
-                    }).fail(function (err) {
+                    }).catch(function (err) {
                         Logger.error(err);
                         expect(false).toBeTruthy();
                         next();
-                    }).done();
+                    });
                 });
 
                 it("updateDevice", function (next) {
@@ -39,11 +39,11 @@ describe("AuthManager", function () {
                         Logger.info("Updated device: " + deviceId);
                         createdDeviceId = deviceId;
                         next();
-                    }).fail(function (err) {
+                    }).catch(function (err) {
                         Logger.error(err);
                         expect(false).toBeTruthy();
                         next();
-                    }).done();
+                    });
                 });
 
                 it("generateSessionId", function (next) {
@@ -52,11 +52,11 @@ describe("AuthManager", function () {
                         Logger.info("Created session: " + sessionId);
                         createdSessionId = sessionId;
                         next();
-                    }).fail(function (err) {
+                    }).catch(function (err) {
                         Logger.error(err);
                         expect(false).toBeTruthy();
                         next();
-                    }).done();
+                    });
                 });
 
                 it("validateSessionToken", function (next) {
@@ -65,11 +65,11 @@ describe("AuthManager", function () {
                         callback(deviceData);
                         Logger.info("Device data: " + deviceData);
                         next();
-                    }).fail(function (err) {
+                    }).catch(function (err) {
                         Logger.error(err);
                         expect(false).toBeTruthy();
                         next();
-                    }).done();
+                    });
                 });
             }
 
@@ -95,10 +95,10 @@ describe("AuthManager", function () {
             it("deleteUser", function (next) {
                 UserAuth.deleteUser('login1', 'group1').then(function () {
                     next();
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.info(err);
                     next();
-                }).done();
+                });
             });
 
             it("signUpUser", function (next) {
@@ -117,11 +117,11 @@ describe("AuthManager", function () {
                         createdUserData = userData;
                         Logger.info(userData);
                         next();
-                    }).fail(function (err) {
+                    }).catch(function (err) {
                     Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("_registerAccessTokenCheckingMaxDevices", function (next) {
@@ -137,11 +137,11 @@ describe("AuthManager", function () {
                     maxDeviceCount).then(function (userData) {
                     expect(userData).not.toBeNull();
                     next();
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("_registerAccessTokenCheckingMaxDevices", function (next) {
@@ -157,11 +157,11 @@ describe("AuthManager", function () {
                     maxDeviceCount).then(function (userData) {
                     expect(userData).toBeNull();
                     next();
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("_registerAccessTokenCheckingMaxDevices", function (next) {
@@ -177,22 +177,22 @@ describe("AuthManager", function () {
                     maxDeviceCount).then(function (userData) {
                     expect(userData).not.toBeNull();
                     next();
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("logoutAnyUserFromDevice", function (next) {
                 UserAuth.logoutAnyUserFromDevice('456', 'app1').then(function (userData) {
                     expect(userData).not.toBeNull();
                     next();
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
         });
 
@@ -204,10 +204,10 @@ describe("AuthManager", function () {
             it("deleteUser", function (next) {
                 UserAuth.deleteUser('login2', 'group2').then(function () {
                     next();
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.error(err);
                     next();
-                }).done();
+                });
             });
 
             it("signUpUser", function (next) {
@@ -226,20 +226,20 @@ describe("AuthManager", function () {
                         createdUserData1 = userData;
                         Logger.info(userData);
                         next();
-                    }).fail(function (err) {
+                    }).catch(function (err) {
                     Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("deleteUser", function (next) {
                 UserAuth.deleteUser('login3', 'group2').then(function () {
                     next();
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.error(err);
                     next();
-                }).done();
+                });
             });
 
             it("signUpUser", function (next) {
@@ -258,11 +258,11 @@ describe("AuthManager", function () {
                         createdUserData2 = userData;
                         Logger.info(userData);
                         next();
-                    }).fail(function (err) {
+                    }).catch(function (err) {
                     Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("login user 1 on device 1", function (next) {
@@ -277,11 +277,11 @@ describe("AuthManager", function () {
                 }).then(function (loginResult) {
                     expect(loginResult).not.toBeNull();
                     next();
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("login user 1 on device 2", function (next) {
@@ -296,11 +296,11 @@ describe("AuthManager", function () {
                 }).then(function (loginResult) {
                     expect(loginResult).not.toBeNull();
                     next();
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("login user 2 on device 2", function (next) {
@@ -319,13 +319,13 @@ describe("AuthManager", function () {
                         UserAuth.isUserLoggedInOnDeviceByLoginAndGroup('login2', 'group2', deviceId2, 'app3').then(function (userData) {
                             expect(userData).toBeNull();
                             next();
-                        }).done();
-                    }).done();
-                }).fail(function (err) {
+                        });
+                    });
+                }).catch(function (err) {
                     Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
 
             it("login user 1 on device 2", function (next) {
@@ -344,13 +344,13 @@ describe("AuthManager", function () {
                         UserAuth.isUserLoggedInOnDeviceByLoginAndGroup('login3', 'group2', deviceId2, 'app3').then(function (userData) {
                             expect(userData).toBeNull();
                             next();
-                        }).done();
-                    }).done();
-                }).fail(function (err) {
+                        });
+                    });
+                }).catch(function (err) {
                     Logger.error(err);
                     expect(false).toBeTruthy();
                     next();
-                }).done();
+                });
             });
         });
     });

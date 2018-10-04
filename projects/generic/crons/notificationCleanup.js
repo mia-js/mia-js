@@ -110,7 +110,7 @@ var _resetNotifications = function () {
         if (affectedItems > 0) {
             Logger.info("Reset " + affectedItems + " notifications to pending. Seems theses messages got stuck in process before.");
         }
-    }).fail(function (err) {
+    }).catch(function (err) {
         Logger.error(err);
     });
 };
@@ -138,7 +138,7 @@ var _retryNotificationsTerminate = function () {
         if (affectedItems > 0) {
             Logger.warn("Giving up " + affectedItems + " notifications due to max reties reached.");
         }
-    }).fail(function (err) {
+    }).catch(function (err) {
         Logger.error(err);
     });
 };

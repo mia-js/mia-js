@@ -102,7 +102,7 @@ module.exports = BaseCronJob.extend({},
                     if (deletedCount > 0) {
                         Logger.info(deletedCount + ' inactive devices removed from devices collections');
                     }
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.error(err);
                 });
 
