@@ -51,7 +51,7 @@ module.exports = BaseCronJob.extend({},
                     if (deletedCount > 0) {
                         Logger.info(deletedCount + ' deleted user accounts removed from user collections');
                     }
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.info(null, err);
                 }
             );

@@ -70,7 +70,7 @@ function thisModule() {
                 next();
 
             }
-        }).fail(function () {
+        }).catch(function () {
             // Ignore rate limit due to failure
             next();
         });

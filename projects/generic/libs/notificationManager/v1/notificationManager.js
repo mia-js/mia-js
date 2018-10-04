@@ -11,7 +11,7 @@
                 email: "me@example.com"
  },
  schedule: new Date(Date.now()+60*5*1000) // OPTIONAL: Set a schedule date for the notification
- }).address("adrian@kuehlewind.net").fail(function(err){
+ }).address("adrian@kuehlewind.net").catch(function(err){
             Logger.error(err);
         });
 
@@ -25,7 +25,7 @@
             },
             payload: {} // OPTIONAL: Put in any object you like to submit to the app as payload
             schedule: new Date(Date.now()+60*5*1000) // OPTIONAL: Set a schedule date for the notification
-        }).user("5538b7b3f0007f6ce1000006").fail(function(err){
+        }).user("5538b7b3f0007f6ce1000006").catch(function(err){
             Logger.error(err);
         });
 
@@ -36,7 +36,7 @@
             replacements: { //OPTIONAL
                 name: "Test"
             }
-        }).device("3f90f57437acb4dfd7f0f9221763ae32").fail(function(err){
+        }).device("3f90f57437acb4dfd7f0f9221763ae32").catch(function(err){
             Logger.error(err);
         });
 

@@ -103,7 +103,7 @@ module.exports = BaseCronJob.extend({},
                     if (nModified > 0) {
                         Logger.info(nModified + ' sessions removed from devices collections');
                     }
-                }).fail(function (err) {
+                }).catch(function (err) {
                     Logger.info(null, err);
                 });
         },

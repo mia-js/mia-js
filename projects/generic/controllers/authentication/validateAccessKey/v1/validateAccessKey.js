@@ -206,7 +206,7 @@ function thisModule() {
             else {
                 return Q.reject();
             }
-        }).fail(function (err) {
+        }).catch(function (err) {
             return Q.reject({
                 status: 500
             });
@@ -245,7 +245,7 @@ function thisModule() {
                     });
                 }
             }
-        }).fail(function (err) {
+        }).catch(function (err) {
             return Q.reject(err);
         });
 
@@ -466,7 +466,7 @@ function thisModule() {
                     });
                 }
                 return Q.resolve(deviceId);
-            }).fail(function (err) {
+            }).catch(function (err) {
                 if (err) {
                     return Q.reject(err);
                 }
@@ -547,7 +547,7 @@ function thisModule() {
                                 next();
 
                             }
-                        }).fail(function () {
+                        }).catch(function () {
                             // Ignore rate limit due to failure
                             next();
                         });

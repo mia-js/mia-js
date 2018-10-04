@@ -167,6 +167,9 @@ module.exports = {
 
         //Default db name of mongoDb to use for application
         defaultMongoDatabase: 'mia',
+        
+        // Helpful in test environments to prevent the database from indexing if whole collections are frequently created and dropped again
+        skipDatabaseIndexingOnNewCollections: false,
 
         // Mongodb: Database configuration
         mongoDatabases: {
@@ -293,6 +296,33 @@ You can use a predefined json output controller available in `generic` project t
 
 ### Cron-Jobs
 Mia.js comes with a build in cron job manager to support cron jobs. If you like to run tasks time-based like clean up a database or send data to an external api you can define a cron job and it will run at the time you defined. Mia.js handles job execution and job concurrency on all servers your applications is currently running so all you need to set up is time and number of instances that should run this job. You can also define a single server to run all your cron-jobs defined in mia.js global configuration.
+
+#### Run single cron job immediately without bootstrapping the web server
+
+```bash
+$ node server.js local cron=CronjobName
+
+# Or as an alternative you could use
+$ npm start cron=CronjobName
+```
+
+#### Run multiple cron jobs (by their time pattern) without bootstrapping the web server
+
+```bash
+$ node server.js local cron=CronjobA,CronjobB,CronjobC
+
+# Or as an alternative you could use
+$ npm start cron=CronjobA,CronjobB,CronjobC
+```
+
+#### Don't run any cron job at all (only bootstrap web server)
+
+```bash
+$ node server.js local nocron
+
+# Or as an alternative you could use
+$ npm start nocron
+```
 
 #### Defining a cron job
 To define a cron job place a file in the folder `crons` and add the following code

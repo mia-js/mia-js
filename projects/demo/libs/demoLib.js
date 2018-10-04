@@ -79,7 +79,7 @@ function thisModule() {
                 }
             });
 
-        }).fail(function (err) {
+        }).catch(function (err) {
             return err && err.code == "11000" ? Q.reject(err) : Q.reject();
         })
     };
@@ -109,7 +109,7 @@ function thisModule() {
             }).then(function () {
                 return Q.resolve();
             });
-        }).fail(function (err) {
+        }).catch(function (err) {
             return err && err.code == "11000" ? Q.reject(err) : Q.reject();
         })
     };
@@ -121,7 +121,7 @@ function thisModule() {
         return ToDoModel.deleteOne(query).then(function (data) {
             var deletedCount = data.deletedCount || 0;
             return deletedCount == 1 ? Q.resolve() : Q.reject();
-        }).fail(function (err) {
+        }).catch(function (err) {
             return Q.reject(err);
         })
     };

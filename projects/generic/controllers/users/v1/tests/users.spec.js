@@ -60,10 +60,10 @@ describe("Testing user service", function () {
             expect(data[0] != null).toBe(expectResult);
             _sessionId = data[0].response.sessionId;
             next();
-        }).fail(function (err) {
+        }).catch(function (err) {
             expect(false).toBe(expectResult);
             next();
-        }).done();
+        });
     });
 
     var _signUp = function (expectResult) {
@@ -94,10 +94,10 @@ describe("Testing user service", function () {
                 expect(data[0].response.login == _userData.login).toBe(expectResult);
                 expect(data[0].response.userId != null).toBe(expectResult);
                 next();
-            }).fail(function (err) {
+            }).catch(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            }).done();
+            });
         });
     };
 
@@ -128,10 +128,10 @@ describe("Testing user service", function () {
                 expect(data[0].response.login == _userData.login).toBe(expectResult);
                 expect(data[0].response.userId != null).toBe(expectResult);
                 next();
-            }).fail(function (err) {
+            }).catch(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            }).done();
+            });
         });
     };
 
@@ -153,10 +153,10 @@ describe("Testing user service", function () {
             }).then(function (data) {
                 expect(data != null).toBe(expectResult);
                 next();
-            }).fail(function (err) {
+            }).catch(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            }).done();
+            });
         });
     };
 
@@ -178,10 +178,10 @@ describe("Testing user service", function () {
             }).then(function (data) {
                 expect(data != null).toBe(expectResult);
                 next();
-            }).fail(function (err) {
+            }).catch(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            }).done();
+            });
         });
     };
 
@@ -206,10 +206,10 @@ describe("Testing user service", function () {
                 expect(data[0].response.login == _userData.login).toBe(expectResult);
                 expect(data[0].response.userId != null).toBe(expectResult);
                 next();
-            }).fail(function (err) {
+            }).catch(function (err) {
                 expect(false).toBe(expectResult);
                 next();
-            }).done();
+            });
         });
     };
 

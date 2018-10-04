@@ -51,7 +51,7 @@ function thisModule() {
                     return Q.reject({status: 500});
                 }
             })
-        }).fail(function (err) {
+        }).catch(function (err) {
             if (err.status == 500) {
                 return Q.reject(err);
             }
@@ -99,7 +99,7 @@ function thisModule() {
                     return Q(id);
                 }
             })
-        }).fail(function (err) {
+        }).catch(function (err) {
             return Q.reject(err);
         });
 
@@ -249,7 +249,7 @@ function thisModule() {
                     });
                 }
             })
-        }).fail(function (err) {
+        }).catch(function (err) {
             if (err.status == 500) {
                 return Q.reject(err);
             }

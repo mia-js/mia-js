@@ -1,3 +1,8 @@
+## 1.0.3 (October 4, 2018)
+* Updated mia-js-core to version 2.2.0
+* Skip indexing Database on test env and by setting the env var skipDatabaseIndexing
+* Refactored q.fail() to .catch(); Removed q.done()
+
 ## 1.0.2 (May 23, 2018)
 * Interoperation between native promises and Q promises
 * Bumped mia-js-core version to 2.1.2
