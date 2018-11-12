@@ -306,7 +306,7 @@ $ node server.js local cron=CronjobName
 $ npm start cron=CronjobName
 ```
 
-#### Run multiple cron jobs (by their time pattern) without bootstrapping the web server
+#### Run multiple cron jobs immediately without bootstrapping the web server
 
 ```bash
 $ node server.js local cron=CronjobA,CronjobB,CronjobC
