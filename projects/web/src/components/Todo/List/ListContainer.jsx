@@ -2,17 +2,10 @@ import React from 'react'
 import _ from 'lodash'
 import {connect} from 'react-redux'
 import List from './List.jsx'
-import PropTypes from 'prop-types'
-import {componentWillUnmount, fetchTodos} from '../../../actions/Todo'
+import {componentWillUnmount, fetchTodos} from '../actions'
+import {withRouter} from 'react-router-dom'
 
 class ListContainer extends React.Component {
-    static propTypes = {
-        match: PropTypes.object.isRequired,
-        willUnmount: PropTypes.func.isRequired,
-        fetchTodos: PropTypes.func.isRequired,
-        items: PropTypes.array
-    };
-
     /**
      * Used to fetch needed data for SSR
      * @param {Object} store
@@ -40,7 +33,7 @@ class ListContainer extends React.Component {
     componentDidMount() {
         if (_.isUndefined(this.props.items)) {
             // Only if not done on server already (see fetchData())
-            this.props.fetchTodos(this.props.match.params.list);
+            this.props.fetchTodos(this.props.config, this.props.match.params.list);
         }
     }
 
@@ -60,7 +53,7 @@ class ListContainer extends React.Component {
     componentWillReceiveProps(nextProps) {
         if (_.isArray(this.props.items) && this.props.match.params.list !== nextProps.match.params.list) {
             // Refresh todos if navigating to another list
-            nextProps.fetchTodos(nextProps.match.params.list);
+            nextProps.fetchTodos(this.props.config, nextProps.match.params.list);
         }
     }
 
@@ -81,17 +74,18 @@ class ListContainer extends React.Component {
 }
 
 const mapStateToProps = state => ({
+    config: state.App.config,
     alert: state.Todo.alert,
     items: state.Todo.items
 });
 
-const mapDispatchToProps = (dispatch, ownProps) => ({
+const mapDispatchToProps = dispatch => ({
     willUnmount: () => {
         return dispatch(componentWillUnmount());
     },
-    fetchTodos: list => {
-        return dispatch(fetchTodos(ownProps.config, list));
+    fetchTodos: (config, list) => {
+        return dispatch(fetchTodos(config, list));
     }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ListContainer);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ListContainer));

@@ -10,11 +10,13 @@ class ListItem extends React.Component {
         handleChange: PropTypes.func.isRequired,
         handleUpdate: PropTypes.func.isRequired,
         handleKeyDown: PropTypes.func.isRequired,
-        handleRemove: PropTypes.func.isRequired
+        handleRemove: PropTypes.func.isRequired,
+        config: PropTypes.object.isRequired,
+        match: PropTypes.object.isRequired
     };
 
     render() {
-        const {item} = this.props;
+        const {item, config, match} = this.props;
         const checked = item.status === "checked";
         const checkedClass = item.status === "checked" ? "checked" : "unchecked";
 
@@ -22,15 +24,18 @@ class ListItem extends React.Component {
             <div className={styles.toDos}>
                 <div className="input-group">
                     <span className="input-group-addon">
-                        <input type="checkbox" onChange={this.props.handleCheck} data-id={item._id} checked={checked}/>
+                        <input type="checkbox" onChange={e => this.props.handleCheck(e, config, match.params.list)}
+                               data-id={item._id} checked={checked}/>
                     </span>
                     <input type="text" className={"form-control " + checkedClass} data-id={item._id}
-                           onChange={this.props.handleChange} onBlur={this.props.handleUpdate}
-                           onKeyDown={this.props.handleKeyDown}
+                           onChange={e => this.props.handleChange(e)}
+                           onBlur={e => this.props.handleUpdate(e, config, match.params.list)}
+                           onKeyDown={e => this.props.handleKeyDown(e, config, match.params.list)}
                            value={item.name}/>
                     <span className={['input-group-addon', styles.delete].join(' ')} data-id={item._id}
-                          onClick={this.props.handleRemove}>
-                        <span className="fa fa-times" data-id={item._id} onClick={this.props.handleRemove}/>
+                          onClick={e => this.props.handleRemove(e, config, match.params.list)}>
+                        <span className="fa fa-times" data-id={item._id}
+                              onClick={e => this.props.handleRemove(e, config, match.params.list)}/>
                     </span>
                 </div>
             </div>

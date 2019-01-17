@@ -147,7 +147,7 @@ function thisModule() {
         else {
             timeOffset = (tokenDate - dateNow) / 1000; //Timeoffset in seconds
             if (Math.abs(timeOffset) > maxTokenValidTime) {
-                Logger.info("Timestamp in signature has expired");
+                Logger.warn("Timestamp in signature has expired");
                 return Q.reject({
                     status: 401,
                     err: {'code': 'KeyExpired', 'msg': translator('generic-translations', 'KeyExpired')}
@@ -207,6 +207,7 @@ function thisModule() {
                 return Q.reject();
             }
         }).catch(function (err) {
+            Logger.error(err)
             return Q.reject({
                 status: 500
             });
@@ -379,7 +380,7 @@ function thisModule() {
             , maxTokenValidTime = 300; // Max time token is valid in seconds
 
         if (signatureMethod != "sha256") {
-            Logger.info("Signature method not allowed");
+            Logger.debug("Signature method not allowed");
             return Q.reject({
                 status: 403,
                 err: {
@@ -391,7 +392,7 @@ function thisModule() {
 
         // Check deviceId
         if (_.isEmpty(deviceId) || deviceId.length < 32) {
-            Logger.info("DeviceId is invalid length, given: " + deviceId);
+            Logger.debug("DeviceId is invalid length, given: " + deviceId);
             return Q.reject({
                 status: 401,
                 err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
@@ -400,7 +401,7 @@ function thisModule() {
 
         //Check secretId
         if (_.isEmpty(secretId) || secretId.length < 32) {
-            Logger.info("SecretId is invalid length, given: " + secretId);
+            Logger.debug("SecretId is invalid length, given: " + secretId);
             return Q.reject({
                 status: 401,
                 err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
@@ -410,7 +411,7 @@ function thisModule() {
         //Check signatureTimeStamp is valid
         var signatureDate = new Date(signatureTimeStamp * 1000); // needs to be in milliseconds
         if (signatureDate == "Invalid Date") {
-            Logger.info("Timestamp is invalid date, given: " + signatureTimeStamp);
+            Logger.debug("Timestamp is invalid date, given: " + signatureTimeStamp);
             return Q.reject({
                 status: 401,
                 err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
@@ -457,7 +458,7 @@ function thisModule() {
 
                 // Check validity of given signature
                 if (signature.toLowerCase() != authorizedSignature.toLowerCase()) {
-                    Logger.info("DENIED: Expected Hash: " + authorizedSignature + ", Given: " + signature);
+                    Logger.debug("DENIED: Expected Hash: " + authorizedSignature + ", Given: " + signature);
                     /*Logger.warn("DENIED: Expected Signature: " + deviceId + secretId + signatureTimeStamp + authorizedSignature);
                      Logger.warn("DENIED: Given Signature: " + signatureToken);*/
                     return Q.reject({

@@ -78,7 +78,7 @@ function Server() {
                         '</head>' +
                         `<body ${bodyAttrs}>` +
                         `<div id="app">${app}</div>` +
-                        `<script type="text/javascript" src="${publicPath + 'scripts/bundle.js'}" async></script>` +
+                        `<script type="text/javascript" src="${!_.isEmpty(publicPath) ? publicPath : '/'}scripts/bundle.js" async></script>` +
                         '</body>' +
                         '</html>';
                 } catch (e) {

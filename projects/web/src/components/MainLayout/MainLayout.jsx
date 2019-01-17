@@ -53,21 +53,21 @@ class MainLayout extends React.Component {
                     <link rel="icon" type="image/png" sizes="16x16" href={favicon16}/>
                     <link rel="mask-icon" href={safariPinnedTab} color="#5bbad5"/>
                 </Helmet>
-                <TopNavigation config={this.props.config}/>
+                <TopNavigation/>
                 <Container fluid={true}>
                     <Row>
                         {
                             /* Sidebar open */
                             this.props.isSidebarOpen &&
                             <Col md="2" className="sidebar">
-                                <Sidebar {...this.props}/>
+                                <Sidebar/>
                             </Col>
                         }
                         {
                             /* Sidebar close */
                             !this.props.isSidebarOpen &&
                             <div className="sidebar">
-                                <Sidebar {...this.props}/>
+                                <Sidebar/>
                             </div>
                         }
                         <Col md={{size: mainContentSize, offset: mainContentOffset}}

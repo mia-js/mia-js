@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
-const routes = require('../routes/index');
+const publicPath = require('./webpack/publicPath');
 
 const projectName = path.resolve(__dirname, '../').split(path.sep).pop();
 const bundleName = projectName + 'ServerBundle';
@@ -21,7 +21,7 @@ const getConfig = mode => {
             // Output server package directly in controllers folder
             path: path.resolve(__dirname, '../controllers'),
             // Get public path from projects routes config
-            publicPath: routes.prefix + '/',
+            publicPath: publicPath,
             filename: 'server.dist.js'
         },
         devtool: mode === 'watch' ? 'eval-source-map' : 'eval',
