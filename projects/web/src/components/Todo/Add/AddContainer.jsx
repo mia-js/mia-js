@@ -1,22 +1,17 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import Add from './Add.jsx'
-import {handleSubmit} from '../../../actions/Todo'
+import {handleSubmit} from '../actions'
+import {withRouter} from 'react-router-dom'
 
-class AddContainer extends React.Component {
-    render() {
-        return (
-            <Add {...this.props}/>
-        )
-    }
-}
+const mapStateToProps = state => ({
+    config: state.App.config
+});
 
-const mapStateToProps = (state, ownProps) => ({});
-
-const mapDispatchToProps = (dispatch, ownProps) => ({
-    handleSubmit: name => {
-        return dispatch(handleSubmit(name, ownProps.config, ownProps.match.params.list));
+const mapDispatchToProps = dispatch => ({
+    handleSubmit: (name, config, list) => {
+        return dispatch(handleSubmit(name, config, list));
     }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddContainer);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Add));

@@ -1,4 +1,4 @@
-import {TOGGLE_SIDEBAR} from '../actions/Sidebar'
+import {TOGGLE_SIDEBAR} from '../actions'
 
 export default function Reducers(state = {
     isSidebarOpen: true

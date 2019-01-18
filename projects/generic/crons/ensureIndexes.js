@@ -92,8 +92,7 @@ const _ensureIndexes = (model, modelIndexes, dbIndexes, modifiedIndexes) => {
 
                         if (debug) {
                             let dbIndex = _findIndexByName(dbIndexName, dbIndexes);
-                            Logger.debug('Database index:', dbIndex);
-                            Logger.debug('Model index:', modelIndex);
+                            Logger.debug('Database index: ' + dbIndex + ' Model index: ' + modelIndex)
                         }
                     }
 
@@ -127,8 +126,7 @@ const _removeIndexes = (model, modelIndexes, dbIndexes) => {
         if (!modelIndex) {
             Logger.info('Index "' + dbIndexName + '" on model "' + model.identity + '" is going to be removed');
             if (debug) {
-                Logger.debug('Database index:', dbIndex);
-                Logger.debug('Model index:', modelIndex);
+                Logger.debug('Database index: ' + dbIndex + ' Model index: ' + modelIndex)
             }
             let dropResult = await model.dropIndex(dbIndexName);
             if (dropResult.ok !== 1) {

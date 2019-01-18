@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const path = require('path');
 const webpack = require('webpack');
-const routes = require('../routes/index');
+const publicPath = require('./webpack/publicPath');
 
 const projectName = path.resolve(__dirname, '../').split(path.sep).pop();
 const bundleName = projectName + 'ClientBundle';
@@ -16,14 +16,14 @@ const getConfig = mode => {
         mode: mode === 'watch' ? 'development' : 'production',
         name: bundleName,
         entry: [
-            path.resolve(__dirname, './../../../node_modules/babel-polyfill'),
-            `webpack-hot-middleware/client?path=${routes.prefix}/__webpack_hmr&name=${bundleName}`,
+            path.resolve(__dirname, './../../../node_modules/@babel/polyfill'),
+            `webpack-hot-middleware/client?path=${!_.isEmpty(publicPath) ? publicPath : '/'}__webpack_hmr&name=${bundleName}`,
             path.resolve(__dirname, '../src/client.jsx')
         ],
         output: {
             // Output dist files directly in projects public folder
             path: path.resolve(__dirname, '../public/'),
-            publicPath: routes.prefix + '/',
+            publicPath: publicPath,
             filename: 'scripts/bundle.js'
         },
         devtool: mode === 'watch' ? 'eval-source-map' : 'eval',
@@ -38,7 +38,7 @@ const getConfig = mode => {
 
     if (mode === 'fs') {
         config['entry'] = [
-            path.resolve(__dirname, '../../../node_modules/babel-polyfill'),
+            path.resolve(__dirname, '../../../node_modules/@babel/polyfill'),
             path.resolve(__dirname, '../src/client.jsx')
         ];
         config['plugins'] = [

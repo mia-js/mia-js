@@ -56,7 +56,7 @@ function thisModule() {
                 return Q.reject(err);
             }
             else if (err.code && err.code == '11000' && retryCount > 1) {
-                Logger.info('DeviceId already exists, retrying to generate one');
+                Logger.debug('DeviceId already exists, retrying to generate one');
                 return Q(self.createDevice(options, deviceData, retryCount - 1));
             }
             else {
@@ -203,7 +203,7 @@ function thisModule() {
                 return Q.resolve(secretData);
             }
             else {
-                Logger.info('Expected key: ' + validHash + secretId);
+                Logger.error('Expected key: ' + validHash + secretId);
                 return Q.reject({
                     status: 403,
                     err: {'code': 'AccessKeyInvalid', 'msg': translator('generic-translations', 'AccessKeyInvalid')}
@@ -254,7 +254,7 @@ function thisModule() {
                 return Q.reject(err);
             }
             else if (err.code && err.code == '11001' && retryCount > 1) {
-                Logger.info('SessionId already exists retrying to generate one');
+                Logger.debug('SessionId already exists retrying to generate one');
                 return Q.resolve(self.generateSessionId(options, deviceId, ip, allowedAccessGroups, retryCount - 1));
             }
             else {
@@ -388,7 +388,7 @@ function thisModule() {
             //Check CIDRs
             for (var thisCIDR in deviceData.session.cidr) {
                 if (IP.cidrSubnet(deviceData.session.cidr[thisCIDR]).contains(ip)) {
-                    Logger.info('Grant access for device ' + deviceData.id);
+                    Logger.debug('Grant access for device ' + deviceData.id);
                     return Q(deviceData);
                 }
             }

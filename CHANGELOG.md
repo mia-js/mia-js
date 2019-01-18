@@ -1,3 +1,8 @@
+## 1.0.4 (January 17, 2019)
+* Updated mia-js-core to version 2.3.1
+* Some webpack configuration improvements
+* Some React component improvements
+
 ## 1.0.3 (October 4, 2018)
 * Updated mia-js-core to version 2.2.0
 * Skip indexing Database on test env and by setting the env var skipDatabaseIndexing

@@ -3,7 +3,9 @@ import PropTypes from 'prop-types'
 
 class Add extends React.Component {
     static propTypes = {
-        handleSubmit: PropTypes.func.isRequired
+        handleSubmit: PropTypes.func.isRequired,
+        config: PropTypes.object.isRequired,
+        match: PropTypes.object.isRequired
     };
 
     constructor(props, context) {
@@ -19,7 +21,7 @@ class Add extends React.Component {
     handleSubmit(e) {
         e.preventDefault();
         if (this.state.value) {
-            this.props.handleSubmit(this.state.value).then(() => {
+            this.props.handleSubmit(this.state.value, this.props.config, this.props.match.params.list).then(() => {
                 this.setState({value: ''});
             })
         }

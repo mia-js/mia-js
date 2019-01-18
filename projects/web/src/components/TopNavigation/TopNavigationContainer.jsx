@@ -1,12 +1,7 @@
 import React from 'react'
 import TopNavigation from './TopNavigation.jsx'
-import PropTypes from 'prop-types'
 
 class TopNavigationContainer extends React.Component {
-    static propTypes = {
-        config: PropTypes.object.isRequired
-    };
-
     constructor(props) {
         super(props);
 

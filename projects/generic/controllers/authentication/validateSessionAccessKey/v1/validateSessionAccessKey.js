@@ -54,7 +54,7 @@ function thisModule() {
             , translator = req.miajs.translator;
 
         AuthService.checkAccessKey({translator: translator}, accessKey, deviceId, group).then(function (data) {
-            Logger.info('Access key is valid');
+            Logger.debug('Access key is valid');
 
             //Set allowed groups (depending on secret)
             if (data.groups) {

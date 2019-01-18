@@ -7,7 +7,7 @@ import {
     REMOVE_ITEM_FAILURE,
     ADD_ITEM,
     ADD_ITEM_FAILURE
-} from '../actions/Todo'
+} from '../actions'
 
 export default function Reducers(state = {
     items: undefined,
@@ -59,6 +59,8 @@ export default function Reducers(state = {
             for (let i in items) {
                 let item = items[i];
                 if (item._id === itemId && item.name !== name) {
+                    // Don't do in-place-updates otherwise there will be no re-render
+                    item = _.cloneDeep(item);
                     item['name'] = name;
                     item['_dirty'] = true;
                 }

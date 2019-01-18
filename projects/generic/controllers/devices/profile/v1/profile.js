@@ -224,7 +224,7 @@ function thisModule() {
 
         MemberHelpers.setPathPropertyValue(data, 'device.userAgent', req.headers['user-agent']);
         AuthService.createDevice({translator: translator}, data, 5).then(function (id) {
-            Logger.info('Device ' + id + ' created');
+            Logger.debug('Device ' + id + ' created');
             res.response = {id: id};
             res.header("timestamp", Date.now());
             next();
@@ -255,7 +255,7 @@ function thisModule() {
 
         AuthService.updateDevice({translator: translator}, id, data)
             .then(function (id) {
-                Logger.info('Device ' + id + ' updated');
+                Logger.debug('Device ' + id + ' updated');
                 res.response = {id: id};
                 res.header("timestamp", Date.now());
                 return next();

@@ -1,34 +1,31 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import ListItem from './ListItem.jsx'
-import {checkItem, changeItemName, handleUpdate, handleKeyDown, handleRemove} from '../../../actions/Todo'
+import {checkItem, changeItemName, handleUpdate, handleKeyDown, handleRemove} from '../actions'
+import {withRouter} from 'react-router-dom'
 
-class ListItemContainer extends React.Component {
-    render() {
-        return (
-            <ListItem {...this.props}/>
-        )
+const mapStateToProps = state => {
+    return {
+        config: state.App.config
     }
-}
+};
 
-const mapStateToProps = (state, ownProps) => ({});
-
-const mapDispatchToProps = (dispatch, ownProps) => ({
-    handleCheck: e => {
-        return dispatch(checkItem(e, ownProps.config, ownProps.match.params.list));
+const mapDispatchToProps = dispatch => ({
+    handleCheck: (e, config, list) => {
+        return dispatch(checkItem(e, config, list));
     },
     handleChange: e => {
         return dispatch(changeItemName(e));
     },
-    handleUpdate: e => {
-        return dispatch(handleUpdate(e, ownProps.config, ownProps.match.params.list));
+    handleUpdate: (e, config, list) => {
+        return dispatch(handleUpdate(e, config, list));
     },
-    handleKeyDown: e => {
-        return dispatch(handleKeyDown(e, ownProps.config, ownProps.match.params.list));
+    handleKeyDown: (e, config, list) => {
+        return dispatch(handleKeyDown(e, config, list));
     },
-    handleRemove: e => {
-        return dispatch(handleRemove(e, ownProps.config, ownProps.match.params.list));
+    handleRemove: (e, config, list) => {
+        return dispatch(handleRemove(e, config, list));
     }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ListItemContainer);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ListItem));

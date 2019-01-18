@@ -28,14 +28,14 @@ class List extends React.Component {
                     <h5>using React.js</h5>
                 </div>
                 <div className={styles.add}>
-                    <Add {...this.props}/>
+                    <Add/>
                     <div className={styles.itemCount}>{_.isArray(items) ? items.length : 0} items</div>
                 </div>
                 {
                     _.isArray(items) &&
                     items.map(item => {
                         return (
-                            <ListItem key={'item' + item._id.toString()} item={item} {...this.props}/>
+                            <ListItem key={'item' + item._id.toString()} item={item}/>
                         );
                     })
                 }
