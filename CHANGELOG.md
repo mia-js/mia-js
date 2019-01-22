@@ -1,3 +1,9 @@
+## 1.0.5 (January 21, 2019)
+* Optimized webpack publicPath handling
+* Fixed HMR error with redux store
+* Updated mia-js-core to version 2.3.3
+* Fixed potential security vulnerabilities
+
 ## 1.0.4 (January 17, 2019)
 * Updated mia-js-core to version 2.3.1
 * Some webpack configuration improvements

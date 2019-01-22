@@ -14,12 +14,12 @@ class TopNavigation extends React.Component {
 
     render() {
         return (
-            <Navbar color="inverse" className={['navbar-toggleable-sm', styles.topNavigation].join(' ')} inverse>
-                <NavbarToggler right onClick={this.props.toggle}/>
+            <Navbar className={['bg-dark', 'navbar-toggleable-sm', styles.topNavigation].join(' ')} expand="md" dark>
                 <NavbarBrand tag={RRNavLink} to="/">
                     <img src={LogoImage} alt="Logo image" style={{maxWidth: '5em', marginRight: '0.5em'}}/>
                     Frontend demo
                 </NavbarBrand>
+                <NavbarToggler onClick={this.props.toggle}/>
                 <Collapse isOpen={this.props.isOpen} navbar>
                     <Nav className="ml-auto" navbar>
                         <NavItem>

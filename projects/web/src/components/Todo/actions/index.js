@@ -142,7 +142,7 @@ export const handleRemove = (e, config, list) => {
     return (dispatch, getState) => {
         e.preventDefault();
         e.stopPropagation();
-        const itemId = e.target.getAttribute('data-id');
+        const itemId = e.currentTarget.getAttribute('data-id');
 
         return dispatch(_removeItem(config, itemId))
             .then(action => {

@@ -17,7 +17,7 @@ const getConfig = mode => {
         name: bundleName,
         entry: [
             path.resolve(__dirname, './../../../node_modules/@babel/polyfill'),
-            `webpack-hot-middleware/client?path=${!_.isEmpty(publicPath) ? publicPath : '/'}__webpack_hmr&name=${bundleName}`,
+            `webpack-hot-middleware/client?path=${publicPath}__webpack_hmr&name=${bundleName}`,
             path.resolve(__dirname, '../src/client.jsx')
         ],
         output: {
