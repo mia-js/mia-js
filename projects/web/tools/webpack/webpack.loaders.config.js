@@ -89,7 +89,7 @@ const getLoaders = (bundle, mode) => {
                 limit: 10000,
                 mimetype: 'application/font-woff',
                 name: 'fonts/[name].[ext]',
-                publicPath: !_.isEmpty(publicPath) ? publicPath : '/',
+                publicPath: publicPath,
                 emitFile: bundle === 'client'
             }
         },
@@ -98,7 +98,7 @@ const getLoaders = (bundle, mode) => {
             loader: 'file-loader',
             options: {
                 name: 'fonts/[name].[ext]',
-                publicPath: !_.isEmpty(publicPath) ? publicPath : '/',
+                publicPath: publicPath,
                 emitFile: bundle === 'client'
             }
         },
@@ -107,7 +107,7 @@ const getLoaders = (bundle, mode) => {
             loader: 'file-loader',
             options: {
                 name: 'img/[name].[ext]',
-                publicPath: !_.isEmpty(publicPath) ? publicPath : '/',
+                publicPath: publicPath,
                 emitFile: bundle === 'client'
             }
         }

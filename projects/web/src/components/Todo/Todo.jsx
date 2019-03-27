@@ -25,7 +25,7 @@ class Todo extends React.Component {
                 </Jumbotron>
                 <Row>
                     <Col xs="12" sm="6" md="4" className="mb-4">
-                        <Link to="/todo/work" className="btn btn-secondary btn-outline-secondary btn-lg btn-block"
+                        <Link to="/todo/work" className="btn btn-outline-secondary btn-lg btn-block"
                               role="button">
                             <div className="display-3">
                                 <span className="fa fa-list-alt"/>
@@ -36,7 +36,7 @@ class Todo extends React.Component {
                         </Link>
                     </Col>
                     <Col xs="12" sm="6" md="4" className="mb-4">
-                        <Link to="/todo/private" className="btn btn-secondary btn-outline-secondary btn-lg btn-block"
+                        <Link to="/todo/private" className="btn btn-outline-secondary btn-lg btn-block"
                               role="button">
                             <div className="display-3">
                                 <span className="fa fa-list-alt"/>

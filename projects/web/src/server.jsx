@@ -20,7 +20,6 @@ function Server() {
         };
 
         initialState['App'] = initialState['App'] || {};
-        initialState['App']['env'] = env;
         initialState['App']['publicPath'] = publicPath;
         initialState['App']['config'] = require(`./config/${env.identity}.js`);
 
@@ -43,7 +42,7 @@ function Server() {
                     const app = ReactDOMServer.renderToString(
                         <Provider store={store}>
                             <StaticRouter
-                                basename={publicPath.substring(1, publicPath.length - 1)}
+                                basename={publicPath === '/' ? '' : publicPath.substring(1, publicPath.length - 1)}
                                 location={location}
                                 context={context}>
                                 <App context={context}/>
@@ -78,7 +77,7 @@ function Server() {
                         '</head>' +
                         `<body ${bodyAttrs}>` +
                         `<div id="app">${app}</div>` +
-                        `<script type="text/javascript" src="${!_.isEmpty(publicPath) ? publicPath : '/'}scripts/bundle.js" async></script>` +
+                        `<script type="text/javascript" src="${publicPath}scripts/bundle.js" async></script>` +
                         '</body>' +
                         '</html>';
                 } catch (e) {
