@@ -1,3 +1,6 @@
+## 1.0.6 (March 27, 2019)
+* Updated packages
+
 ## 1.0.5 (January 21, 2019)
 * Optimized webpack publicPath handling
 * Fixed HMR error with redux store

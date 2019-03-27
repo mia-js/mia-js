@@ -91,7 +91,7 @@ module.exports = {
     mongoDatabases: {
         // Application db
         mia: {
-            url: 'mongodb://api:api@localhost:27017/mia',
+            url: 'mongodb://localhost:27017/mia',
             options: {
                 w: 1, //write acknowledgement
                 poolSize: 15
