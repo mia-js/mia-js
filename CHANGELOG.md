@@ -1,3 +1,7 @@
+## 1.0.7 (April 18, 2019)
+* Consolidated development and build process of frontend projects and HMR devServer
+* Fixed security vulnerabilities
+
 ## 1.0.6 (March 27, 2019)
 * Updated packages
 

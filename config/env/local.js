@@ -99,9 +99,6 @@ module.exports = {
         }
     },
     webpack: {
-        skip: true, // When TRUE whole webpack compilation is skipped
-        purge: false, // When TRUE prior bundle files will be purged before compiling
-        watchMode: false, // TRUE for development: Watching the files and pushing it to the client via HMR
         verbose: false // When FALSE only some general info, warnings and errors are shown
     }
 };
