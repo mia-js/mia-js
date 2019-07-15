@@ -1,4 +1,4 @@
-<a href="#"><img src="http://7factory.github.io/mia-js/images/miajs.png" title="mia.js"/></a>
+<a href="#"><img src="http://mia-js.github.io/mia-js/images/miajs.png" title="mia.js"/></a>
 
 mia.js is an API framework based on [node.js](http://nodejs.org), [Express](https://github.com/strongloop/express) and [mongoDB](https://www.mongodb.org/) that makes it easy to build custom or enterprise-grade api's and web frontend's.
 Focus of mia.js is to work as middleware backend for mobile apps to have all your communication in one place and avoid overloading your mobile apps.
