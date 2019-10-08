@@ -1,4 +1,6 @@
 npm-debug.log
 node_modules/
 .idea/
-!bundle.js
+**/dist/
+**/*.dist.js
+projects/Static-React/public

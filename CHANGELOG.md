@@ -1,3 +1,11 @@
+## 1.1.0 (October 8, 2019)
+* Updated mia-js-core
+* Added two new example projects for a simple React site:
+** One with a client bundle which is rendered in the browser only
+** Another one including a server bundle which is used for static site generation (like gatsby.js etc)
+* Refactored webpack configuration files
+* Fixed npm vulnerabilities
+
 ## 1.0.7 (April 18, 2019)
 * Consolidated development and build process of frontend projects and HMR devServer
 * Fixed security vulnerabilities
