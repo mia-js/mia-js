@@ -492,6 +492,7 @@ module.exports = {
         maxRequests: 1000, // Requests per IP per rate limit window
         interval: 5 // Rate limit window in minutes
     },
+    parameterOverflow: 'log', // Optional: What to do if more parameters as configured were given. Possible values are "ignore", "log" and "block". This setting is valid for all the routes in the file
     routes: {
         // Route /unicorn
         './flavours': {
@@ -504,6 +505,7 @@ module.exports = {
                         maxRequests: 500, // Requests per IP per rate limit window
                         interval: 5 // Rate limit window in minutes
                 },
+                parameterOverflow: 'block',  // Optional: What to do if more parameters as configured were given. Possible values are "ignore", "log" and "block". This setting is valid only for the route
                 controller: [
                     {
                         name: 'generic-accessKeyService',
@@ -574,7 +576,8 @@ There are some global parameters of your routes file to adjust the routes behavi
 * `corsHeaders` - Apply CORS headers to a routes file i.e. for Cross Domain Policy. Defining the CORS header automatically enables all routes of this routes definition file to response to a browsers CORS requests methods OPTIONS
 * `rateLimit` - Limit the request rate for an interval time range and max request for all routes within this routes file. Memcached needed to use rateLimit
 * `routes` - All of your application routes
-* `decrecated` - *optional* Add this flag to mark all methods of this route as deprecated. The will lead to a notice field when requesting an api and highlighting in [Swagger::Docs](https://github.com/richhollis/swagger-docs) documentation
+* `deprecated` - *optional* Add this flag to mark all methods of this route as deprecated. The will lead to a notice field when requesting an api and highlighting in [Swagger::Docs](https://github.com/richhollis/swagger-docs) documentation
+* `parameterOverflow` - *optional* Specifies how to handle additional parameters which were given but not configured. Possible values are "ignore", "log" and "block". This setting is valid for all the routes in the file
 
 ##### Routes
 Define multiple routes for your application project. Mia.js has some build in methods and parameters to describe the route. First give your route a name see example `./flavours`. This name is directly used as route path and appended to the prefix. You can use variable names inside of your routes path to allow routes like `/icecream/v1/:flavour/ingredient/:name`. Use a `:` as variable prefix of a path variable. A route always needs a request method your route is listening to - use one of the following.
@@ -606,7 +609,7 @@ Define multiple routes for your application project. Mia.js has some build in me
 * `authorization` - *optional* Indicates if this route requires authorization. This flag is available in `generic-listServices` controller to indicate that this service is somehow protected and needs authorization.
 * `corsHeaders` - *optional* Apply CORS headers to single route i.e. for Cross Domain Policy. Defining the CORS header automatically enables this route to response to a browsers CORS requests methods OPTIONS
 * `responseSchemes` - *optional* To describe what the excepted response in case of a successful response or an error response will look like you can specify the response schema. This will be visible in the [Swagger::Docs](https://github.com/richhollis/swagger-docs) documentation
-*
+* `parameterOverflow` - *optional* Specifies how to handle additional parameters which were given but not configured. Possible values are "ignore", "log" and "block". This setting is valid only for the specific route
 
 ####### Define controllers of a route method
 Controllers are defined as array in the routes file definition of your route method. The order of elements follows the chaining of your controllers. You can chain as many controllers as you need to perform a request and return a response. Controllers are chained by calling `next()` in a controller file. The last controller should handle the response output i.e. `res.send()` see [Express](https://github.com/strongloop/express)
@@ -1804,17 +1807,47 @@ Place these config files directly in the root of the project folder, like so:
 | +-- controllers<br/>
 | +-- ...<br/>
 | +-- webpack.client.fs.config.js<br/>
-| +-- webpack.client.watch.config.js<br/>
+| +-- webpack.client.hmr.config.js<br/>
 | +-- webpack.server.fs.config.js<br/>
-| +-- webpack.server.watch.config.js<br/>
+| +-- webpack.server.hmr.config.js<br/>
 
-Where `*.fs.*` presents production builds and `*.watch.*` development builds. Every single file is optional.<br/>
+Where `*.fs.*` presents production builds and `*.hmr.*` development builds. Every single file is optional.<br/>
 Please find an example configuration for every file in the "web" project. To prevent code duplication most of the configuration can be found in the "tools" folder.
   
 # Hot Module Replacement
 For an introduction to hot module replacement you can look [here](https://webpack.js.org/concepts/hot-module-replacement/).<br/>
 With mia.js HMR can be used in two different places. First place is the development build of individual projects where file changes will be watched, recompiled and pushed into the bundles. Here we are using webpack's own "HotModuleReplacement" plugin which makes use of the [integrated HMR API](https://webpack.js.org/api/hot-module-replacement/) to replace modules in memory on the fly. This use case is very straight forward, recommended by webpack and very well documented on various websites.<br/>
 The other place is in the server itself where we don't execute the webpack build but our server code and therefore we can't take advantage of the injected HMR API. You'll get more details about this solution in the next paragraph.
+
+## HMR argument
+You can control which projects are served with hot module replacement by specifying a startup argument `hmr`. 
+
+### Run all projects and the internal development server with HMR
+
+```bash
+$ node server.js local hmr
+
+# Or as an alternative you could use
+$ npm start hmr
+```
+
+### Run only the internal development server with HMR
+
+```bash
+$ node server.js local hmr=devServer
+
+# Or as an alternative you could use
+$ npm start hmr=devServer
+```
+
+### Run the internal development server and project `web` with HMR
+
+```bash
+$ node server.js local hmr=devServer,web
+
+# Or as an alternative you could use
+$ npm start hmr=devServer,web
+```
 
 ## Server implementation
 The following lines will give you some background information about how we implemented HMR into the server.

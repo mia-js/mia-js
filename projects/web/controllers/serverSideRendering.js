@@ -12,15 +12,15 @@ function thisModule() {
     self.identity = 'Web-ServerSideRendering';
     self.version = '1.0';
     self.created = '2017-12-14T12:00:00';
-    self.modified = '2017-12-14T12:00:00';
+    self.modified = '2019-10-08T16:00:00';
     self.group = 'web';
 
     self.list = (req, res) => {
         let webpackServerConfig;
         let Server;
 
-        if (env && env.webpack && env.webpack.watchMode) {
-            webpackServerConfig = require('../webpack.server.watch.config');
+        if (Shared.runtimeArgs.hmr) {
+            webpackServerConfig = require('../webpack.server.hmr.config');
 
             // Disable gzip compression to allow server-sent events (HMR)
             res.setHeader('Cache-Control', 'no-transform');
