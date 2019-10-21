@@ -467,7 +467,7 @@ module.exports = BaseModel.extend({
  * `min`       *Number i.e. 1* - Min number a value must have, only for numbers
  * `allow`     *Array|Number|String i.e. [2, 3, 4]* - Define allowed values (case-in-sensitive)
  * `deny`      *Array|Number|String i.e. [2, 3, 4]* - Denied values that are not allowed (case-in-sensitive)
- * `extend`    *Function* - Define a function that extends a schema definition dynamically i.e. iterate function [1...20] ==> name: 1,{type: Number, default: 0}
+ * `extend`    *Function* - Define a function that extends a schema definition dynamically i.e. (values) => {child: {type: Number, min: 1, max: 10}}. The function will be given the corresponding input value
 
 ## Routes
 Routes are the key functionality to build your application. Define routes of your project in the routes definition of mia.js. The build in routes handler connects all your controllers, registers the routes and handles route parameters of your application. You can have multiple routes files in your projects `routes` folder to logically separate routes or create routes with different compilation of chained controllers i.e. routes for version v1, routes for version v2 or routes for testing.

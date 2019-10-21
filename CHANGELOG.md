@@ -1,3 +1,7 @@
+## 1.1.1. (October 21, 2019)
+* Updated mia-js-core
+* Updated README regarding "extend" precondition
+
 ## 1.1.0 (October 8, 2019)
 * Updated mia-js-core
 * Added two new example projects for a simple React site:
