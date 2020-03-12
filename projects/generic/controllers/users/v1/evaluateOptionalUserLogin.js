@@ -21,7 +21,7 @@ function thisModule() {
         req.miajs = req.miajs || {};
 
         if (!req.miajs.device) {
-            next({status: 500, 'msg': translator('generic-translations', 'InternalServerError')});
+            next(new MiaJs.Error({status: 500, 'msg': translator('generic-translations', 'InternalServerError')}));
             return;
         }
 
@@ -34,7 +34,7 @@ function thisModule() {
             }
             next();
         }).catch(function (err) {
-            next(err);
+            next(new MiaJs.Error(err));
         });
     };
 

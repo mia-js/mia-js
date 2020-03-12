@@ -73,7 +73,7 @@ var _sendMail = function (smtpServer, sender, to, replyTo, subject, text, html) 
         ]
     }, function (err, message) {
         if (err) {
-            deferred.reject(err);
+            deferred.reject(new MiaJs.Error(err));
         }
         else {
             deferred.resolve();
@@ -149,7 +149,7 @@ var _getTemplateData = function (id, configId, connector, type, notification, la
 
             //Check fallback without language prefix
             if (_.isEmpty(model) || !model.templates || !model.templates[name] || _.isEmpty(model.templates[name]) || !model.templates[name][type] || _.isEmpty(model.templates[name][type]) || !model.templates[name][type][connector] || _.isEmpty(model.templates[name][type][connector])) {
-                return Q.reject("No template found");
+                return Q.reject(new MiaJs.Error("No template found"));
             }
             else {
                 return Q.resolve(_.cloneDeep(model.templates[name][type][connector]));
@@ -170,7 +170,7 @@ var _getConnector = function (id, type, environment) {
     environment = environment || "production";
     var model = Shared.config(id) || {};
     if (_.isEmpty(model) || !model.connectors || !model.connectors[type] || !model.connectors[type][environment] || _.isEmpty(model.connectors[type][environment])) {
-        return Q.reject("No connector found");
+        return Q.reject(new MiaJs.Error("No connector found"));
     }
     return Q.resolve(model.connectors[type][environment]);
 };
@@ -223,7 +223,7 @@ var _processEmail = function (data) {
         var notification = data.notification;
         return Q().then(function () {
             return _getTemplateData(data._id, data.configId, "smtp", "mail", notification, notification.language).catch(function () {
-                return Q.reject("Invalid template for email");
+                return Q.reject(new MiaJs.Error("Invalid template for email"));
             });
         }).then(function (template) {
             // Do replacements
@@ -259,10 +259,10 @@ var _processEmail = function (data) {
                                 return Q.resolve();
                                 break;
                             default:
-                                return Q.reject(err);
+                                return Q.reject(new MiaJs.Error(err));
                         }
                     }
-                    return Q.reject(err);
+                    return Q.reject(new MiaJs.Error(err));
                 });
         });
     }).catch(function (err) {
@@ -279,7 +279,7 @@ var _sendApn = function (data, deviceData) {
 
     if (!deviceData.device || !deviceData.device.notification || !deviceData.device.notification.token) {
         _notificationStatusReject(data._id, "Device is not registered for push. Missing push token");
-        return Q.reject("Device is not registered for push. Missing push token");
+        return Q.reject(new MiaJs.Error("Device is not registered for push. Missing push token"));
     }
 
     var environment = deviceData.device && deviceData.device.notification && deviceData.device.notification.environment ? deviceData.device.notification.environment : "production";
@@ -369,7 +369,7 @@ var _sendApn = function (data, deviceData) {
         });
     }).catch(function (err) {
         _notificationStatusReject(data._id, err);
-        return Q.reject(err);
+        return Q.reject(new MiaJs.Error(err));
     });
 
 
@@ -489,6 +489,6 @@ module.exports = BaseCronJob.extend({},
                 });
         },
         created: '2015-04-05T22:00:00', // Creation date
-        modified: '2015-04-05T22:00:00' // Last modified date
+        modified: '2020-03-12T17:00:00' // Last modified date
     }
 );

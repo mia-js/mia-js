@@ -27,7 +27,7 @@ function thisModule() {
     self.identity = 'generic-rateLimiter'; // Controller name used in routes, policies and followups
     self.version = '1.0'; // Version number of service
     self.created = '2015-03-01T00:00:00'; // Creation date of controller
-    self.modified = '2015-03-01T00:00:00'; // Last modified date of controller
+    self.modified = '2020-03-12T18:00:00'; // Last modified date of controller
 
     self.all = function (req, res, next) {
 
@@ -54,13 +54,13 @@ function thisModule() {
                 res.header("X-Rate-Limit-Limit", rateLimiterResult.limit);
                 res.header("X-Rate-Limit-Remaining", 0);
                 res.header("X-Rate-Limit-Reset", rateLimiterResult.timeTillReset);
-                next({
+                next(new MiaJs.Error({
                     status: 429,
                     err: {
                         'code': 'RateLimitExceededForKey',
                         'msg': Translator('generic-translations', 'RateLimitExceededForKey')
                     }
-                });
+                }));
             }
             else {
                 res.header("X-Rate-Limit-Limit", rateLimiterResult.limit);

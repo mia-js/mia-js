@@ -17,7 +17,7 @@ function thisModule() {
     self.identity = 'generic-listServices'; // Controller name used in routes, policies and followups
     self.version = '1.0'; // Version number of service
     self.created = '2014-05-23T00:00:00'; // Creation date of controller
-    self.modified = '2014-05-23T00:00:00'; // Last modified date of controller
+    self.modified = '2020-03-12T18:00:00'; // Last modified date of controller
 
     self.preconditions = {
         list: {
@@ -58,13 +58,13 @@ function thisModule() {
             next();
         }
         else {
-            next({
+            next(new MiaJs.Error({
                 'status': 500,
                 err: {
                     'code': 'UnknownServiceGroupOrVersion',
                     'msg': Translator('generic-translations', 'UnknownServiceGroupOrVersion')
                 }
-            });
+            }));
         }
     };
 

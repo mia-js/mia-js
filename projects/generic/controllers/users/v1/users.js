@@ -19,7 +19,7 @@ function thisModule() {
     self.identity = 'generic-users'; // Unique controller id used in routes, policies and followups
     self.version = '1.0'; // Version number of service
     self.created = '2014-10-03T19:00:00'; // Creation date of controller
-    self.modified = '2014-10-03T19:00:00'; // Last modified date of controller
+    self.modified = '2020-03-12T18:00:00'; // Last modified date of controller
     self.group = ''; // Group this service to a origin
 
     /*
@@ -288,21 +288,21 @@ function thisModule() {
         //checking preconditions for chaining this controller
         if (!req.miajs.device || !req.miajs.userService || !req.miajs.userService.signupParams) {
             Logger.error("Failure in chaining controllers.");
-            next({status: 500});
+            next(new MiaJs.Error({status: 500}));
             return;
         }
         var params = req.miajs.userService.signupParams;
 
         AuthManager.signUpUser(params).then(function (userData) {
             if (!userData) {
-                return Q.reject({status: 500}); //should normally never be the case
+                return Q.reject(new MiaJs.Error({status: 500})); //should normally never be the case
             }
             else {
                 //login user optionally
                 if (params.options.loginOnSignUp === true) {
                     return AuthManager.loginUser(params).then(function (userData) {
                         if (!userData) {
-                            return Q.reject({status: 500}); //should normally never be the case
+                            return Q.reject(new MiaJs.Error({status: 500})); //should normally never be the case
                         }
                         else {
                             _getUserAccountResponse(req, res, userData, params.appId);
@@ -316,7 +316,7 @@ function thisModule() {
                 }
             }
         }).catch(function (err) {
-            next(err);
+            next(new MiaJs.Error(err));
         });
     };
 
@@ -335,7 +335,7 @@ function thisModule() {
         //checking preconditions for chaining this controller
         if (!req.miajs.device) {
             Logger.error('Missing req.miajs.device. Failure in chaining controllers.');
-            next({status: 500});
+            next(new MiaJs.Error({status: 500}));
             return;
         }
 
@@ -351,7 +351,7 @@ function thisModule() {
 
         AuthManager.loginUser(params).then(function (userData) {
             if (!userData) {
-                return Q.reject({status: 500}); //should normally never be the case
+                return Q.reject(new MiaJs.Error({status: 500})); //should normally never be the case
             }
             else {
                 req.miajs.userService.loginStatus = "created"; // set loginStatus
@@ -359,7 +359,7 @@ function thisModule() {
                 next();
             }
         }).catch(function (err) {
-            next(err);
+            next(new MiaJs.Error(err));
         });
     };
 
@@ -405,7 +405,7 @@ function thisModule() {
             || !req.miajs.userService.fbLoginParams
             || !req.miajs.userService.fbLoginParams.thirdPartyLogin) {
             Logger.error("Failure in chaining controllers.");
-            next({status: 500});
+            next(new MiaJs.Error({status: 500}));
             return;
         }
         var params = req.miajs.userService.fbLoginParams;
@@ -442,7 +442,7 @@ function thisModule() {
                 req.miajs.userService.loginStatus = loginData.loginStatus;
                 return AuthManager.loginUserCore(params).then(function (userData) {
                     if (!userData) {
-                        return Q.reject({status: 500}); //should normally never be the case
+                        return Q.reject(new MiaJs.Error({status: 500})); //should normally never be the case
                     }
                     else {
                         _getUserAccountResponse(req, res, userData, params.appId);
@@ -451,7 +451,7 @@ function thisModule() {
                 });
             });
         }).catch(function (err) {
-            next(err);
+            next(new MiaJs.Error(err));
         });
     };
 
@@ -470,7 +470,7 @@ function thisModule() {
 
         if (!req.miajs.device) {
             Logger.error('Missing req.miajs.device. Failure in chaining controllers.');
-            next({status: 500});
+            next(new MiaJs.Error({status: 500}));
             return;
         }
         var deviceId = req.miajs.device.id;
@@ -478,7 +478,7 @@ function thisModule() {
         AuthManager.logoutAnyUserFromDevice(deviceId, group).then(function (userData) {
             next();
         }).catch(function (err) {
-            next(err);
+            next(new MiaJs.Error(err));
         });
     };
 
@@ -498,12 +498,12 @@ function thisModule() {
 
         if (!req.miajs.device) {
             Logger.error('Missing req.miajs.device. Failure in chaining controllers.');
-            next({status: 500});
+            next(new MiaJs.Error({status: 500}));
             return;
         }
 
         if (!req.miajs.userData || !req.miajs.userData._id) {
-            next({status: 500});
+            next(new MiaJs.Error({status: 500}));
             return;
         }
 
@@ -517,7 +517,7 @@ function thisModule() {
             }
         }).then(function (userData) {
             if (!userData) {
-                return Q.reject({status: 500});
+                return Q.reject(new MiaJs.Error({status: 500}));
             }
             else {
                 if (userData.etag == etag && etag != null) {
@@ -531,7 +531,7 @@ function thisModule() {
                 }
             }
         }).catch(function (err) {
-            next(err);
+            next(new MiaJs.Error(err));
         });
     };
 
@@ -572,12 +572,12 @@ function thisModule() {
         //checking preconditions for chaining this controller
         if (!req.miajs.device) {
             Logger.error("Missing session or validatedParameters in req.miajs. Failure in chaining controllers.");
-            next({status: 500});
+            next(new MiaJs.Error({status: 500}));
             return;
         }
 
         if (!req.miajs.userData || !req.miajs.userData._id) {
-            next({status: 500});
+            next(new MiaJs.Error({status: 500}));
             return;
         }
 
@@ -609,7 +609,7 @@ function thisModule() {
             }
             next();
         }).catch(function (err) {
-            next(err);
+            next(new MiaJs.Error(err));
         });
     };
 
@@ -626,12 +626,12 @@ function thisModule() {
 
         if (!req.miajs.device) {
             Logger.error('Missing req.miajs.device. Failure in chaining controllers.');
-            next({status: 500});
+            next(new MiaJs.Error({status: 500}));
             return;
         }
 
         if (!req.miajs.userData || !req.miajs.userData.login || !req.miajs.userData.group) {
-            next({status: 500});
+            next(new MiaJs.Error({status: 500}));
             return;
         }
         var userData = req.miajs.userData;
@@ -639,7 +639,7 @@ function thisModule() {
         AuthManager.deleteUser(userData.login, userData.group).then(function () {
             next();
         }).catch(function (err) {
-            next(err);
+            next(new MiaJs.Error(err));
         });
     };
 
@@ -665,13 +665,13 @@ function thisModule() {
                 next();
             }
             else {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 401,
                     err: {
                         'code': 'LoginInvalid',
                         'msg': translator('generic-translations', 'LoginInvalid')
                     }
-                });
+                }));
             }
         }).catch(function (err) {
             if (err.status == 401) {
@@ -708,13 +708,13 @@ function thisModule() {
                 next();
             }
             else {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 401,
                     err: {
                         'code': 'InvalidPasswordResetToken',
                         'msg': translator('generic-translations', 'InvalidPasswordResetToken')
                     }
-                });
+                }));
             }
         }).catch(function (err) {
             if (err.status == 401) {
@@ -743,13 +743,13 @@ function thisModule() {
                 next();
             }
             else {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 401,
                     err: {
                         'code': 'InvalidValidationToken',
                         'msg': translator('generic-translations', 'InvalidValidationToken')
                     }
-                });
+                }));
             }
         }).catch(function (err) {
             if (err.status == 401) {
@@ -778,13 +778,13 @@ function thisModule() {
                 next();
             }
             else {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 401,
                     err: {
                         'code': 'InvalidInvalidationToken',
                         'msg': translator('generic-translations', 'InvalidInvalidationToken')
                     }
-                });
+                }));
             }
         }).catch(function (err) {
             if (err.status == 401) {

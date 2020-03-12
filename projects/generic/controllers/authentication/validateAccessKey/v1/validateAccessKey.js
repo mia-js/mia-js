@@ -60,11 +60,13 @@ function thisModule() {
                         desc: "Authorization access key signature method. Default SHA256 if not set",
                         allow: ["sha256"],
                         convert: "lower",
-                        type: String
+                        type: String,
+                        docs: false
                     },
                     requestdate: {
                         desc: "Date string when client request was initiated i.e. 2015-01-01T00:00:00",
-                        type: Date
+                        type: Date,
+                        docs: false
                     }
                 }
             },
@@ -139,19 +141,19 @@ function thisModule() {
         var tokenDate = new Date(tokenTimestamp * 1000);
         var translator = options.translator || Translator.default;
         if (tokenDate == "Invalid Date") {
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 401,
                 err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
-            });
+            }));
         }
         else {
             timeOffset = (tokenDate - dateNow) / 1000; //Timeoffset in seconds
             if (Math.abs(timeOffset) > maxTokenValidTime) {
                 Logger.warn("Timestamp in signature has expired");
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 401,
                     err: {'code': 'KeyExpired', 'msg': translator('generic-translations', 'KeyExpired')}
-                });
+                }));
             }
             else {
                 return Q(Math.round(timeOffset));
@@ -208,9 +210,9 @@ function thisModule() {
             }
         }).catch(function (err) {
             Logger.error(err)
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 500
-            });
+            }));
         });
     };
 
@@ -229,10 +231,10 @@ function thisModule() {
         return DeviceModel.findOne({'access.key': accessKey}).then(function (deviceData) {
             // Access key not found
             if (deviceData === null) {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 401,
                     err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
-                });
+                }));
             }
             //Access key is valid
             else {
@@ -240,10 +242,10 @@ function thisModule() {
                     return Q(deviceData);
                 }
                 else {
-                    return Q.reject({
+                    return Q.reject(new MiaJs.Error({
                         status: 401,
                         err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
-                    });
+                    }));
                 }
             }
         }).catch(function (err) {
@@ -265,26 +267,26 @@ function thisModule() {
         options = options || {};
         var translator = options.translator || Translator.default;
         if (_.isEmpty(deviceData)) {
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 500
-            });
+            }));
         }
 
         //Check if the device is marked as active and is not disabled
         if (deviceData.status != 'active') {
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 403,
                 err: {'code': 'TemporaryDisabled', 'msg': translator('generic-translations', 'TemporaryDisabled')}
-            });
+            }));
         }
 
         //Check if group is allowed for the session. Group permission is set by used secret
         if (deviceData.access.groups) {
             if ((deviceData.access.groups).indexOf(group) == -1) {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 403,
                     err: {'code': 'KeyInvalidForGroup', 'msg': translator('generic-translations', 'KeyInvalidForGroup')}
-                });
+                }));
             }
         }
 
@@ -292,10 +294,10 @@ function thisModule() {
         if (deviceData.access && deviceData.access.blockcidr) {
             for (var thisBlockCIDR in deviceData.access.blockcidr) {
                 if (IP.cidrSubnet(deviceData.access.blockcidr[thisBlockCIDR]).contains(ip)) {
-                    return Q.reject({
+                    return Q.reject(new MiaJs.Error({
                         status: 403,
                         err: {'code': 'IPNotAllowed', 'msg': translator('generic-translations', 'IPNotAllowed')}
-                    });
+                    }));
                 }
             }
         }
@@ -314,10 +316,10 @@ function thisModule() {
             }
         }
 
-        return Q.reject({
+        return Q.reject(new MiaJs.Error({
             status: 403,
             err: {'code': 'IPNotAllowed', 'msg': translator('generic-translations', 'IPNotAllowed')}
-        });
+        }));
     };
 
 
@@ -334,23 +336,23 @@ function thisModule() {
         // Get device data from db and reject if device is disabled or does not exists
         return AuthService.getDeviceDataById(deviceId).then(function (deviceData) {
             if (_.isEmpty(deviceData)) {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 401,
                     err: {
                         'code': 'DeviceIdInvalid',
                         'msg': translator('generic-translations', 'DeviceIdInvalid')
                     }
-                });
+                }));
             }
 
             if (deviceData.status == "disabled") {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 403,
                     err: {
                         'code': 'TemporaryDisabled',
                         'msg': translator('generic-translations', 'TemporaryDisabled')
                     }
-                });
+                }));
             }
             // Update device lastModified to mark device as still in use. Only once in 24 hours
             if (deviceData.lastModified < new Date(Date.now() - 60 * 60 * 24 * 1000) || deviceData.status == "inactive") {
@@ -381,41 +383,41 @@ function thisModule() {
 
         if (signatureMethod != "sha256") {
             Logger.debug("Signature method not allowed");
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 403,
                 err: {
                     'code': 'SignatureMethodInvalid',
                     'msg': translator('generic-translations', 'SignatureMethodInvalid')
                 }
-            });
+            }));
         }
 
         // Check deviceId
         if (_.isEmpty(deviceId) || deviceId.length < 32) {
             Logger.debug("DeviceId is invalid length, given: " + deviceId);
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 401,
                 err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
-            });
+            }));
         }
 
         //Check secretId
         if (_.isEmpty(secretId) || secretId.length < 32) {
             Logger.debug("SecretId is invalid length, given: " + secretId);
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 401,
                 err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
-            });
+            }));
         }
 
         //Check signatureTimeStamp is valid
         var signatureDate = new Date(signatureTimeStamp * 1000); // needs to be in milliseconds
         if (signatureDate == "Invalid Date") {
             Logger.debug("Timestamp is invalid date, given: " + signatureTimeStamp);
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 401,
                 err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
-            });
+            }));
         }
 
         //Check signature timeStamp. Reject if timediff to now is > maxTokenValidTime (also if timestamp is in future)
@@ -426,32 +428,32 @@ function thisModule() {
 
                 // Check if access is allowed with this secret for this group
                 if (!secretData || !secretData.groups || !secretData.secret) {
-                    return Q.reject({
+                    return Q.reject(new MiaJs.Error({
                         status: 401,
                         err: {
                             'code': 'KeyInvalid',
                             'msg': translator('generic-translations', 'AuthTokenInvalid')
                         }
-                    });
+                    }));
                 }
 
                 //Reject if secret used is not allowed to access this service group
                 if ((secretData.groups).indexOf(group.toLowerCase()) == -1) {
-                    return Q.reject({
+                    return Q.reject(new MiaJs.Error({
                         status: 403,
                         err: {
                             'code': 'KeyInvalidForGroup',
                             'msg': translator('generic-translations', 'KeyInvalidForGroup')
                         }
-                    });
+                    }));
                 }
 
                 //Check if secret is currently disabled
                 if (secretData.enabled == false) {
-                    return Q.reject({
+                    return Q.reject(new MiaJs.Error({
                         status: 401,
                         err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
-                    });
+                    }));
                 }
                 // Generate a signature that is excepted to match
                 var authorizedSignature = _generateAuthorizedSignature(req, deviceId, secretData.secret, signatureTimeStamp, signatureMethod);
@@ -461,10 +463,10 @@ function thisModule() {
                     Logger.debug("DENIED: Expected Hash: " + authorizedSignature + ", Given: " + signature);
                     /*Logger.warn("DENIED: Expected Signature: " + deviceId + secretId + signatureTimeStamp + authorizedSignature);
                      Logger.warn("DENIED: Given Signature: " + signatureToken);*/
-                    return Q.reject({
+                    return Q.reject(new MiaJs.Error({
                         status: 401,
                         err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
-                    });
+                    }));
                 }
                 return Q.resolve(deviceId);
             }).catch(function (err) {
@@ -472,10 +474,10 @@ function thisModule() {
                     return Q.reject(err);
                 }
                 else {
-                    return Q.reject({
+                    return Q.reject(new MiaJs.Error({
                         status: 401,
                         err: {'code': 'KeyInvalid', 'msg': translator('generic-translations', 'KeyInvalid')}
-                    });
+                    }));
                 }
             });
         });
@@ -532,13 +534,13 @@ function thisModule() {
                                 res.header("X-Rate-Limit-Limit", rateLimiterResult.limit);
                                 res.header("X-Rate-Limit-Remaining", 0);
                                 res.header("X-Rate-Limit-Reset", rateLimiterResult.timeTillReset);
-                                next({
+                                next(new MiaJs.Error({
                                     status: 429,
                                     err: {
                                         'code': 'RateLimitExceededForKey',
                                         'msg': Translator('generic-translations', 'RateLimitExceededForKey')
                                     }
-                                });
+                                }));
                             }
                             else {
                                 res.header("X-Rate-Limit-Limit", rateLimiterResult.limit);

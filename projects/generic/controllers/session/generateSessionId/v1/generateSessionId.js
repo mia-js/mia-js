@@ -17,7 +17,7 @@ function thisModule() {
     self.identity = 'generic-generateSession'; // Controller name used in routes, policies and followups
     self.version = '1.0'; // Version number of service
     self.created = '2014-01-09T19:00:00'; // Creation date of controller
-    self.modified = '2014-01-09T19:00:00'; // Last modified date of controller
+    self.modified = '2020-03-12T18:00:00'; // Last modified date of controller
     self.description = 'Get session token'; // Short description
     self.group = ''; // Group this service to a origin
 
@@ -56,7 +56,7 @@ function thisModule() {
             };
             next();
         }).catch(function (err) {
-            next(err);
+            next(new MiaJs.Error(err));
         });
     };
 

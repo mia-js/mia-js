@@ -287,7 +287,8 @@ Preconditions consists of `parameters` and `responses`. In parameters you can us
  * `virtual`   *String|Function* - Apply a defined virtual function to convert a value with a custom function and add to values
  * `max`       *Number i.e. 20* - Max number a value can have, only for numbers
  * `min`       *Number i.e. 1* - Min number a value must have, only for numbers
- * `allow`     *Array|Number|String i.e. [2, 3, 4]* - Define allowed values (case-in-sensitive)
+ * `allow`     *Array|Number|String i.e. [2, 3, 4]* - Define allowed values (case-in-sensitive). Only one must apply
+ * `allowMultiple` *Number|String] i.e. [2, 3, 4]* - Define allowed values (case-in-sensitive). Multiple can apply
  * `deny`      *Array|Number|String i.e. [2, 3, 4]* - Denied values that are not allowed (case-in-sensitive)
 
 ##### Assign to the next controller
@@ -465,7 +466,8 @@ module.exports = BaseModel.extend({
  * `virtual`   *String|Function* - Apply a defined virtual function to convert a value with a custom function and add to values
  * `max`       *Number i.e. 20* - Max number a value can have, only for numbers
  * `min`       *Number i.e. 1* - Min number a value must have, only for numbers
- * `allow`     *Array|Number|String i.e. [2, 3, 4]* - Define allowed values (case-in-sensitive)
+ * `allow`     *Array|Number|String i.e. [2, 3, 4]* - Define allowed values (case-in-sensitive). Only one must apply
+ * `allowMultiple` *Number|String i.e. [2, 3, 4]* - Define allowed values (case-in-sensitive). Multiple can apply
  * `deny`      *Array|Number|String i.e. [2, 3, 4]* - Denied values that are not allowed (case-in-sensitive)
  * `extend`    *Function* - Define a function that extends a schema definition dynamically i.e. (values) => {child: {type: Number, min: 1, max: 10}}. The function will be given the corresponding input value
 

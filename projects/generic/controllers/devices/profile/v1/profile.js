@@ -19,7 +19,7 @@ function thisModule() {
     self.identity = 'generic-deviceProfile'; // Controller name used in routes, policies and followups
     self.version = '1.0'; // Version number of service
     self.created = '2014-01-09T19:00:00'; // Creation date of controller
-    self.modified = '2014-01-09T19:00:00'; // Last modified date of controller
+    self.modified = '2020-03-12T18:00:00'; // Last modified date of controller
     self.group = ''; // Group this service to a origin
 
     self.preconditions = {
@@ -230,7 +230,7 @@ function thisModule() {
             next();
         }).catch(function (err) {
             res.header("timestamp", Date.now());
-            next(err);
+            next(new MiaJs.Error(err));
         });
     };
 
@@ -241,16 +241,16 @@ function thisModule() {
 
         if (id != req.miajs.device.id) {
             res.header("timestamp", Date.now());
-            return next({status: 403});
+            return next(new MiaJs.Error({status: 403}));
         }
 
         MemberHelpers.setPathPropertyValue(data, 'device.userAgent', req.headers['user-agent']);
         if (_.isEmpty(data)) {
             res.header("timestamp", Date.now());
-            return next({
+            return next(new MiaJs.Error({
                 status: 400,
                 err: {'code': 'BodyDataIsEmpty', 'msg': translator('generic-translations', 'BodyDataIsEmpty')}
-            });
+            }));
         }
 
         AuthService.updateDevice({translator: translator}, id, data)
