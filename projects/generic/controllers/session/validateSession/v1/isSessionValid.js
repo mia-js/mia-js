@@ -57,18 +57,18 @@ function thisModule() {
         }
 
         if (_.isEmpty(ip)) {
-            next({
+            next(new MiaJs.Error({
                 'status': 403,
                 err: {'code': 'NoIPDetermined', 'msg': Translator('generic-translations', 'NoIPDetermined')}
-            });
+            }));
             return;
         }
 
         if (!sessionId || sessionId == '') {
-            next({
+            next(new MiaJs.Error({
                 status: 400,
                 err: {'code': 'SessionTokenEmpty', 'msg': translator('generic-translations', 'SessionTokenEmpty')}
-            });
+            }));
             return;
         }
 
@@ -87,7 +87,7 @@ function thisModule() {
             req.miajs.device = deviceData;
             next();
         }).catch(function (err) {
-            next(err);
+            next(new MiaJs.Error(err));
         });
     };
 

@@ -48,22 +48,22 @@ function thisModule() {
                     return Q(deviceDataCreated[0].id);
                 }
                 else {
-                    return Q.reject({status: 500});
+                    return Q.reject(new MiaJs.Error({status: 500}));
                 }
             })
         }).catch(function (err) {
             if (err.status == 500) {
-                return Q.reject(err);
+                return Q.reject(new MiaJs.Error(err));
             }
             else if (err.code && err.code == '11000' && retryCount > 1) {
                 Logger.debug('DeviceId already exists, retrying to generate one');
                 return Q(self.createDevice(options, deviceData, retryCount - 1));
             }
             else {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 400,
                     err: err
-                });
+                }));
             }
         });
     };
@@ -87,20 +87,20 @@ function thisModule() {
             return deviceModel.updateOne({id: id}, {$set: validatedData}).then(function (data) {
                 var nModified = data.result && data.result.nModified ? data.result.nModified : 0;
                 if (nModified == 0) {
-                    return Q.reject({
+                    return Q.reject(new MiaJs.Error({
                         status: 400,
                         err: {
                             'code': 'DeviceIdDoesNotExist',
                             'msg': translator('generic-translations', 'DeviceIdDoesNotExist')
                         }
-                    });
+                    }));
                 }
                 else {
                     return Q(id);
                 }
             })
         }).catch(function (err) {
-            return Q.reject(err);
+            return Q.reject(new MiaJs.Error(err));
         });
 
     };
@@ -127,15 +127,15 @@ function thisModule() {
             },
             function (err, data) {
                 if (err) {
-                    deferred.reject({status: 500});
+                    deferred.reject(new MiaJs.Error({status: 500}));
                 } else if (data) {
                     deferred.resolve(data);
                 }
                 else {
-                    deferred.reject({
+                    deferred.reject(new MiaJs.Error({
                         status: 403,
                         err: {'code': 'AccessKeyInvalid', 'msg': translator('generic-translations', 'AccessKeyInvalid')}
-                    });
+                    }));
                 }
             }
         );
@@ -158,17 +158,17 @@ function thisModule() {
         var translator = options.translator || Translator.default;
 
         if (!accessKey) {
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 401,
                 err: {'code': 'AccessKeyIsEmpty', 'msg': translator('generic-translations', 'AccessKeyIsEmpty')}
-            });
+            }));
         }
 
         if (!deviceId || deviceId.length < 32) {
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 400,
                 err: {'code': 'DeviceIdInvalid', 'msg': translator('generic-translations', 'DeviceIdInvalid')}
-            });
+            }));
         }
 
         //Access key format: md5([secret{32}][deviceId])[secretId{32}]
@@ -176,10 +176,10 @@ function thisModule() {
         var secretId = accessKey.substr(32, accessKey.length);
 
         if (hash.length != 32 || secretId.length != 32) {
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 403,
                 err: {'code': 'AccessKeyInvalid', 'msg': translator('generic-translations', 'AccessKeyInvalid')}
-            });
+            }));
         }
 
         return _getSecretFromDb(options, secretId).then(function (secretData) {
@@ -188,13 +188,13 @@ function thisModule() {
             //Check if access key is allowed for this group
             if (secretData.groups) {
                 if ((secretData.groups).indexOf(group.toLowerCase()) == -1) {
-                    return Q.reject({
+                    return Q.reject(new MiaJs.Error({
                         status: 403,
                         err: {
                             'code': 'AccessKeyInvalidGroup',
                             'msg': translator('generic-translations', 'AccessKeyInvalidGroup')
                         }
-                    });
+                    }));
                 }
             }
 
@@ -204,10 +204,10 @@ function thisModule() {
             }
             else {
                 Logger.error('Expected key: ' + validHash + secretId);
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 403,
                     err: {'code': 'AccessKeyInvalid', 'msg': translator('generic-translations', 'AccessKeyInvalid')}
-                });
+                }));
             }
         });
     };
@@ -240,28 +240,28 @@ function thisModule() {
                     return Q(validatedData["session.id"]);
                 }
                 else {
-                    return Q.reject({
+                    return Q.reject(new MiaJs.Error({
                         status: 403,
                         err: {
                             'code': 'DeviceIdInvalid',
                             'msg': translator('generic-translations', 'DeviceIdInvalidOrDoesNotExists')
                         }
-                    });
+                    }));
                 }
             })
         }).catch(function (err) {
             if (err.status == 500) {
-                return Q.reject(err);
+                return Q.reject(new MiaJs.Error(err));
             }
             else if (err.code && err.code == '11001' && retryCount > 1) {
                 Logger.debug('SessionId already exists retrying to generate one');
                 return Q.resolve(self.generateSessionId(options, deviceId, ip, allowedAccessGroups, retryCount - 1));
             }
             else {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 400,
                     err: err
-                });
+                }));
             }
         });
     };
@@ -286,17 +286,17 @@ function thisModule() {
             function (err, deviceData) {
                 if (err) {
                     //Error while requesting db
-                    deferred.reject({status: 500});
+                    deferred.reject(new MiaJs.Error({status: 500}));
                 } else {
                     // Session token not found
                     if (deviceData === null) {
-                        deferred.reject({
+                        deferred.reject(new MiaJs.Error({
                             status: 403,
                             err: {
                                 'code': 'SessionTokenNotValid',
                                 'msg': translator('generic-translations', 'SessionTokenNotValid')
                             }
-                        });
+                        }));
                     }
                     //Session token is present
                     else {
@@ -304,13 +304,13 @@ function thisModule() {
                             deferred.resolve(deviceData);
                         }
                         else {
-                            deferred.reject({
+                            deferred.reject(new MiaJs.Error({
                                 status: 403,
                                 err: {
                                     'code': 'SessionTokenNotValid',
                                     'msg': translator('generic-translations', 'SessionTokenNotValid')
                                 }
-                            });
+                            }));
                         }
                     }
                 }
@@ -333,7 +333,7 @@ function thisModule() {
             },
             function (err, deviceData) {
                 if (err) {
-                    deferred.reject(err);
+                    deferred.reject(new MiaJs.Error(err));
                 }
                 else {
                     deferred.resolve(deviceData);
@@ -359,27 +359,27 @@ function thisModule() {
         var translator = options.translator || Translator.default;
 
         if (_.isEmpty(deviceData)) {
-            return Q.reject({status: 500});
+            return Q.reject(new MiaJs.Error({status: 500}));
         }
 
         //Check if the device is marked as active and is not disabled
         if (deviceData.status != 'active') {
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 403,
                 err: {'code': 'TemporaryDisabled', 'msg': translator('generic-translations', 'TemporaryDisabled')}
-            });
+            }));
         }
 
         //Check if group is allowed for the session. Group permission is set by used secret
         if (deviceData.session.groups) {
             if ((deviceData.session.groups).indexOf(group) == -1) {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 403,
                     err: {
                         'code': 'SessionInvalidGroup',
                         'msg': translator('generic-translations', 'SessionInvalidGroup')
                     }
-                });
+                }));
             }
         }
 
@@ -393,10 +393,10 @@ function thisModule() {
                 }
             }
 
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 403,
                 err: {'code': 'IPNotAllowed', 'msg': translator('generic-translations', 'IPNotAllowed')}
-            });
+            }));
         }
     }
 

@@ -209,7 +209,7 @@ function thisModule() {
                 //Use custom model
                 params.userProfileData = params.userProfileData || {};
                 return params.userProfileModel.validate(params.userProfileData).catch(function (err) {
-                    return Q.reject({status: 400, err: err});
+                    return Q.reject(new MiaJs.Error({status: 400, err: err}));
                 });
             }
             else if (!_.isObject(params.userProfileModel) && !_.isObject(params.userProfileData)) {
@@ -223,7 +223,7 @@ function thisModule() {
                     params.userProfileData.createdAt = now;
                 }
                 return UserProfileModel.validate(params.userProfileData).catch(function (err) {
-                    return Q.reject({status: 400, err: err});
+                    return Q.reject(new MiaJs.Error({status: 400, err: err}));
                 });
             }
             else if (params.userProfileModel == 'doNotValidate') {
@@ -231,7 +231,7 @@ function thisModule() {
                 return Q(params.userProfileData);
             }
             else {
-                return Q.reject('Model expected!');
+                return Q.reject(new MiaJs.Error('Model expected!'));
             }
         }).then(function (values) {
             params.userProfileData = {};
@@ -259,13 +259,13 @@ function thisModule() {
                 }
                 else {
                     //provided login is already in use
-                    return Q.reject({
+                    return Q.reject(new MiaJs.Error({
                         status: 401,
                         err: {
                             'code': 'LoginAlreadyExists',
                             'msg': translator('generic-translations', 'LoginAlreadyExists')
                         }
-                    });
+                    }));
                 }
             });
         }
@@ -421,11 +421,11 @@ function thisModule() {
             if (!_.isEmpty(params.password)) {
                 var group = params.group || userData.group;
                 if (!group) {
-                    return Q.reject({
+                    return Q.reject(new MiaJs.Error({
                         err: {
                             'msg': 'Empty group is not allowed'
                         }
-                    });
+                    }));
                 }
 
                 self.hashCredentials(group, params.password, params.options).then(function (passHash) {
@@ -508,7 +508,7 @@ function thisModule() {
                         //user data might be empty here to some concurrent update taking place
                         return self.getUserDataById(userId).then(function (userData) {
                             if (!userData.etag) {
-                                return Q.reject({status: 500});
+                                return Q.reject(new MiaJs.Error({status: 500}));
                             }
                             else {
                                 return Q(userData);
@@ -739,7 +739,7 @@ function thisModule() {
                         return Q(userData);
                     }
                     else {
-                        return Q.reject('Cannot register a new token for your user. You might want to try again later.');
+                        return Q.reject(new MiaJs.Error('Cannot register a new token for your user. You might want to try again later.'));
                     }
                 });
             });
@@ -766,7 +766,7 @@ function thisModule() {
             //});
         }
         else {
-            return Q.reject('Cannot register a new token for your user. You might want to try again later.');
+            return Q.reject(new MiaJs.Error('Cannot register a new token for your user. You might want to try again later.'));
         }
     };
 
@@ -954,23 +954,23 @@ function thisModule() {
     //<editor-fold desc="=== Signup : OK ===">
     self.prepareDataForSignup = function (params) {
         if (_.isEmpty(params.group)) {
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 err: {
                     'code': 'InternalServerError',
                     'msg': 'Group cannot be empty'
                 }
-            });
+            }));
         }
 
         params = _.clone(params);
         if (!params.login) {
             if (_.isEmpty(params.thirdPartyTokens)) {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     err: {
                         'code': 'InternalServerError',
                         'msg': 'Both empty login and empty thirdPartyTokens are not allowed'
                     }
-                });
+                }));
             }
             params.login = Encryption.randHash();
             params.password = Encryption.randHash();
@@ -978,12 +978,12 @@ function thisModule() {
         }
         else {
             if (_.isEmpty(params.password)) {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     err: {
                         'code': 'InternalServerError',
                         'msg': 'Password cannot be empty if login is set'
                     }
-                });
+                }));
             }
         }
 
@@ -1043,22 +1043,22 @@ function thisModule() {
             || _.isEmpty(params.login)
             || _.isEmpty(params.passHash)
             || _.isEmpty(params.email)) {
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 err: {
                     'code': 'InternalServerError',
                     'msg': 'Error chaining controllers'
                 }
-            });
+            }));
         }
 
         if (!params.email.match(/[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/)) {
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 status: 400,
                 err: {
                     code: "InvalidEmailAddress",
                     msg: translator('generic-translations', 'InvalidEmailAddress')
                 }
-            });
+            }));
         }
 
         return UserModel.findOne({
@@ -1087,13 +1087,13 @@ function thisModule() {
             }
             else {
                 //provided login is already in use
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 401,
                     err: {
                         'code': 'LoginAlreadyExists',
                         'msg': translator('generic-translations', 'LoginAlreadyExists')
                     }
-                });
+                }));
             }
         });
     };
@@ -1168,13 +1168,13 @@ function thisModule() {
                         }
                         else {
                             //e-mail is not validated
-                            return Q.reject({
+                            return Q.reject(new MiaJs.Error({
                                 status: 401,
                                 err: {
                                     'code': 'EmailAddressIsNotValidated',
                                     'msg': translator('generic-translations', 'EmailAddressIsNotValidated')
                                 }
-                            });
+                            }));
                         }
                     }
                 });
@@ -1218,12 +1218,12 @@ function thisModule() {
 
     self.validateUser = function (token) {
         if (token == null) {
-            return Q.reject({
+            return Q.reject(new MiaJs.Error({
                 err: {
                     'code': 'InternalServerError',
                     'msg': 'Empty token is not allowed'
                 }
-            });
+            }));
         }
         else {
             return _updateUserData({
@@ -1246,7 +1246,7 @@ function thisModule() {
 
     self.invalidateUser = function (token) {
         if (token == null) {
-            return Q.reject({status: 500});
+            return Q.reject(new MiaJs.Error({status: 500}));
         }
         else {
             return _updateUserData({
@@ -1321,13 +1321,13 @@ function thisModule() {
                 return self.updateUserProfileData(params);
             }
             else {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 401,
                     err: {
                         'code': 'WrongOrMissingRequestParameter',
                         'msg': 'Invalid token'
                     }
-                });
+                }));
             }
         });
     };
@@ -1356,13 +1356,13 @@ function thisModule() {
             //wrong credentials for an existing user OR provided user doesn't exist OR is inactivated
             // ==> log out any user (if any was logged in) from this device
             return self.logoutAnyUserFromDevice(params.deviceId, params.appId).then(function (userData) {
-                return Q.reject({
+                return Q.reject(new MiaJs.Error({
                     status: 401,
                     err: {
                         'code': 'InvalidCredentials',
                         'msg': translator('generic-translations', 'InvalidCredentials')
                     }
-                });
+                }));
             });
         }
         else {

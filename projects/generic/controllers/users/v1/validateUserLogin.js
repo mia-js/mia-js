@@ -29,7 +29,7 @@ function thisModule() {
         req.miajs = req.miajs || {};
 
         if (!req.miajs.device) {
-            next({status: 500, 'msg': translator('generic-translations', 'InternalServerError')});
+            next(new MiaJs.Error({status: 500, 'msg': translator('generic-translations', 'InternalServerError')}));
             return;
         }
 
@@ -38,17 +38,17 @@ function thisModule() {
 
         AuthService.getUserLoggedInOnDevice(req.miajs.device.id, group).then(function (userData) {
             if (!userData) {
-                next({
+                next(new MiaJs.Error({
                     status: 401,
                     err: {'code': 'NoUserIsLoggedIn', 'msg': translator('generic-translations', 'NoUserIsLoggedIn')}
-                });
+                }));
             }
             else {
                 req.miajs.userData = userData;
                 next();
             }
         }).catch(function (err) {
-            next(err);
+            next(new MiaJs.Error(err));
         });
     };
 

@@ -1,3 +1,9 @@
+## 1.2.0 (March 12, 2020)
+* Updated mia-js-core to version 2.7.0
+* Updated README regarding "allowMultiple" precondition
+* Hid requestdate and signature method from generic auth controller as its not needed
+* Changed all errors to MiaError
+
 ## 1.1.1. (October 21, 2019)
 * Updated mia-js-core
 * Updated README regarding "extend" precondition

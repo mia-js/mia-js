@@ -84,7 +84,7 @@ function thisModule() {
     var _validateNotificationSettings = function (data, type) {
         // Check if notification configId exists
         if (!data.configId || _.isEmpty(Shared.config(data.configId))) {
-            return Q.reject({code: "ConfigIdNotFound", msg: "Notification configId not found"});
+            return Q.reject(new MiaJs.Error({code: "ConfigIdNotFound", msg: "Notification configId not found"}));
         }
         var config = Shared.config(data.configId);
         // Check if template exists
@@ -94,7 +94,7 @@ function thisModule() {
 
         // Check if schedule exists
         if (data.schedule && (Object.prototype.toString.call(data.schedule) !== "[object Date]" || data.schedule == "Invalid Date")) {
-            return Q.reject({code: "NotificationScheduleInvalid", msg: "Notification schedule date is invalid"});
+            return Q.reject(new MiaJs.Error({code: "NotificationScheduleInvalid", msg: "Notification schedule date is invalid"}));
         }
 
         // Check if template has this method
@@ -151,7 +151,7 @@ function thisModule() {
         return {
             address: function (to) {
                 if (_.isEmpty(to) || !to.match(/[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/)) {
-                    return Q.reject({code: "InvalidEmailAddress", msg: "Invalid email address"});
+                    return Q.reject(new MiaJs.Error({code: "InvalidEmailAddress", msg: "Invalid email address"}));
                 }
                 else {
                     return _validateNotificationSettings(data, type).then(function () {
@@ -161,7 +161,7 @@ function thisModule() {
             },
             user: function (userId) {
                 if (_.isEmpty(userId)) {
-                    return Q.reject({code: "EmptyUserId", msg: "No user id given"});
+                    return Q.reject(new MiaJs.Error({code: "EmptyUserId", msg: "No user id given"}));
                 }
                 return _validateNotificationSettings(data, type).then(function () {
                     return AuthManager.getUserDataById(userId).then(function (userData) {
@@ -176,7 +176,7 @@ function thisModule() {
                             return Q.all(funcArray);
                         }
                         else {
-                            return Q.reject({code: "NoUserDevices", msg: "User is not logged in on any device"});
+                            return Q.reject(new MiaJs.Error({code: "NoUserDevices", msg: "User is not logged in on any device"}));
                         }
                     });
                 })
@@ -196,7 +196,7 @@ function thisModule() {
         return {
             user: function (userId) {
                 if (_.isEmpty(userId)) {
-                    return Q.reject({code: "EmptyUserId", msg: "No user id given"});
+                    return Q.reject(new MiaJs.Error({code: "EmptyUserId", msg: "No user id given"}));
                 }
                 return _validateNotificationSettings(data, type).then(function () {
                     return AuthManager.getDevicesUserIsLoggedInOnByUserId(userId).then(function (deviceIds) {
@@ -209,7 +209,7 @@ function thisModule() {
                             return Q.all(funcArray);
                         }
                         else {
-                            return Q.reject({code: "NoUserDevices", msg: "User is not logged in on any device"});
+                            return Q.reject(new MiaJs.Error({code: "NoUserDevices", msg: "User is not logged in on any device"}));
                         }
                     });
                 })
@@ -217,7 +217,7 @@ function thisModule() {
             // Send push to device
             device: function (deviceId) {
                 if (_.isEmpty(deviceId)) {
-                    return Q.reject({code: "EmptyDeviceId", msg: "No device id given"});
+                    return Q.reject(new MiaJs.Error({code: "EmptyDeviceId", msg: "No device id given"}));
                 }
                 return _validateNotificationSettings(data, type).then(function () {
                     //TODO: Check if deviceID and push token exists exists if needed. Will be checked by notificationProcessor cron anyway
