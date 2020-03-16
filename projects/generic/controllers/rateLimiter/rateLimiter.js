@@ -14,71 +14,64 @@
  * }
  */
 
+var _ = require('lodash')
+var MiaJs = require('mia-js-core')
+var RateLimiter = MiaJs.RateLimiter
 
-var MiaJs = require("mia-js-core")
-    , Shared = MiaJs.Shared
-    , RateLimiter = MiaJs.RateLimiter;
+function ThisModule () {
+  var self = this
+  // Disable controller
+  self.disabled = false
+  self.identity = 'generic-rateLimiter' // Controller name used in routes, policies and followups
+  self.version = '1.0' // Version number of service
+  self.created = '2015-03-01T00:00:00' // Creation date of controller
+  self.modified = '2020-03-13T18:00:00' // Last modified date of controller
 
-function thisModule() {
+  self.all = function (req, res, next) {
+    var rateLimit = req.miajs.rateLimit
 
-    var self = this;
-    // Disable controller
-    self.disabled = false;
-    self.identity = 'generic-rateLimiter'; // Controller name used in routes, policies and followups
-    self.version = '1.0'; // Version number of service
-    self.created = '2015-03-01T00:00:00'; // Creation date of controller
-    self.modified = '2020-03-12T18:00:00'; // Last modified date of controller
+    if (!rateLimit || !rateLimit.key) {
+      next()
+      return
+    }
 
-    self.all = function (req, res, next) {
+    if (!rateLimit.interval || !_.isNumber(rateLimit.interval) || parseInt(rateLimit.interval) <= 0) {
+      next()
+      return
+    }
 
-        var rateLimit = req.miajs.rateLimit;
+    if (!rateLimit.maxRequests && !_.isNumber(rateLimit.maxRequests) && parseInt(rateLimit.maxRequests) <= 0) {
+      next()
+      return
+    }
 
-        if (!rateLimit || !rateLimit.key) {
-            next();
-            return;
-        }
+    var Translator = req.miajs.translator
+    return RateLimiter.checkRateLimitByKey(rateLimit.key, rateLimit.interval, rateLimit.maxRequests).then(function (rateLimiterResult) {
+      if (rateLimiterResult.remaining === -1) {
+        res.header('X-Rate-Limit-Limit', rateLimiterResult.limit)
+        res.header('X-Rate-Limit-Remaining', 0)
+        res.header('X-Rate-Limit-Reset', rateLimiterResult.timeTillReset)
+        next(new MiaJs.Error({
+          status: 429,
+          err: {
+            code: 'RateLimitExceededForKey',
+            msg: Translator('generic-translations', 'RateLimitExceededForKey')
+          }
+        }))
+      } else {
+        res.header('X-Rate-Limit-Limit', rateLimiterResult.limit)
+        res.header('X-Rate-Limit-Remaining', rateLimiterResult.remaining)
+        res.header('X-Rate-Limit-Reset', rateLimiterResult.timeTillReset)
 
-        if (!rateLimit.interval || !_.isNumber(rateLimit.interval) || parseInt(rateLimit.interval) <= 0) {
-            next();
-            return;
-        }
+        next()
+      }
+    }).catch(function () {
+      // Ignore rate limit due to failure
+      next()
+    })
+  }
 
-        if (!rateLimit.maxRequests && !_.isNumber(rateLimit.maxRequests) && parseInt(rateLimit.maxRequests) <= 0) {
-            next();
-            return;
-        }
+  return self
+}
 
-        var Translator = req.miajs.translator;
-        return RateLimiter.checkRateLimitByKey(rateLimit.key, rateLimit.interval, rateLimit.maxRequests).then(function (rateLimiterResult) {
-            if (rateLimiterResult.remaining == -1) {
-                res.header("X-Rate-Limit-Limit", rateLimiterResult.limit);
-                res.header("X-Rate-Limit-Remaining", 0);
-                res.header("X-Rate-Limit-Reset", rateLimiterResult.timeTillReset);
-                next(new MiaJs.Error({
-                    status: 429,
-                    err: {
-                        'code': 'RateLimitExceededForKey',
-                        'msg': Translator('generic-translations', 'RateLimitExceededForKey')
-                    }
-                }));
-            }
-            else {
-                res.header("X-Rate-Limit-Limit", rateLimiterResult.limit);
-                res.header("X-Rate-Limit-Remaining", rateLimiterResult.remaining);
-                res.header("X-Rate-Limit-Reset", rateLimiterResult.timeTillReset);
-
-                next();
-
-            }
-        }).catch(function () {
-            // Ignore rate limit due to failure
-            next();
-        });
-
-    };
-
-    return self;
-};
-
-module.exports = new thisModule();
-
+module.exports = new ThisModule()

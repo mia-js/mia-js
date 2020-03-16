@@ -42,14 +42,14 @@
 // ``30 4 1,15 * 5'' would cause a command to be run at  4:30
 // am on the 1st and 15th of each month, plus every Friday.
 
-const _ = require('lodash');
-const MiaJs = require('mia-js-core');
-const Logger = MiaJs.Logger.tag('generic', 'cron', 'ensureIndexes');
-const BaseCronJob = MiaJs.CronJobs.BaseCronJob;
-const Shared = MiaJs.Shared;
+const _ = require('lodash')
+const MiaJs = require('mia-js-core')
+const Logger = MiaJs.Logger.tag('generic', 'cron', 'ensureIndexes')
+const BaseCronJob = MiaJs.CronJobs.BaseCronJob
+const Shared = MiaJs.Shared
 
-let debug = false;
-let envConfig;
+let debug = false
+let envConfig
 
 /**
  * Finds index from array by name
@@ -59,12 +59,12 @@ let envConfig;
  * @private
  */
 const _findIndexByName = (indexName, indexes) => {
-    for (let i in indexes) {
-        let index = indexes[i];
-        if (index.name === indexName) return index;
-    }
-    return undefined;
-};
+  for (const i in indexes) {
+    const index = indexes[i]
+    if (index.name === indexName) return index
+  }
+  return undefined
+}
 
 /**
  * Creates all model indexes
@@ -76,36 +76,35 @@ const _findIndexByName = (indexName, indexes) => {
  * @private
  */
 const _ensureIndexes = (model, modelIndexes, dbIndexes, modifiedIndexes) => {
-    return new Promise(resolve => {
-        model.ensureAllIndexes(error => {
-            if (error) {
-                if (error.code === 85) {
-                    // Index already exists with different options
-                    Logger.warn(error.message + ' in model "' + model.identity + '"');
+  return new Promise(resolve => {
+    model.ensureAllIndexes(error => {
+      if (error) {
+        if (error.code === 85) {
+          // Index already exists with different options
+          Logger.warn(error.message + ' in model "' + model.identity + '"')
 
-                    let splittedErrorMessage = error.errmsg.split(' '); //FIXME: Find better solution to get indexName than parsing error.message. Maybe with higher mongodb versions
-                    let dbIndexName = splittedErrorMessage[3];
-                    let modelIndex = _findIndexByName(dbIndexName, modelIndexes);
+          const splittedErrorMessage = error.errmsg.split(' ') // FIXME: Find better solution to get indexName than parsing error.message. Maybe with higher mongodb versions
+          const dbIndexName = splittedErrorMessage[3]
+          const modelIndex = _findIndexByName(dbIndexName, modelIndexes)
 
-                    if (modelIndex) {
-                        modifiedIndexes.push(modelIndex);
+          if (modelIndex) {
+            modifiedIndexes.push(modelIndex)
 
-                        if (debug) {
-                            let dbIndex = _findIndexByName(dbIndexName, dbIndexes);
-                            Logger.debug('Database index: ' + dbIndex + ' Model index: ' + modelIndex)
-                        }
-                    }
-
-                } else {
-                    Logger.error('An error occurred while ensuring indexes for model "' + model.identity + '"', error);
-                }
-            } else {
-                Logger.info('All indexes are existing for model "' + model.identity + '"');
+            if (debug) {
+              const dbIndex = _findIndexByName(dbIndexName, dbIndexes)
+              Logger.debug('Database index: ' + dbIndex + ' Model index: ' + modelIndex)
             }
-            return resolve();
-        }, envConfig.useBackgroundMode);
-    });
-};
+          }
+        } else {
+          Logger.error('An error occurred while ensuring indexes for model "' + model.identity + '"', error)
+        }
+      } else {
+        Logger.info('All indexes are existing for model "' + model.identity + '"')
+      }
+      return resolve()
+    }, envConfig.useBackgroundMode)
+  })
+}
 
 /**
  * Syncs db indexes with model indexes and removes them if necessary
@@ -116,27 +115,27 @@ const _ensureIndexes = (model, modelIndexes, dbIndexes, modifiedIndexes) => {
  * @private
  */
 const _removeIndexes = (model, modelIndexes, dbIndexes) => {
-    dbIndexes.forEach(async dbIndex => {
-        let dbIndexName = dbIndex.name;
-        if (dbIndexName === '_id_') {
-            // Skip _id_ indexes
-            return;
-        }
-        let modelIndex = _findIndexByName(dbIndexName, modelIndexes);
-        if (!modelIndex) {
-            Logger.info('Index "' + dbIndexName + '" on model "' + model.identity + '" is going to be removed');
-            if (debug) {
-                Logger.debug('Database index: ' + dbIndex + ' Model index: ' + modelIndex)
-            }
-            let dropResult = await model.dropIndex(dbIndexName);
-            if (dropResult.ok !== 1) {
-                Logger.error('An error occurred while removing index "' + dbIndexName + '" on model "' + model.identity + '"', dropResult);
-            }
-            Logger.info('Index "' + dbIndexName + '" on model "' + model.identity + '" removed successfully');
-        }
-    });
-    return Promise.resolve();
-};
+  dbIndexes.forEach(async dbIndex => {
+    const dbIndexName = dbIndex.name
+    if (dbIndexName === '_id_') {
+      // Skip _id_ indexes
+      return
+    }
+    const modelIndex = _findIndexByName(dbIndexName, modelIndexes)
+    if (!modelIndex) {
+      Logger.info('Index "' + dbIndexName + '" on model "' + model.identity + '" is going to be removed')
+      if (debug) {
+        Logger.debug('Database index: ' + dbIndex + ' Model index: ' + modelIndex)
+      }
+      const dropResult = await model.dropIndex(dbIndexName)
+      if (dropResult.ok !== 1) {
+        Logger.error('An error occurred while removing index "' + dbIndexName + '" on model "' + model.identity + '"', dropResult)
+      }
+      Logger.info('Index "' + dbIndexName + '" on model "' + model.identity + '" removed successfully')
+    }
+  })
+  return Promise.resolve()
+}
 
 /**
  * Recreates modified indexes
@@ -146,128 +145,128 @@ const _removeIndexes = (model, modelIndexes, dbIndexes) => {
  * @private
  */
 const _recreateIndexes = (model, modifiedIndexes) => {
-    if (!_.isEmpty(modifiedIndexes)) {
-        let recreationPromises = [];
-        Logger.info('Going to recreate modified indexes for model "' + model.identity + '"');
-        modifiedIndexes.forEach(index => {
-            recreationPromises.push(model.dropIndex(index.name)
-                .then(() => {
-                    return new Promise((resolve, reject) => {
-                        model.ensureIndexes([index], envConfig.useBackgroundMode, error => {
-                            if (error) return reject(error);
-                            return resolve();
-                        });
-                    });
-                })
-                .then(() => {
-                    Logger.info('Index "' + index.name + '" on model "' + model.identity + '" successfully recreated');
-                })
-                .catch(err => {
-                    Logger.error('An error occurred while recreating index "' + index.name + '" on model "' + model.identity, err);
-                })
-            );
-        });
+  if (!_.isEmpty(modifiedIndexes)) {
+    const recreationPromises = []
+    Logger.info('Going to recreate modified indexes for model "' + model.identity + '"')
+    modifiedIndexes.forEach(index => {
+      recreationPromises.push(model.dropIndex(index.name)
+        .then(() => {
+          return new Promise((resolve, reject) => {
+            model.ensureIndexes([index], envConfig.useBackgroundMode, error => {
+              if (error) return reject(new MiaJs.Error(error))
+              return resolve()
+            })
+          })
+        })
+        .then(() => {
+          Logger.info('Index "' + index.name + '" on model "' + model.identity + '" successfully recreated')
+        })
+        .catch(err => {
+          Logger.error('An error occurred while recreating index "' + index.name + '" on model "' + model.identity, err)
+        })
+      )
+    })
 
-        return Promise.all(recreationPromises)
-            .then(() => {
-                Logger.info('All modified indexes are processed for model "' + model.identity + '"');
-            });
-    }
-    return Promise.resolve();
-};
+    return Promise.all(recreationPromises)
+      .then(() => {
+        Logger.info('All modified indexes are processed for model "' + model.identity + '"')
+      })
+  }
+  return Promise.resolve()
+}
 
 module.exports = BaseCronJob.extend({},
-    {
-        identity: 'generic-ensureIndexes', // Job name
-        created: '2017-11-23T16:00:00', // Creation date
-        modified: '2014-11-28T18:00:00', // Last modified date
-        disabled: false, // Enable/disable job definition
-        time: {
-            hour: '3',
-            minute: '0',
-            second: '0',
-            dayOfMonth: '0-31',
-            dayOfWeek: '0-7', // (0 or 7 is Sun, or use names)
-            month: '0-12',   // names are also allowed
-            timezone: 'CET'
-        },
-        isSuspended: false,
-        debugOutput: false,
-        allowedHosts: [],
-        maxInstanceNumberTotal: 1,
-        maxInstanceNumberPerServer: 1,
+  {
+    identity: 'generic-ensureIndexes', // Job name
+    created: '2017-11-23T16:00:00', // Creation date
+    modified: '2020-03-13T18:00:00', // Last modified date
+    disabled: false, // Enable/disable job definition
+    time: {
+      hour: '3',
+      minute: '0',
+      second: '0',
+      dayOfMonth: '0-31',
+      dayOfWeek: '0-7', // (0 or 7 is Sun, or use names)
+      month: '0-12', // names are also allowed
+      timezone: 'CET'
+    },
+    isSuspended: false,
+    debugOutput: false,
+    allowedHosts: [],
+    maxInstanceNumberTotal: 1,
+    maxInstanceNumberPerServer: 1,
 
-        /**
-         * Cronjob main routine
-         * @param {Object} self
-         * @param {Object} actualConfig
-         * @returns {Promise}
-         */
-        worker: async function (self, actualConfig) {
-            const startDate = new Date();
-            const env = Shared.config('environment');
+    /**
+     * Cronjob main routine
+     * @param {Object} self
+     * @param {Object} actualConfig
+     * @returns {Promise}
+     */
+    worker: async function (self, actualConfig) {
+      const startDate = new Date()
+      const env = Shared.config('environment')
 
-            envConfig = env.cronJobs.ensureIndexes || {
-                autoStart: false,
-                runOnStartup: false,
-                useBackgroundMode: true
-            };
+      envConfig = env.cronJobs.ensureIndexes || {
+        autoStart: false,
+        runOnStartup: false,
+        useBackgroundMode: true
+      }
 
-            debug = actualConfig.debugOutput;
+      debug = actualConfig.debugOutput
 
-            if (envConfig.autoStart || actualConfig.forceRun == true) {
-                const models = Shared.models();
-                let modelPromises = [];
+      if (envConfig.autoStart || actualConfig.forceRun === true) {
+        const models = Shared.models()
+        const modelPromises = []
 
-                Logger.info('Start running...');
+        Logger.info('Start running...')
 
-                if (envConfig.useBackgroundMode) {
-                    Logger.info('New indexes will be created in background');
-                } else {
-                    Logger.warn('New indexes will be created in foreground, all other operations on the database will be blocked!');
-                }
-
-                for (let identity in models) {
-                    let versions = models[identity];
-                    for (let version in versions) {
-                        let model = versions[version];
-                        let modelIndexes = model.getIndexes();
-                        let dbIndexes = [];
-                        let modifiedIndexes = [];
-
-                        dbIndexes = await model.indexes();
-
-                        modelPromises.push(
-                            /**
-                             * Sync db indexes with model indexes and remove them if necessary
-                             */
-                            _removeIndexes(model, modelIndexes, dbIndexes)
-                                .then(() => {
-                                    return model.indexes()
-                                        .then(dbIndexes => {
-                                            /**
-                                             * Ensure all model indexes (create new ones if necessary)
-                                             */
-                                            return _ensureIndexes(model, modelIndexes, dbIndexes, modifiedIndexes);
-                                        })
-                                        .then(() => {
-                                            /**
-                                             * Recreate modified indexes
-                                             */
-                                            return _recreateIndexes(model, modifiedIndexes);
-                                        });
-                                })
-                        );
-                    }
-                }
-
-                return Promise.all(modelPromises)
-                    .then(() => {
-                        Logger.info('Finished. Runtime: ' + (Math.abs(new Date() - startDate) / 1000) + ' seconds');
-                    });
-            } else {
-                Logger.info('Deactivated for environment ' + env.identity);
-            }
+        if (envConfig.useBackgroundMode) {
+          Logger.info('New indexes will be created in background')
+        } else {
+          Logger.warn('New indexes will be created in foreground, all other operations on the database will be blocked!')
         }
+
+        for (const identity in models) {
+          const versions = models[identity]
+          for (const version in versions) {
+            const model = versions[version]
+            const modelIndexes = model.getIndexes()
+            let dbIndexes = []
+            const modifiedIndexes = []
+
+            dbIndexes = await model.indexes()
+
+            modelPromises.push(
+              /**
+               * Sync db indexes with model indexes and remove them if necessary
+               */
+              _removeIndexes(model, modelIndexes, dbIndexes)
+                .then(() => {
+                  return model.indexes()
+                    .then(dbIndexes => {
+                      /**
+                       * Ensure all model indexes (create new ones if necessary)
+                       */
+                      return _ensureIndexes(model, modelIndexes, dbIndexes, modifiedIndexes)
+                    })
+                    .then(() => {
+                      /**
+                       * Recreate modified indexes
+                       */
+                      return _recreateIndexes(model, modifiedIndexes)
+                    })
+                })
+            )
+          }
+        }
+
+        return Promise.all(modelPromises)
+          .then(() => {
+            Logger.info('Finished. Runtime: ' + (Math.abs(new Date() - startDate) / 1000) + ' seconds')
+          })
+      } else {
+        Logger.info('Deactivated for environment ' + env.identity)
+      }
     }
-);
+  }
+)

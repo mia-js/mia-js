@@ -1,7 +1,7 @@
 const path = require('path')
 
-function thisModule () {
-  let self = this
+function ThisModule () {
+  const self = this
 
   self.identity = 'Simple-React-Service'
   self.version = '1.0'
@@ -13,4 +13,4 @@ function thisModule () {
   return self
 }
 
-module.exports = new thisModule()
+module.exports = new ThisModule()

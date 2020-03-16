@@ -1,11 +1,11 @@
 /*
  * action types
  */
-export const TOGGLE_SIDEBAR = 'TOGGLE_SIDEBAR';
+export const TOGGLE_SIDEBAR = 'TOGGLE_SIDEBAR'
 
 /*
  * action creators
  */
 export const toggleSidebar = () => ({
-    type: TOGGLE_SIDEBAR
-});
+  type: TOGGLE_SIDEBAR
+})

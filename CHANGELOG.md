@@ -1,3 +1,8 @@
+## 1.3.0 (March 16, 2020)
+* Added StandardJS linting
+* Linted whole project
+* Consolidated generic project
+
 ## 1.2.0 (March 12, 2020)
 * Updated mia-js-core to version 2.7.0
 * Updated README regarding "allowMultiple" precondition

@@ -1,6 +1,6 @@
 module.exports = {
 
-    /* List of translations.
+  /* List of translations.
      Available in all controllers using:
      req.miajs.translator('system', 'ExternalDataRequestError')
 
@@ -31,33 +31,33 @@ module.exports = {
      }
      */
 
-    Gone: {
-        de: 'Diese Ressource gibt es nicht mehr oder hat nie gegeben. Versuche es mit einer anderen.',
-        en: 'This resource is gone or never was there. Try another one.'
-    },
-    ExternalDataRequestError: {
-        de: 'Unerwartetes Datenformat von externer API erhalten',
-        en: 'Unexpected data structure received from external API'
-    },
-    InternalServerError: {
-        de: 'Oops - irgendwas ist schief gelaufen',
-        en: 'Oops - I\'m sorry but something went wrong'
-    },
-    BadRequest: {
-        de: 'Irgendwas stimmt nicht mit der Anfrage',
-        en: 'Something is not ok with your request'
-    },
-    Forbidden: {
-        de: 'Du bist nicht berechtigt diesen Service zu verwenden',
-        en: 'You are not allowed to access this service'
-    },
-    NotFound: {
-        de: 'Nach was auch immer du suchst, hier ist es leider nicht',
-        en: 'Whatever you are looking for it is not here'
-    },
-    RateLimitExceeded: {
-        de: "Zugriffslimit erreicht",
-        en: "Rate limit exceeded"
-    }
+  Gone: {
+    de: 'Diese Ressource gibt es nicht mehr oder hat nie gegeben. Versuche es mit einer anderen.',
+    en: 'This resource is gone or never was there. Try another one.'
+  },
+  ExternalDataRequestError: {
+    de: 'Unerwartetes Datenformat von externer API erhalten',
+    en: 'Unexpected data structure received from external API'
+  },
+  InternalServerError: {
+    de: 'Oops - irgendwas ist schief gelaufen',
+    en: 'Oops - I\'m sorry but something went wrong'
+  },
+  BadRequest: {
+    de: 'Irgendwas stimmt nicht mit der Anfrage',
+    en: 'Something is not ok with your request'
+  },
+  Forbidden: {
+    de: 'Du bist nicht berechtigt diesen Service zu verwenden',
+    en: 'You are not allowed to access this service'
+  },
+  NotFound: {
+    de: 'Nach was auch immer du suchst, hier ist es leider nicht',
+    en: 'Whatever you are looking for it is not here'
+  },
+  RateLimitExceeded: {
+    de: 'Zugriffslimit erreicht',
+    en: 'Rate limit exceeded'
+  }
 
-};
+}

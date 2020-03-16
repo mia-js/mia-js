@@ -3,7 +3,6 @@
  * Auto removing todo tasks 5min after set to done
  * */
 
-
 // Cron pattern:
 //    minute         0-59
 //    hour           0-23
@@ -44,59 +43,57 @@
 // ``30 4 1,15 * 5'' would cause a command to be run at  4:30
 // am on the 1st and 15th of each month, plus every Friday.
 
-var _ = require('lodash')
-    , MiaJs = require('mia-js-core')
-    , Logger = MiaJs.Logger.tag('cron', 'demo')
-    , Utils = MiaJs.Utils
-    , CronJobs = MiaJs.CronJobs
-    , BaseCronJob = CronJobs.BaseCronJob
-    , Shared = MiaJs.Shared
-    , ToDoModel = Shared.models('todos-model');
+const MiaJs = require('mia-js-core')
+const Logger = MiaJs.Logger.tag('cron', 'demo')
+const CronJobs = MiaJs.CronJobs
+const BaseCronJob = CronJobs.BaseCronJob
+const Shared = MiaJs.Shared
+const ToDoModel = Shared.models('todos-model')
 
 /**
  * Custom cron job
  */
 module.exports = BaseCronJob.extend({},
-    {
-        disabled: false, // Enable /disable job definition
-        time: { // Times are used as default timings. To change after first run see mongodb collection cronJobTypes
-            hour: '0-23',
-            minute: '0-59',
-            second: '0-59/10',
-            dayOfMonth: '0-31',
-            dayOfWeek: '0-7', // (0 or 7 is Sun, or use names)
-            month: '0-12',   // names are also allowed
-            timezone: 'CET'
+  {
+    disabled: false, // Enable /disable job definition
+    time: { // Times are used as default timings. To change after first run see mongodb collection cronJobTypes
+      hour: '0-23',
+      minute: '0-59',
+      second: '0-59/10',
+      dayOfMonth: '0-31',
+      dayOfWeek: '0-7', // (0 or 7 is Sun, or use names)
+      month: '0-12', // names are also allowed
+      timezone: 'CET'
+    },
+
+    isPaused: false,
+    servers: ['server1'], // Not working currently - ignore
+
+    maxInstanceNumberTotal: 1, // Not working currently - ignore
+    maxInstanceNumberPerServer: 1, // Not working currently - ignore
+
+    identity: 'removeToDosMarkedAsDoneCron', // Job name
+
+    worker: function () {
+      Logger.info('Start clean cronjob, see crons')
+
+      const maxAge = new Date(Date.now() - (5 * 60 * 1000)) // older than 5 minutes
+
+      return ToDoModel.deleteMany(
+        {
+          lastModified: { $lte: maxAge }
         },
+        { validate: false }).then(function (data) {
+        const deletedCount = data.deletedCount || 0
+        if (deletedCount > 0) {
+          Logger.info(deletedCount + ' todos auto removed')
+        }
+      }).catch(function (err) {
+        Logger.error(err)
+      })
+    },
 
-        isPaused: false,
-        servers: ['server1'], // Not working currently - ignore
-
-        maxInstanceNumberTotal: 1,// Not working currently - ignore
-        maxInstanceNumberPerServer: 1,// Not working currently - ignore
-
-        identity: 'removeToDosMarkedAsDoneCron', // Job name
-
-        worker: function () {
-            Logger.info("Start clean cronjob, see crons");
-
-            var maxAge = new Date(Date.now() - (5 * 60 * 1000)); // older than 5 minutes
-
-            return ToDoModel.deleteMany(
-                {
-                    'lastModified': {$lte: maxAge}
-                },
-                {validate: false}).then(function (data) {
-                    var deletedCount = data.deletedCount || 0;
-                    if (deletedCount > 0) {
-                        Logger.info(deletedCount + ' todos auto removed');
-                    }
-                }).catch(function (err) {
-                    Logger.error(err);
-                });
-        },
-
-        created: '2015-07-14T12:00:00', // Creation date
-        modified: '2015-07-14T12:00:00' // Last modified date
-    }
-);
+    created: '2015-07-14T12:00:00', // Creation date
+    modified: '2020-03-16T15:00:00' // Last modified date
+  }
+)

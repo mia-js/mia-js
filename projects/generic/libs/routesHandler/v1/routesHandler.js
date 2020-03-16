@@ -1,6 +1,5 @@
 function ThisModule () {
-
-  let self = this
+  const self = this
 
   self.identity = 'generic-routesHandler'
   self.version = '1.0'
