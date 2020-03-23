@@ -1,375 +1,370 @@
-var _ = require('lodash');
-var BaseModel = require("mia-js-core/lib/baseModel");
-var Encryption = require("mia-js-core/lib/utils").Encryption;
+var _ = require('lodash')
+var BaseModel = require('mia-js-core/lib/baseModel')
+var Encryption = require('mia-js-core/lib/utils').Encryption
 
-function thisModule() {
+function ThisModule () {
+  // Generate a device id
+  var generateDeviceId = function () {
+    return Encryption.md5(Encryption.randHash())
+  }
 
-    //Generate a device id
-    var generateDeviceId = function () {
-        return Encryption.md5(Encryption.randHash());
-    };
+  // Generate a session id
+  var generateSessionId = function () {
+    return Encryption.randHash()
+  }
 
-    //Generate a session id
-    var generateSessionId = function () {
-        return Encryption.randHash();
-    };
+  // Set session id
+  var setSessionId = function () {
+    return { 'session.id': generateSessionId(), 'session.created': Date.now() }
+  }
 
-    // Set session id
-    var setSessionId = function () {
-        return {'session.id': generateSessionId(), 'session.created': Date.now()};
-    };
+  // Set culture language and region
+  var cultureCodeSetter = function (value) {
+    var culture = {}
+    culture.language = value.substring(0, 2).toLowerCase()
+    culture.region = value.substring(3, 5).toLowerCase()
+    return { 'culture.language': culture.language, 'culture.region': culture.region }
+  }
 
-    //Set culture language and region
-    var cultureCodeSetter = function (value) {
-        var culture = {};
-        culture.language = value.substring(0, 2).toLowerCase();
-        culture.region = value.substring(3, 5).toLowerCase();
-        return {'culture.language': culture.language, 'culture.region': culture.region};
-    };
+  // Set resolution width and height
+  var setHeightWidth = function (value) {
+    var dimensions = value.split('x')
+    return { 'device.screen.height': dimensions[0], 'device.screen.width': dimensions[1] }
+  }
 
-    // Set resolution width and height
-    var setHeightWidth = function (value) {
-        var dimensions = value.split("x");
-        return {'device.screen.height': dimensions[0], 'device.screen.width': dimensions[1]};
-    };
+  // Check for device group
+  var setDeviceGroup = function (value) {
+    var group = 'desktop'
 
+    if (/(Android)/i.test(value)) {
+      if (/(Mobile)/i.test(value)) {
+        group = 'phone'
+      } else {
+        group = 'tablet'
+      }
 
-    //Check for device group
-    var setDeviceGroup = function (value) {
+      if (/(Mobile)/i.test(value) && /(Kindle)/i.test(value)) {
+        group = 'tablet'
+      }
+    } else {
+      if (/(iP(ad)|Kindle|Playbook|Silk-Accelerated)/i.test(value)) {
+        group = 'tablet'
+      }
+      if (/(Mobile|iP(hone|od)|Windows Phone|BlackBerry)/i.test(value)) {
+        group = 'phone'
+      }
+    }
+    return { 'device.group': group }
+  }
 
-        var group = 'desktop';
+  // Check OS type and version
+  var setOsTypeAndVersion = function (value) {
+    var os,
+      version
 
-        if (/(Android)/i.test(value)) {
-            if (/(Mobile)/i.test(value)) {
-                group = 'phone';
-            }
-            else {
-                group = 'tablet';
-            }
+    // Get Android OS Version
+    var regExAndroid = /(Android)\s?([\d|.]*)/i
+    if (regExAndroid.test(value)) {
+      const partsArray = regExAndroid.exec(value)
+      os = 'android'
+      version = partsArray[2]
+    }
 
-            if (/(Mobile)/i.test(value) && /(Kindle)/i.test(value)) {
-                group = 'tablet';
-            }
-        }
-        else {
-            if (/(iP(ad)|Kindle|Playbook|Silk-Accelerated)/i.test(value)) {
-                group = 'tablet';
-            }
-            if (/(Mobile|iP(hone|od)|Windows Phone|BlackBerry)/i.test(value)) {
-                group = 'phone';
-            }
-        }
-        return {'device.group': group}
-    };
+    //  Get iOS OS Version
+    var regExiOs = /(iP(hone|ad|od))\s?OS\s?([\d|_]*)/i
+    if (regExiOs.test(value)) {
+      const partsArray = regExiOs.exec(value)
+      os = 'ios'
+      version = partsArray[3].replace(/_/g, '.')
+    }
 
-    // Check OS type and version
-    var setOsTypeAndVersion = function (value) {
-        var os
-            , version;
+    //  Get Windows Phone OS Version
+    var regExWP = /(Windows Phone)\s?OS\s?([\d|.]*)/i
+    if (regExWP.test(value)) {
+      const partsArray = regExWP.exec(value)
+      os = 'windows phone'
+      version = partsArray[2]
+    }
+    return { 'device.os.type': os, 'device.os.version': version }
+  }
 
-        // Get Android OS Version
-        var regExAndroid = /(Android)\s?([\d|\.]*)/i;
-        if (regExAndroid.test(value)) {
-            var partsArray = regExAndroid.exec(value);
-            os = 'android';
-            version = partsArray[2];
-        }
+  // Set device model,group and os type,version if not given
+  var setDevice = function (value) {
+    var group = setDeviceGroup(value)
+    var os = setOsTypeAndVersion(value)
+    var obj = _.assign(group, os)
+    return obj
+  }
 
-        //  Get iOS OS Version
-        var regExiOs = /(iP(hone|ad|od))\s?OS\s?([\d|_]*)/i;
-        if (regExiOs.test(value)) {
-            var partsArray = regExiOs.exec(value);
-            os = 'ios';
-            version = partsArray[3].replace(/_/g, '.');
-        }
+  // Remove all spaces in String
+  var trimSpaces = function (value) {
+    return { this: value.replace(' ', '') }
+  }
 
-        //  Get Windows Phone OS Version
-        var regExWP = /(Windows Phone)\s?OS\s?([\d|.]*)/i;
-        if (regExWP.test(value)) {
-            var partsArray = regExWP.exec(value);
-            os = 'windows phone';
-            version = partsArray[2];
-        }
-        return {'device.os.type': os, 'device.os.version': version};
-    };
+  var model = BaseModel.extend({
+    data: {
 
-    // Set device model,group and os type,version if not given
-    var setDevice = function (value) {
-        var group = setDeviceGroup(value);
-        var os = setOsTypeAndVersion(value);
-        var obj = _.assign(group, os);
-        return obj;
-    };
+      /** id: Device-Id generated by the middleware */
+      id: {
+        type: String,
+        maxLength: 32,
+        minLength: 32,
+        required: true,
+        unique: true,
+        index: true,
+        convert: 'lower',
+        default: generateDeviceId
+      },
 
-    // Remove all spaces in String
-    var trimSpaces = function (value) {
-        return {this: value.replace(' ', '')};
-    };
-
-    var model = BaseModel.extend({
-            data: {
-
-                /** id: Device-Id generated by the middleware */
-                id: {
-                    type: String,
-                    maxLength: 32,
-                    minLength: 32,
-                    required: true,
-                    unique: true,
-                    index: true,
-                    convert: 'lower',
-                    default: generateDeviceId
-                },
-
-                session: {
-                    set: {
-                        type: Boolean,
-                        virtual: setSessionId,
-                        public: {set: true, get: false}
-                    },
-                    id: {
-                        type: String,
-                        maxLength: 64,
-                        minLength: 64,
-                        unique: true,
-                        sparse: true,
-                        index: true,
-                        convert: 'lower',
-                        public: {set: false, get: true}
-                    },
-                    cidr: {
-                        type: Array,
-                        subType: 'CIDR',
-                        index: true
-                    },
-                    expireable: {
-                        type: Boolean,
-                        default: true,
-                        index: true
-                    },
-                    created: {
-                        type: Date,
-                        public: {set: false, get: true},
-                        index: true
-                    },
-                    groups: {
-                        type: Array,
-                        convert: 'lower'
-                    }
-                },
-                rateLimit: {
-                    interval: {
-                        type: Number
-                    },
-                    maxRequests: {
-                        type: Number
-                    }
-                },
-                access: {
-                    key: {
-                        type: String,
-                        minLength: 32,
-                        maxLength: 32,
-                        index: true,
-                        unique: true,
-                        sparse: true,
-                        convert: "lower"
-                    },
-                    cidr: {
-                        type: Array,
-                        subType: 'CIDR',
-                        index: true
-                    },
-                    blockcidr: {
-                        type: Array,
-                        subType: 'CIDR',
-                        index: true
-                    },
-                    groups: {
-                        type: Array,
-                        convert: 'lower'
-                    },
-                    exipires: {
-                        type: Date,
-                        index: true,
-                        nullable: true
-                    }
-                },
-                culture: {
-                    language: {
-                        type: String,
-                        minLength: 2,
-                        maxLength: 2,
-                        match: /[a-zA-Z]{2}/i,
-                        required: true,
-                        public: {set: false, get: true}
-                    },
-                    region: {
-                        type: String,
-                        minLength: 2,
-                        maxLength: 2,
-                        match: /[a-zA-Z]{2}/i,
-                        required: true,
-                        public: {set: false, get: true}
-                    },
-                    code: {
-                        type: String,
-                        minLength: 5,
-                        maxLength: 5,
-                        match: /[a-zA-Z]{2}-[a-zA-Z]{2}/i,
-                        required: true,
-                        public: {set: true, get: false},
-                        virtual: cultureCodeSetter,
-                        default: 'de-de'
-                    }
-                },
-
-                app: {
-                    id: {
-                        type: String,
-                        minLength: 5,
-                        maxLength: 50,
-                        virtual: trimSpaces,
-                        convert: 'lower'
-                    },
-                    version: {
-                        type: String,
-                        minLength: 1,
-                        maxLength: 16,
-                        match: /^([\d]{1,3}\.)?([\d]{1,3}\.)?([\d]{1,3}\.)?[\d]{1,3}$/i //Match up to 1.2.3.4
-                    },
-                    vendor: {
-                        id: {
-                            type: String,
-                            minLength: 5,
-                            maxLength: 50,
-                            convert: 'lower'
-                        }
-                    },
-
-                    advertiser: {
-                        id: {
-                            type: String,
-                            minLength: 5,
-                            maxLength: 50,
-                            convert: 'lower'
-                        }
-                    }
-                },
-
-                device: {
-                    model: {
-                        type: String,
-                        minLength: 1,
-                        maxLength: 50,
-                        convert: 'lower'
-                    },
-                    group: {
-                        type: String,
-                        allow: ['phone', 'tablet', 'tv', 'desktop']
-                    },
-                    userAgent: {
-                        type: String,
-                        minLength: 5,
-                        virtual: setDevice
-                    },
-                    os: {
-                        type: {
-                            type: String,
-                            minLength: 2,
-                            maxLength: 50,
-                            //allow: ['ios', 'android', 'windows phone'],
-                            convert: 'lower'
-                        },
-                        version: {
-                            type: String,
-                            minLength: 1,
-                            maxLength: 7,
-                            match: /^([\d]{1,3}\.)?([\d]{1,3}\.)?([\d]{1,3}\.)?[\d]{1,3}$/i //Match up to 1.2.3.4
-                        }
-                    },
-                    carrier: {
-                        type: {
-                            type: String,
-                            minLength: 1,
-                            maxLength: 50,
-                            convert: 'lower'
-                        }
-                    },
-                    screen: {
-                        height: {
-                            type: Number,
-                            minLength: 1,
-                            maxLength: 6,
-                            public: {set: false, get: true}
-                        },
-                        width: {
-                            type: Number,
-                            minLength: 1,
-                            maxLength: 6,
-                            public: {set: false, get: true}
-                        },
-                        resolution: {
-                            type: String,
-                            match: /(\d+)x(\d+)/i,
-                            virtual: setHeightWidth,
-                            public: {set: true, get: false}
-                        }
-                    },
-                    notification: {
-                        token: {
-                            type: String
-                        },
-                        environment: {
-                            type: String,
-                            allow: ["sandbox", "production"],
-                            default: "production"
-                        }
-                    }
-                },
-
-                user: {
-                    id: {
-                        type: String
-                    },
-                    token: {
-                        type: String
-                    },
-                    tokenIssueDate: {
-                        type: Date
-                    }
-                },
-
-                created: {
-                    type: Date,
-                    default: Date.now(),
-                    required: true
-                },
-                lastModified: {
-                    type: Date,
-                    default: Date.now(),
-                    required: true,
-                    index: true
-                },
-                status: {
-                    type: String,
-                    default: 'inactive',
-                    allow: ['active', 'inactive', 'disabled'],
-                    required: true,
-                    index: true
-                }
-            }
+      session: {
+        set: {
+          type: Boolean,
+          virtual: setSessionId,
+          public: { set: true, get: false }
         },
-        {
-            disabled: false, // Enable /disable model
-            identity: 'generic-device-model', // Model name
-            version: '1.0', // Version number
-            created: '2014-01-09T19:00:00', // Creation date
-            modified: '2014-01-09T19:00:00', // Last modified date
-            collectionName: 'devices'
-        });
+        id: {
+          type: String,
+          maxLength: 64,
+          minLength: 64,
+          unique: true,
+          sparse: true,
+          index: true,
+          convert: 'lower',
+          public: { set: false, get: true }
+        },
+        cidr: {
+          type: Array,
+          subType: 'CIDR',
+          index: true
+        },
+        expireable: {
+          type: Boolean,
+          default: true,
+          index: true
+        },
+        created: {
+          type: Date,
+          public: { set: false, get: true },
+          index: true
+        },
+        groups: {
+          type: Array,
+          convert: 'lower'
+        }
+      },
+      rateLimit: {
+        interval: {
+          type: Number
+        },
+        maxRequests: {
+          type: Number
+        }
+      },
+      access: {
+        key: {
+          type: String,
+          minLength: 32,
+          maxLength: 32,
+          index: true,
+          unique: true,
+          sparse: true,
+          convert: 'lower'
+        },
+        cidr: {
+          type: Array,
+          subType: 'CIDR',
+          index: true
+        },
+        blockcidr: {
+          type: Array,
+          subType: 'CIDR',
+          index: true
+        },
+        groups: {
+          type: Array,
+          convert: 'lower'
+        },
+        exipires: {
+          type: Date,
+          index: true,
+          nullable: true
+        }
+      },
+      culture: {
+        language: {
+          type: String,
+          minLength: 2,
+          maxLength: 2,
+          match: /[a-zA-Z]{2}/i,
+          required: true,
+          public: { set: false, get: true }
+        },
+        region: {
+          type: String,
+          minLength: 2,
+          maxLength: 2,
+          match: /[a-zA-Z]{2}/i,
+          required: true,
+          public: { set: false, get: true }
+        },
+        code: {
+          type: String,
+          minLength: 5,
+          maxLength: 5,
+          match: /[a-zA-Z]{2}-[a-zA-Z]{2}/i,
+          required: true,
+          public: { set: true, get: false },
+          virtual: cultureCodeSetter,
+          default: 'de-de'
+        }
+      },
 
-    return model;
-};
+      app: {
+        id: {
+          type: String,
+          minLength: 5,
+          maxLength: 50,
+          virtual: trimSpaces,
+          convert: 'lower'
+        },
+        version: {
+          type: String,
+          minLength: 1,
+          maxLength: 16,
+          match: /^([\d]{1,3}\.)?([\d]{1,3}\.)?([\d]{1,3}\.)?[\d]{1,3}$/i // Match up to 1.2.3.4
+        },
+        vendor: {
+          id: {
+            type: String,
+            minLength: 5,
+            maxLength: 50,
+            convert: 'lower'
+          }
+        },
 
-module.exports = thisModule();
+        advertiser: {
+          id: {
+            type: String,
+            minLength: 5,
+            maxLength: 50,
+            convert: 'lower'
+          }
+        }
+      },
+
+      device: {
+        model: {
+          type: String,
+          minLength: 1,
+          maxLength: 50,
+          convert: 'lower'
+        },
+        group: {
+          type: String,
+          allow: ['phone', 'tablet', 'tv', 'desktop']
+        },
+        userAgent: {
+          type: String,
+          minLength: 5,
+          virtual: setDevice
+        },
+        os: {
+          type: {
+            type: String,
+            minLength: 2,
+            maxLength: 50,
+            // allow: ['ios', 'android', 'windows phone'],
+            convert: 'lower'
+          },
+          version: {
+            type: String,
+            minLength: 1,
+            maxLength: 7,
+            match: /^([\d]{1,3}\.)?([\d]{1,3}\.)?([\d]{1,3}\.)?[\d]{1,3}$/i // Match up to 1.2.3.4
+          }
+        },
+        carrier: {
+          type: {
+            type: String,
+            minLength: 1,
+            maxLength: 50,
+            convert: 'lower'
+          }
+        },
+        screen: {
+          height: {
+            type: Number,
+            minLength: 1,
+            maxLength: 6,
+            public: { set: false, get: true }
+          },
+          width: {
+            type: Number,
+            minLength: 1,
+            maxLength: 6,
+            public: { set: false, get: true }
+          },
+          resolution: {
+            type: String,
+            match: /(\d+)x(\d+)/i,
+            virtual: setHeightWidth,
+            public: { set: true, get: false }
+          }
+        },
+        notification: {
+          token: {
+            type: String
+          },
+          environment: {
+            type: String,
+            allow: ['sandbox', 'production'],
+            default: 'production'
+          }
+        }
+      },
+
+      user: {
+        id: {
+          type: String
+        },
+        token: {
+          type: String
+        },
+        tokenIssueDate: {
+          type: Date
+        }
+      },
+
+      created: {
+        type: Date,
+        default: Date.now(),
+        required: true
+      },
+      lastModified: {
+        type: Date,
+        default: Date.now(),
+        required: true,
+        index: true
+      },
+      status: {
+        type: String,
+        default: 'inactive',
+        allow: ['active', 'inactive', 'disabled'],
+        required: true,
+        index: true
+      }
+    }
+  },
+  {
+    disabled: false, // Enable /disable model
+    identity: 'generic-device-model', // Model name
+    version: '1.0', // Version number
+    created: '2014-01-09T19:00:00', // Creation date
+    modified: '2014-01-09T19:00:00', // Last modified date
+    collectionName: 'devices'
+  })
+
+  return model
+}
+
+module.exports = ThisModule()

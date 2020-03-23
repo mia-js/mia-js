@@ -1,14 +1,14 @@
-import {TOGGLE_SIDEBAR} from '../actions'
+import { TOGGLE_SIDEBAR } from '../actions'
 
-export default function Reducers(state = {
-    isSidebarOpen: true
+export default function Reducers (state = {
+  isSidebarOpen: true
 }, action) {
-    switch (action.type) {
-        case TOGGLE_SIDEBAR:
-            return Object.assign({}, state, {
-                isSidebarOpen: !state.isSidebarOpen
-            });
-        default:
-            return state;
-    }
+  switch (action.type) {
+    case TOGGLE_SIDEBAR:
+      return Object.assign({}, state, {
+        isSidebarOpen: !state.isSidebarOpen
+      })
+    default:
+      return state
+  }
 }

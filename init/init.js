@@ -1,19 +1,11 @@
-/**
- * Custom logging function like console.log
- */
+function ThisModule () {
+  const self = this
 
-var Shared = require('mia-js-core/lib/shared');
-var Logger = require('mia-js-core/lib/logger');
+  self.init = function () {
+    // Add some initial tasks here run on server startup i.e. writing initial data
+  }
 
-function thisModule() {
+  return self
+}
 
-    var self = this;
-
-    self.init = function () {
-        //Add some initial tasks here run on server startup i.e. writing initial data
-    };
-
-    return self;
-};
-
-module.exports = new thisModule();
+module.exports = new ThisModule()

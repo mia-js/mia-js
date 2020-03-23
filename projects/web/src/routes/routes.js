@@ -11,23 +11,23 @@ import Todo from '../components/Todo'
 import TodoList from '../components/Todo/List'
 
 export default [
-    {
-        name: 'app',
-        component: App,
+  {
+    name: 'app',
+    component: App,
+    routes: [
+      {
+        name: 'todo',
+        path: '/todo',
+        component: Todo,
         routes: [
-            {
-                name: 'todo',
-                path: '/todo',
-                component: Todo,
-                routes: [
-                    {
-                        name: 'todo-list',
-                        path: '/todo/:list',
-                        exact: true,
-                        component: TodoList
-                    }
-                ]
-            }
+          {
+            name: 'todo-list',
+            path: '/todo/:list',
+            exact: true,
+            component: TodoList
+          }
         ]
-    }
-];
+      }
+    ]
+  }
+]

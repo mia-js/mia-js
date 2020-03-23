@@ -3,7 +3,7 @@
  * contents. Don't add access credentials in here!
  */
 module.exports = {
-    api: {
-        root: 'http://localhost:3000/demo/'
-    }
-};
+  api: {
+    root: 'http://localhost:3000/demo/'
+  }
+}
