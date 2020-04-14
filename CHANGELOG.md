@@ -1,3 +1,7 @@
+## 1.3.1 (April 14, 2020)
+* Updated mia-js-core to version 2.7.8
+* NPM audit
+
 ## 1.3.0 (March 16, 2020)
 * Added StandardJS linting
 * Linted whole project
