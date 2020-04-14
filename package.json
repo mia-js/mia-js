@@ -1,7 +1,7 @@
 {
   "name": "mia-js",
   "description": "mia.js - Middleware API framework",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "dependencies": {
     "@babel/core": "7.1.6",
     "@babel/polyfill": "7.0.0",
@@ -14,7 +14,7 @@
     "fbgraphapi": "0.5.0",
     "ip": "1.1.0",
     "lodash": "^4.17.15",
-    "mia-js-core": "^2.7.1",
+    "mia-js-core": "^2.7.8",
     "q": "1.4.1",
     "xml2js": "0.4.16"
   },
@@ -43,7 +43,7 @@
     "progress-bar-webpack-plugin": "^1.12.1",
     "prop-types": "15.6.0",
     "react": "16.2.0",
-    "react-dom": "16.2.0",
+    "react-dom": "^16.13.1",
     "react-helmet": "5.2.0",
     "react-redux": "5.0.6",
     "react-router": "4.2.0",
@@ -54,9 +54,9 @@
     "redux": "3.7.2",
     "redux-logger": "3.0.6",
     "redux-thunk": "2.2.0",
+    "standard": "14.3.1",
     "static-site-generator-webpack-plugin": "github:alexlande/static-site-generator-webpack-plugin#feature-basenameCrawling",
     "style-loader": "^1.0.0",
-    "standard": "14.3.1",
     "url-loader": "1.0.1",
     "webpack-node-externals": "1.6.0"
   },
