@@ -163,6 +163,10 @@ function ThisModule () {
     RateLimitExceededForKey: {
       de: 'Zugriffslimit erreicht für diesen Key',
       en: 'Rate limit exceeded for this key'
+    },
+    LoginAlreadyExists: {
+      de: 'Benutzer existiert bereits',
+      en: 'User already exists'
     }
   }
 

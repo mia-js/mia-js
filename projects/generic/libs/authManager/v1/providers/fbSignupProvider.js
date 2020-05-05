@@ -24,7 +24,7 @@ function ThisModule () {
 
   self.checkCredentialsAndLoadProfile = function (fbToken, version, fields) {
     fields = fields || defaultQueryFields(fields)
-    version = version || 'v2.9'
+    version = version || 'v6.0'
     var fb = new FbGraph.Facebook(fbToken, version)
     return Q.ninvoke(fb, 'graph', '/me?fields=' + fields).then(function (me) {
       return Q({
