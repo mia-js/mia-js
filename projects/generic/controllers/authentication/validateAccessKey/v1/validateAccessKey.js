@@ -201,11 +201,6 @@ function ThisModule () {
       } else {
         return Q.reject()
       }
-    }).catch(function (err) {
-      Logger.error(err)
-      return Q.reject(new MiaJs.Error({
-        status: 500
-      }))
     })
   }
 
