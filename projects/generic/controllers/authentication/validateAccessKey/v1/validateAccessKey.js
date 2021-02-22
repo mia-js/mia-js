@@ -86,11 +86,13 @@ function ThisModule () {
             desc: 'Authorization access key signature method. Default SHA256 if not set',
             allow: ['sha256'],
             convert: 'lower',
-            type: String
+            type: String,
+            docs: false
           },
           requestdate: {
             desc: 'Date string when client request was initiated i.e. 2015-01-01T00:00:00',
-            type: Date
+            type: Date,
+            docs: false
           }
         }
       },
@@ -111,11 +113,13 @@ function ThisModule () {
             desc: 'Authorization access key signature method. Default SHA256 if not set',
             allow: ['sha256'],
             convert: 'lower',
-            type: String
+            type: String,
+            docs: false
           },
           requestdate: {
             desc: 'Date string when client request was initiated i.e. 2015-01-01T00:00:00',
-            type: Date
+            type: Date,
+            docs: false
           }
         }
       },
