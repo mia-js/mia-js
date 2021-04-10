@@ -1,3 +1,8 @@
+## 1.3.3 (April 10, 2021)
+* Updated generic notification manager and processor to use Apple APN HTTP2
+* Run ensureIndex in sequence instead of creating all indexes in parallel
+* Bugfix routes handler HMR for Windows machines 
+
 ## 1.3.3 (September 28, 2020)
 * Added bundle version hash to all build processes
 
