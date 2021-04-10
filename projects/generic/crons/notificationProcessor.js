@@ -42,24 +42,25 @@
 // ``30 4 1,15 * 5'' would cause a command to be run at  4:30
 // am on the 1st and 15th of each month, plus every Friday.
 
-var _ = require('lodash')
-var MiaJs = require('mia-js-core')
-var Logger = MiaJs.Logger
-var CronJobs = MiaJs.CronJobs
-var BaseCronJob = CronJobs.BaseCronJob
-var Shared = MiaJs.Shared
-var Q = require('q')
-var Emailjs = require('emailjs')
-var Encryption = require('mia-js-core/lib/utils').Encryption
-var Apn = require('apn')
-var NotificationModel = Shared.models('generic-notifications-model')
-var AuthService = Shared.libs('generic-deviceAndSessionAuth')
+const _ = require('lodash')
+const MiaJs = require('mia-js-core')
+const Logger = MiaJs.Logger
+const CronJobs = MiaJs.CronJobs
+const BaseCronJob = CronJobs.BaseCronJob
+const Shared = MiaJs.Shared
+const Q = require('q')
+const Emailjs = require('emailjs')
+const Encryption = require('mia-js-core/lib/utils').Encryption
+const Apn = require('apn')
+const NotificationModel = Shared.models('generic-notifications-model')
+const AuthService = Shared.libs('generic-deviceAndSessionAuth')
+// let DeviceModel = Shared.models('generic-device-model')
 
 Q.stopUnhandledRejectionTracking()
 
 // Send email
-var _sendMail = function (smtpServer, sender, to, replyTo, subject, text, html) {
-  var deferred = Q.defer()
+const _sendMail = (smtpServer, sender, to, replyTo, subject, text, html) => {
+  const deferred = Q.defer()
   smtpServer.send({
     text: text,
     from: sender,
@@ -69,7 +70,7 @@ var _sendMail = function (smtpServer, sender, to, replyTo, subject, text, html) 
     attachment: [
       { data: html, alternative: true }
     ]
-  }, function (err, message) {
+  }, (err, message) => {
     if (err) {
       deferred.reject(new MiaJs.Error(err))
     } else {
@@ -80,7 +81,7 @@ var _sendMail = function (smtpServer, sender, to, replyTo, subject, text, html) 
 }
 
 // Set notification to fulfilled
-var _notificationStatusFulfilled = function (id) {
+const _notificationStatusFulfilled = (id) => {
   return NotificationModel.findOneAndUpdate({ _id: id }, {
     $set: {
       status: 'fulfilled',
@@ -91,8 +92,16 @@ var _notificationStatusFulfilled = function (id) {
   })
 }
 
+// Remove push token from device in case token is invalid
+const _unregisterDeviceNotification = (id) => {
+  if (id) {
+    // FIXME: Active device token remove after testing on prod worked
+    // return DeviceModel.updateOne({ id }, { $unset: { 'device.notification.token': '' } })
+  }
+}
+
 // Set notification to rejected
-var _notificationStatusReject = function (id, err) {
+const _notificationStatusReject = (id, err) => {
   return NotificationModel.findOneAndUpdate({ _id: id }, {
     $set: {
       status: 'rejected',
@@ -104,7 +113,7 @@ var _notificationStatusReject = function (id, err) {
 }
 
 // Set notification log
-var _notificationAddLog = function (id, info) {
+const _notificationAddLog = (id, info) => {
   return NotificationModel.findOneAndUpdate({ _id: id }, {
     $set: {
       log: info
@@ -115,7 +124,7 @@ var _notificationAddLog = function (id, info) {
 }
 
 // Set notification to retry
-var _notificationStatusRetry = function (id, log, schedule) {
+const _notificationStatusRetry = (id, log, schedule) => {
   return NotificationModel.findOneAndUpdate({ _id: id }, {
     $set: {
       status: 'retry',
@@ -132,10 +141,10 @@ var _notificationStatusRetry = function (id, log, schedule) {
 }
 
 // Get template data
-var _getTemplateData = function (id, configId, connector, type, notification, language) {
-  var model = Shared.config(configId) || {}
-  var name = notification.template
-  var defaultLanguage = model.defaultLanguage || 'en'
+const _getTemplateData = (id, configId, connector, type, notification, language) => {
+  const model = Shared.config(configId) || {}
+  const name = notification.template
+  const defaultLanguage = model.defaultLanguage || 'en'
 
   // Check if template exists
   if (_.isEmpty(model) || !model.templates || !model.templates[language] || _.isEmpty(model.templates[language]) || !model.templates[language][name] || _.isEmpty(model.templates[language][name]) || !model.templates[language][name][type] || _.isEmpty(model.templates[language][name][type]) || !model.templates[language][name][type][connector] || _.isEmpty(model.templates[language][name][type][connector])) {
@@ -143,33 +152,33 @@ var _getTemplateData = function (id, configId, connector, type, notification, la
     if (_.isEmpty(model) || !model.templates || !model.templates[defaultLanguage] || _.isEmpty(model.templates[defaultLanguage]) || !model.templates[defaultLanguage][name] || _.isEmpty(model.templates[defaultLanguage][name]) || !model.templates[defaultLanguage][name][type] || _.isEmpty(model.templates[defaultLanguage][name][type]) || !model.templates[defaultLanguage][name][type][connector] || _.isEmpty(model.templates[defaultLanguage][name][type][connector])) {
       // Check fallback without language prefix
       if (_.isEmpty(model) || !model.templates || !model.templates[name] || _.isEmpty(model.templates[name]) || !model.templates[name][type] || _.isEmpty(model.templates[name][type]) || !model.templates[name][type][connector] || _.isEmpty(model.templates[name][type][connector])) {
-        return Q.reject(new MiaJs.Error('No template found'))
+        return Promise.reject(new MiaJs.Error('No template found'))
       } else {
-        return Q.resolve(_.cloneDeep(model.templates[name][type][connector]))
+        return Promise.resolve(_.cloneDeep(model.templates[name][type][connector]))
       }
     } else {
       _notificationAddLog(id, 'Fallback to language ' + defaultLanguage + ' due to missing localization notification template')
-      return Q.resolve(_.cloneDeep(model.templates[defaultLanguage][name][type][connector]))
+      return Promise.resolve(_.cloneDeep(model.templates[defaultLanguage][name][type][connector]))
     }
   } else {
-    return Q.resolve(_.cloneDeep(model.templates[language][name][type][connector]))
+    return Promise.resolve(_.cloneDeep(model.templates[language][name][type][connector]))
   }
 }
 
 // Get connector data
-var _getConnector = function (id, type, environment) {
+const _getConnector = (id, type, environment) => {
   environment = environment || 'production'
-  var model = Shared.config(id) || {}
+  const model = Shared.config(id) || {}
   if (_.isEmpty(model) || !model.connectors || !model.connectors[type] || !model.connectors[type][environment] || _.isEmpty(model.connectors[type][environment])) {
-    return Q.reject(new MiaJs.Error('No connector found'))
+    return Promise.reject(new MiaJs.Error('No connector found'))
   }
-  return Q.resolve(model.connectors[type][environment])
+  return Promise.resolve(_.cloneDeep(model.connectors[type][environment]))
 }
 
 // Do text replacements i.e. [name] -> Josh Miller
-var _doReplacements = function (text, replacements) {
-  for (var index in replacements) {
-    var regEx = new RegExp('\\[' + index + '\\]', 'ig')
+const _doReplacements = (text, replacements) => {
+  for (const index in replacements) {
+    const regEx = new RegExp('\\[' + index + '\\]', 'ig')
     text = text.replace(regEx, replacements[index])
   }
   return text
@@ -180,11 +189,11 @@ function _doReplacementsDeep (objSource, replacements) {
     if (objSource === null) return null
 
     if (objSource instanceof Array) {
-      for (var i = 0; i < objSource.length; i++) {
+      for (let i = 0; i < objSource.length; i++) {
         objSource[i] = _doReplacementsDeep(objSource[i], replacements)
       }
     } else {
-      for (var property in objSource) {
+      for (const property in objSource) {
         objSource[property] = _doReplacementsDeep(objSource[property], replacements)
       }
     }
@@ -198,23 +207,23 @@ function _doReplacementsDeep (objSource, replacements) {
 }
 
 // Email connections
-var _emailConnections = {}
+const _emailConnections = {}
 // Process email.
-var _processEmail = function (data) {
-  return _getConnector(data.configId, 'smtp', Shared.config('environment').mode).then(function (connector) {
-    var connectorId = Encryption.md5(JSON.stringify(connector))
+const _processEmail = (data) => {
+  return _getConnector(data.configId, 'smtp', Shared.config('environment').mode).then((connector) => {
+    const connectorId = Encryption.md5(JSON.stringify(connector))
 
     if (!_apnConnections[connectorId]) {
       _emailConnections[connector] = Emailjs.server.connect(connector)
     }
 
-    var smtpServer = _emailConnections[connector]
-    var notification = data.notification
-    return Q().then(function () {
-      return _getTemplateData(data._id, data.configId, 'smtp', 'mail', notification, notification.language).catch(function () {
-        return Q.reject(new MiaJs.Error('Invalid template for email'))
+    const smtpServer = _emailConnections[connector]
+    const notification = data.notification
+    return Promise.resolve().then(() => {
+      return _getTemplateData(data._id, data.configId, 'smtp', 'mail', notification, notification.language).catch(() => {
+        return Promise.reject(new MiaJs.Error('Invalid template for email'))
       })
-    }).then(function (template) {
+    }).then((template) => {
       // Do replacements
       if (notification.replacements && !_.isEmpty(notification.replacements)) {
         template.html = _doReplacements(template.html, notification.replacements)
@@ -230,91 +239,58 @@ var _processEmail = function (data) {
       }
 
       return _sendMail(smtpServer, template.sender, notification.to, template.replyTo, template.subject, template.text, template.html)
-        .then(function () {
+        .then(() => {
           Logger.info('Email ' + data._id + ' send to ' + notification.to)
           _notificationStatusFulfilled(data._id)
-          return Q.resolve()
-        }).catch(function (err) {
+          return Promise.resolve()
+        }).catch((err) => {
           Logger.error('Email ' + data._id + ' NOT send to ' + notification.to)
           if (err && err.code) {
             switch (err.code) {
               case 1:
                 _notificationStatusRetry(data._id, err)
-                return Q.resolve()
+                return Promise.resolve()
               case 4:
                 _notificationStatusRetry(data._id, err)
-                return Q.resolve()
+                return Promise.resolve()
               default:
-                return Q.reject(new MiaJs.Error(err))
+                return Promise.reject(new MiaJs.Error(err))
             }
           }
-          return Q.reject(new MiaJs.Error(err))
+          return Promise.reject(new MiaJs.Error(err))
         })
     })
-  }).catch(function (err) {
+  }).catch((err) => {
     _notificationStatusReject(data._id, err)
-    return Q.reject()
+    return Promise.reject(new MiaJs.Error(err))
   })
 }
 
 // Open connections for APNS
-var _apnConnections = {}
+const _apnConnections = {}
 
 // Send push notification to Apple Push Notification Services (APNS)
-var _sendApn = function (data, deviceData) {
+const _sendApn = async (data, deviceData) => {
   if (!deviceData.device || !deviceData.device.notification || !deviceData.device.notification.token) {
-    _notificationStatusReject(data._id, 'Device is not registered for push. Missing push token')
-    return Q.reject(new MiaJs.Error('Device is not registered for push. Missing push token'))
+    return Promise.reject(new MiaJs.Error('Device is not registered for push. Missing push token'))
   }
 
-  var environment = deviceData.device && deviceData.device.notification && deviceData.device.notification.environment ? deviceData.device.notification.environment : 'production'
+  const environment = deviceData.device && deviceData.device.notification && deviceData.device.notification.environment ? deviceData.device.notification.environment : 'production'
 
-  return _getConnector(data.configId, 'apns', environment).then(function (connector) {
-    var connectorId = Encryption.md5(JSON.stringify(connector))
+  return _getConnector(data.configId, 'apns', environment).then((connector) => {
+    const connectorId = Encryption.md5(JSON.stringify(connector))
 
     // Reuse connection or register new APN connection if not exists
     if (!_apnConnections[connectorId]) {
-      _apnConnections[connectorId] = new Apn.Connection(connector)
-
-      _apnConnections[connectorId].on('connected', function () {
-        Logger.info('Connected to APNS (' + environment + ')')
-      })
-      _apnConnections[connectorId].on('transmitted', function (notification, device) {
-        var messageId = notification.payload.messageId
-        Logger.info('Notification ' + messageId.toString() + ' transmitted to: ' + device.token.toString('hex'))
-        _notificationStatusFulfilled(messageId)
-      })
-      _apnConnections[connectorId].on('transmissionError', function (errCode, notification, device) {
-        var messageId = notification.payload.messageId
-        Logger.error('Notification ' + messageId.toString() + ' caused error: ' + errCode + ' for device ', device, notification)
-        if (errCode === 8) {
-          Logger.warn('A error code of 8 indicates that the device token is invalid. This could be for a number of reasons - are you using the correct environment? i.e. Production vs. Sandbox')
-          _notificationStatusReject(messageId, 'Device token is invalid')
-        } else {
-          _notificationStatusReject(messageId, 'APN Transmission error occured')
-        }
-      })
-      _apnConnections[connectorId].on('timeout', function () {
-        Logger.info('Connection Timeout')
-      })
-      _apnConnections[connectorId].on('disconnected', function () {
-        Logger.info('Disconnected from APNS')
-      })
-      _apnConnections[connectorId].on('socketError', function (err) {
-        Logger.error('Socket connection error. Check config settings', err)
-      })
-
-      _apnConnections[connectorId].on('error', function (err) {
-        Logger.error('Error occured while sending push notification to APNS', err)
-      })
+      _apnConnections[connectorId] = new Apn.Provider(connector)
     }
 
-    var service = _apnConnections[connectorId]
+    const service = _apnConnections[connectorId]
 
-    var notification = data.notification
-    var language = deviceData && deviceData.culture && deviceData.culture.language ? deviceData.culture.language : null
+    const notification = data.notification
+    const language = deviceData && deviceData.culture && deviceData.culture.language ? deviceData.culture.language : null
 
-    return _getTemplateData(data._id, data.configId, 'apns', 'push', notification, language).then(function (template) {
+    return _getTemplateData(data._id, data.configId, 'apns', 'push', notification, language).then((template) => {
       // Do replacements
       if (template.alert && template.alert.title) {
         template.alert.title = _doReplacements(template.alert.title, notification.replacements)
@@ -324,67 +300,82 @@ var _sendApn = function (data, deviceData) {
       }
 
       // Handle payload
-      var payload = template.payload ? _.merge(template.payload, data.notification.payload) : data.notification.payload
+      let payload = template.payload ? _.merge(template.payload, data.notification.payload) : data.notification.payload
       payload = _doReplacementsDeep(payload, notification.replacements) || {}
       payload.messageId = data._id
-      var pushData = new Apn.Notification()
+      const note = new Apn.Notification()
 
       if (template.alert) {
-        pushData.alert = template.alert
+        note.alert = template.alert
       }
 
       if (data.notification.badge || template.badge) {
-        pushData.badge = data.notification.badge || template.badge
+        note.badge = data.notification.badge || template.badge
       }
 
       if (template.sound) {
-        pushData.sound = template.sound
+        note.sound = template.sound
       }
 
       if (template['content-available']) {
-        pushData.contentAvailable = template['content-available']
+        note.contentAvailable = template['content-available']
       }
 
       if (!_.isEmpty(payload)) {
-        pushData.payload = payload
+        note.payload = payload
       }
-      service.pushNotification(pushData, [deviceData.device.notification.token])
-      return Q.resolve()
+
+      note.topic = template.bundleId
+
+      return service.send(note, deviceData.device.notification.token).then(async response => {
+        const failedReason = _.get(response, 'failed.0.response.reason')
+        if (failedReason) {
+          if (failedReason === 'BadDeviceToken') {
+            if (deviceData.id) {
+              // Remove invalid push token from device
+              await _unregisterDeviceNotification(deviceData.id)
+            }
+          }
+          _notificationStatusReject(data._id, failedReason)
+          return Promise.resolve()
+        }
+        _notificationStatusFulfilled(data._id)
+        return Promise.resolve()
+      }).catch(err => {
+        Logger.error(err)
+        _notificationStatusRetry(data._id, err)
+        return Promise.resolve()
+      })
     })
-  }).catch(function (err) {
-    _notificationStatusReject(data._id, err)
-    return Q.reject(new MiaJs.Error(err))
   })
 }
 
 // Process push. Lookup deviceId and push token and call push handler of device os type
-var _processPush = function (data, workerId) {
-  return AuthService.getDeviceDataById(data.notification.to).then(function (deviceData) {
+const _processPush = (data, workerId) => {
+  return AuthService.getDeviceDataById(data.notification.to).then((deviceData) => {
+    if (deviceData === null) {
+      return Promise.reject(new MiaJs.Error('Device does not exists'))
+    }
+
     if (deviceData.device && deviceData.device.os && deviceData.device.os.type) {
-      var deviceType = deviceData.device.os.type
+      const deviceType = deviceData.device.os.type
       if (deviceType === 'ios') {
         return _sendApn(data, deviceData, workerId)
       } else if (deviceType === 'android') {
-        return _notificationStatusReject(data._id, 'Unknown device type').then(function () {
-          return Q.reject()
-        })
+        return Promise.reject(new MiaJs.Error('Unknown device type'))
       } else {
-        return _notificationStatusReject(data._id, 'Unknown device type').then(function () {
-          return Q.reject()
-        })
+        return Promise.reject(new MiaJs.Error('Unknown device type'))
       }
     } else if (deviceData.device) {
       // temp workaround
       return _sendApn(data, deviceData, workerId)
     } else {
-      return _notificationStatusReject(data._id, 'Unknown device type').then(function () {
-        return Q.reject()
-      })
+      return Promise.reject(new MiaJs.Error('Unknown device type'))
     }
-  }).catch(function (err) {
-    var error = err || 'Device failure'
-    return _notificationStatusReject(data._id, error).then(function () {
-      return Q.reject()
+  }).catch((err) => {
+    const error = _.get(err, 'err.msg') || err || new MiaJs.Error('Device failure')
+    return _notificationStatusReject(data._id, error).then(() => {
+      return Promise.reject(err)
     })
   })
 }
@@ -414,8 +405,8 @@ module.exports = BaseCronJob.extend({},
 
     identity: 'generic-notificationProcessor', // Job name
 
-    worker: function () {
-      var workerId = Encryption.randHash()
+    worker: () => {
+      const workerId = Encryption.randHash()
       // Assign all notifications to this worker where schedule is due and status is pending or retry and no other worker is already processing
       return NotificationModel.updateMany({
         $or: [
@@ -434,14 +425,14 @@ module.exports = BaseCronJob.extend({},
       {
         partial: true,
         validate: false
-      }).then(function (data) {
-        var affectedItems = data.result && data.result.nModified ? data.result.nModified : 0
+      }).then((data) => {
+        const affectedItems = data.result && data.result.nModified ? data.result.nModified : 0
         if (affectedItems > 0) {
-          return NotificationModel.find({ workerId: workerId }).then(function (notifications) {
-            return Q.ninvoke(notifications, 'toArray').then(function (results) {
-              var funcArray = []
-              for (var index in results) {
-                var data = results[index]
+          return NotificationModel.find({ workerId: workerId }).then((notifications) => {
+            return Q.ninvoke(notifications, 'toArray').then((results) => {
+              const funcArray = []
+              for (const index in results) {
+                const data = results[index]
                 // Check notification types
                 if (data.type === 'mail') {
                   funcArray.push(_processEmail(data))
@@ -455,11 +446,11 @@ module.exports = BaseCronJob.extend({},
             })
           })
         } else {
-          return Q()
+          return Promise.resolve()
         }
-      }).catch(function (err) {
+      }).catch((err) => {
         Logger.error(err)
-        return Q().reject()
+        return Promise.reject(new MiaJs.Error(err))
       })
     },
     created: '2015-04-05T22:00:00', // Creation date
