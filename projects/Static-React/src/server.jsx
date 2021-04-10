@@ -30,7 +30,7 @@ export default locals => {
         '</head>' +
         '<body>' +
         `<div id="app">${app}</div>` +
-        `<script type="text/javascript" src="${WEBPACK_OUTPUT_PATH}app.dist.js" async></script>` +
+        `<script type="text/javascript" src="${__WEBPACK_OUTPUT_PATH__}app-${__VERSION_HASH__}.dist.js" async></script>` +
         '</body>' +
         '</html>';
 }

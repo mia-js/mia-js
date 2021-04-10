@@ -5,11 +5,13 @@ const ProgressBarPlugin = require('progress-bar-webpack-plugin')
 const chalk = require('chalk')
 const routes = require('./routes')
 const RoutesHandler = require('../generic/libs/routesHandler/v1/routesHandler')
+const crypto = require('crypto')
 
 const projectName = path.resolve(__dirname).split(path.sep).pop()
 const bundleName = projectName + 'ClientBundle'
 const publicPath = path.join(RoutesHandler.getPublicPath(routes), 'dist')
 const webpackLoaders = require('./tools/webpack.loaders.config')('client', 'fs', publicPath)
+const versionHash = crypto.createHash('md5').update(String(process.pid)).digest('hex')
 
 // Hide deprecation warnings from loader-utils
 process.noDeprecation = true
@@ -25,7 +27,7 @@ module.exports = {
     // Output dist files directly in projects public folder
     path: path.resolve(__dirname, './public/dist/'),
     publicPath: publicPath,
-    filename: 'client.dist.js'
+    filename: `client-${versionHash}.dist.js`
   },
   module: {
     rules: webpackLoaders
@@ -40,7 +42,8 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('production')
-      }
+      },
+      __VERSION_HASH__: JSON.stringify(versionHash)
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true,

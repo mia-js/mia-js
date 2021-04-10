@@ -6,10 +6,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const chalk = require('chalk')
 const routes = require('./routes')
 const RoutesHandler = require('../generic/libs/routesHandler/v1/routesHandler')
+const crypto = require('crypto')
 
 const projectName = path.resolve(__dirname).split(path.sep).pop()
 const bundleName = projectName + 'ClientBundle'
 const publicPath = path.join(RoutesHandler.getPublicPath(routes), 'dist')
+const versionHash = crypto.createHash('md5').update(String(process.pid)).digest('hex')
 
 // Hide deprecation warnings from loader-utils
 process.noDeprecation = true
@@ -25,7 +27,7 @@ module.exports = {
     // Output dist files directly in projects public folder
     path: path.resolve(__dirname, './public/dist/'),
     publicPath: publicPath,
-    filename: 'app.dist.js'
+    filename: `app-${versionHash}.dist.js`
   },
   module: {
     rules: [

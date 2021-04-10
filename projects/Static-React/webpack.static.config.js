@@ -8,10 +8,12 @@ const chalk = require('chalk')
 const jsdom = require('jsdom')
 const routes = require('./routes')
 const RoutesHandler = require('../generic/libs/routesHandler/v1/routesHandler')
+const crypto = require('crypto')
 
 const projectName = path.resolve(__dirname).split(path.sep).pop()
 const bundleName = projectName + 'ServerBundle'
 const publicPath = RoutesHandler.getPublicPath(routes)
+const versionHash = crypto.createHash('md5').update(String(process.pid)).digest('hex')
 
 /**
  * Mock browser DOM
@@ -102,7 +104,8 @@ module.exports = {
       'process.env': {
         NODE_ENV: JSON.stringify('production')
       },
-      WEBPACK_OUTPUT_PATH: JSON.stringify(publicPath)
+      __WEBPACK_OUTPUT_PATH__: JSON.stringify(publicPath),
+      __VERSION_HASH__: JSON.stringify(versionHash)
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true,

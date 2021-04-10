@@ -1,3 +1,6 @@
+## 1.3.3 (September 28, 2020)
+* Added bundle version hash to all build processes
+
 ## 1.3.2 (August 22, 2020)
 * Updated mia-js-core to version 2.8.1
 * NPM audit
