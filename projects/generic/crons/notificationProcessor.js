@@ -88,7 +88,7 @@ const _notificationStatusFulfilled = (id) => {
       processed: new Date(Date.now())
     }
   }, {
-    partial: true, upsert: false, returnOriginal: false
+    partial: true, upsert: false, returnDocument: 'after'
   })
 }
 
@@ -108,7 +108,7 @@ const _notificationStatusReject = (id, err) => {
       log: err || 'Unknown error'
     }
   }, {
-    partial: true, upsert: false, returnOriginal: false
+    partial: true, upsert: false, returnDocument: 'after'
   })
 }
 
@@ -119,7 +119,7 @@ const _notificationAddLog = (id, info) => {
       log: info
     }
   }, {
-    partial: true, upsert: false, returnOriginal: false
+    partial: true, upsert: false, returnDocument: 'after'
   })
 }
 
@@ -136,7 +136,7 @@ const _notificationStatusRetry = (id, log, schedule) => {
       retry: 1
     }
   }, {
-    partial: true, upsert: false, returnOriginal: false
+    partial: true, upsert: false, returnDocument: 'after'
   })
 }
 

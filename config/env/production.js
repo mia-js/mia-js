@@ -92,8 +92,9 @@ module.exports = {
     mia: {
       url: 'mongodb://api:api@localhost:27017/mia',
       options: {
-        w: 1, // write acknowledgement
-        poolSize: 15
+        writeConcern: { w: 1 }, // write acknowledgement
+        poolSize: 15,
+        useUnifiedTopology: true
       }
     }
   }

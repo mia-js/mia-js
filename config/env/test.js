@@ -34,8 +34,9 @@ module.exports = {
     miaTest: {
       url: 'mongodb://localhost:27017/miaTest',
       options: {
-        w: 1,
-        poolSize: 15
+        writeConcern: { w: 1 }, // write acknowledgement
+        poolSize: 15,
+        useUnifiedTopology: true
       }
     }
   }

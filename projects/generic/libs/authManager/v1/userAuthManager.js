@@ -110,7 +110,7 @@ function ThisModule () {
   //   }, {
   //     partial: true,
   //     upsert: false,
-  //     returnOriginal: false
+  //     returnDocument: 'after'
   //   }, {
   //     '$set': {
   //       accessTokens: [],
@@ -143,7 +143,7 @@ function ThisModule () {
     return _updateUserData(query, {
       partial: true,
       upsert: false,
-      returnOriginal: false
+      returnDocument: 'after'
     }, {
       $pull: {
         accessTokens: {
@@ -171,7 +171,7 @@ function ThisModule () {
     }, {
       partial: true,
       upsert: false,
-      returnOriginal: false
+      returnDocument: 'after'
     }, {
       $set: {
         etag: _incETag()
@@ -469,14 +469,14 @@ function ThisModule () {
       return _updateUserData(queryObject, {
         partial: true,
         upsert: false,
-        returnOriginal: false
+        returnDocument: 'after'
       }, updateDoc).then(function (result) {
         // Remove old entry from messaging as this can not be done in one query
         if (!_.isEmpty(updateDocRemoveEntry) && result != null) {
           return _updateUserData(queryObjectRemoveEntry, {
             partial: true,
             upsert: false,
-            returnOriginal: false
+            returnDocument: 'after'
           }, updateDocRemoveEntry)
         } else {
           return Q(result)
@@ -643,7 +643,7 @@ function ThisModule () {
     }, {
       partial: true,
       upsert: false,
-      returnOriginal: false
+      returnDocument: 'after'
     }, {
       $push: {
         deviceCounts: {
@@ -672,7 +672,7 @@ function ThisModule () {
       }, {
         partial: true,
         upsert: false,
-        returnOriginal: false
+        returnDocument: 'after'
       }, {
         $push: {
           accessTokens: accessToken
@@ -869,7 +869,7 @@ function ThisModule () {
     }, {
       partial: true,
       upsert: false,
-      returnOriginal: false
+      returnDocument: 'after'
     }, {
       $set: {
         status: 'active',
@@ -911,7 +911,7 @@ function ThisModule () {
     }, {
       partial: true,
       upsert: false,
-      returnOriginal: false
+      returnDocument: 'after'
     }, {
       $set: {
         status: 'deleted',
@@ -1200,7 +1200,7 @@ function ThisModule () {
       }, {
         partial: true,
         upsert: false,
-        returnOriginal: false
+        returnDocument: 'after'
       }, {
         $set: {
           'messaging.$.validated': true,
@@ -1222,7 +1222,7 @@ function ThisModule () {
       }, {
         partial: true,
         upsert: false,
-        returnOriginal: false
+        returnDocument: 'after'
       }, {
         $set: {
           status: 'deleted',
@@ -1260,7 +1260,7 @@ function ThisModule () {
     }, {
       partial: true,
       upsert: false,
-      returnOriginal: false
+      returnDocument: 'after'
     }, {
       $set: {
         'inspectTokens.passwordResetToken.token': _generatePasswordResetToken(),
