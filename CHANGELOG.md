@@ -1,3 +1,7 @@
+## 1.3.6 (July 26, 2022)
+* Upgraded mia-js-core version (mongodb driver update from v3.3.4 to latest legacy v3.7.3)
+* Handled mongodb driver changes
+
 ## 1.3.5 (April 11, 2021)
 * Fixed React Static Router incompatibility with History npm package version > 4.7.2
 

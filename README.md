@@ -8,7 +8,7 @@ Use multiple project folders to keep track of all your api's and connect them by
 You can use it to serve isomorphic frontend apps too. Thanks to webpack you can even use hot module replacement right in the server which will speed up your development pace.
 
 # Installation
-**Install [node.js](http://nodejs.org) >6.xx and [mongoDB](https://www.mongodb.org/) >2.6x**
+**Install [node.js](http://nodejs.org) ~10.16 and [mongoDB](https://www.mongodb.org/) ~4.2**
 
 ## Get the latest stable release of mia.js
 Download or clone this repository in a directory
@@ -177,12 +177,9 @@ module.exports = {
             mia: {
                 url: 'mongodb://api:api@localhost:27017/mia',
                 options: { // MongoDB options see MongoClient definition
-                    db: {
-                        w: 1 //write acknowledgement
-                    },
-                    server: {
-                        poolSize: 15
-                    }
+                    writeConcern: { w: 1 }, //write acknowledgement
+                    poolSize: 15,
+                    useUnifiedTopology: true
                 }
             }
         }
