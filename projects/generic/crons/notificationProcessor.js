@@ -428,7 +428,7 @@ module.exports = BaseCronJob.extend({},
       }).then((data) => {
         const affectedItems = data.result && data.result.nModified ? data.result.nModified : 0
         if (affectedItems > 0) {
-          return NotificationModel.find({ workerId: workerId }).then((notifications) => {
+          return NotificationModel.find({ workerId: workerId }, { readPreference: 'primaryPreferred' }).then((notifications) => {
             return Q.ninvoke(notifications, 'toArray').then((results) => {
               const funcArray = []
               for (const index in results) {
